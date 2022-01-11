@@ -17,8 +17,8 @@ def run(protocol: protocol_api.ProtocolContext):
     # module_magnetic = protocol.load_module('magnetic module gen2', '4')
     
         # Plate setting
-    source_plate = protocol.load_labware("nesteppendrf_96_wellplate_150ul", 6)
-    dest_plate = protocol.load_labware("bioneer_96_wellplate_300ul", 5)
+    source_plate = protocol.load_labware("bioneer_96_tuberack_200ul", 6)
+    dest_plate = protocol.load_labware("bioneer_96_rack_eppendorf_plate_200ul", 5)
 
         # tiprack
     tiprack_20_sin = protocol.load_labware("opentrons_96_tiprack_20ul", 3)

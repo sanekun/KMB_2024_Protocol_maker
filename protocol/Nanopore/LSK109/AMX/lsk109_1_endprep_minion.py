@@ -1,18 +1,15 @@
-from opentrons import types, execute, simulate
+from opentrons import types, protocol_api
 
 # this data is from Ligation Sequencing Kit: DNA Repair and End-Prep 
 # modified script from Sakib <sakib.hossain@opentrons.com>
 metadata = {
-    'protocolName': 'Nanopore LSK109(1) DNA endprep_flongle',
+    'protocolName': 'Nanopore LSK109(1) DNA endprep_MiniON',
     'author': 'Seong-Kun Bak <tjdrns27@kribb.re.kr>',
     'apiLevel': '2.11',
     'description': 'with movable PCR tube pause the protocol when the tube should move'
 }
 
-#protocol = simulate.get_protocol_api("2.11")
-protocol = execute.get_protocol_api("2.11")
-
-def run(protocol):
+def run(protocol: protocol_api.ProtocolContext):
     #============= Deck setting
 
     ## Module setting
@@ -22,9 +19,9 @@ def run(protocol):
 
     ## Labware setting
     enzyme_rack = protocol.load_labware("opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap", 1)
-    falcon_rack = protocol.load_labware("opentrons_15_tuberack_falcon_15ml_conical", 2)
-    dna_plate = protocol.load_labware("bineer_96_tuberack_200ul", 5)
-    mag_plate = protocol.load_labware("biorad_96_tuberack_200ul", 4)
+    falcon_rack = protocol.load_labware("opentrons_6_tuberack_falcon_50ml_conical", 2)
+    dna_plate = protocol.load_labware("bioneer_96_tuberack_200ul", 5)
+    mag_plate = module_magnetic.load_labware("biorad_96_tuberack_200ul", 4)
     trash = protocol.loaded_labwares[12]["A1"]
 
     tiprack_20_sin = protocol.load_labware("opentrons_96_tiprack_20ul", 3)
@@ -33,8 +30,8 @@ def run(protocol):
     p300_sin = protocol.load_instrument("p300_single_gen2", "left", tip_racks=[tiprack_300_sin])
 
     ## Start Tiprack positions
-    p20_sin.starting_tip = tiprack_20_sin.well("A1")
-    p300_sin.starting_tip = tiprack_300_sin.well("A1")
+    p20_sin.starting_tip = tiprack_20_sin.well("B3")
+    p300_sin.starting_tip = tiprack_300_sin.well("A8")
 
     ## Reagents
     ### All of reagents in Eppendorf 1.5ml lobind tube.
@@ -57,25 +54,27 @@ def run(protocol):
 
     #============= PROTOCOL STEPS
     ## Functions
-    def enzyme_transfer(pipette, volume, src, dest, delay_second, asp_rate=None, dis_rate=None):
+    def enzyme_transfer(pipette, volume, src, dest, delay_second, asp_rate=None, dis_rate=None, mix_after=False):
         if asp_rate != None:
             pipette.flow_rate.aspirate=asp_rate
         if dis_rate != None:
-            pipette.flow_rate.dispense=dis_rate
+            pipette.flow_rate.dispense=dis_rate            
         pipette.pick_up_tip()
         pipette.aspirate(volume, src)
         protocol.delay(seconds=delay_second)
         pipette.touch_tip()
         pipette.dispense(volume, dest)
         protocol.delay(seconds=delay_second/2)
+        if type(mix_after) == tuple:
+            pipette.mix(mix_after[0], mix_after[1])
         pipette.blow_out()    
         pipette.touch_tip()
         pipette.drop_tip()
 
-    def remove_supernantant(pipette, volume, src, dest, asp_rate=20):
+    def remove_supernantant(pipette, volume, src, dest, asp_rate=20, z=0):
         pipette.pick_up_tip()
         pipette.flow_rate.aspirate=asp_rate
-        pipette.aspirate(volume, src.bottom().move(types.Point(x=0, y=0, z=-4.1))) #biorad tuberack
+        pipette.aspirate(volume, src.bottom().move(types.Point(x=0, y=0, z=z))) #biorad tuberack
         pipette.dispense(volume, dest)
         pipette.drop_tip()
 
@@ -87,23 +86,18 @@ def run(protocol):
     for dest in dna_well:
         enzyme_transfer(p20_sin, 3.5, endprep_buf, dest, 1, 5, 5)
     for dest in dna_well:
-        enzyme_transfer(p20_sin, 3, endprep_enzyme, dest, 1, 3, 3)
+        enzyme_transfer(p20_sin, 3, endprep_enzyme, dest, 1, 3, 3, mix_after=(2,20))
 
-    try:
-        module_thermocycler.open_lid()
-    except:
-        pass
-
+    module_thermocycler.open_lid()
+    
     protocol.pause("1. Check enzyme\
                 \n2. Spindown\
                 \n3. Move sample tube to thermocycler\
                 \n4. Resume")
 
     ## Incubate on Thermocycler (3)
-    try:
-        module_thermocycler.close_lid()
-    except:
-        pass
+    module_thermocycler.close_lid()
+    
     module_thermocycler.set_block_temperature(20)
     module_thermocycler.set_lid_temperature(70)
     profile = [{'temperature': 20, 'hold_time_minutes': 5},
@@ -119,21 +113,18 @@ def run(protocol):
     protocol.pause("Move tubes from thermocycler to dna_well and Resume")
 
     ## Resuspend AMPure Beads (4)
-    p300_sin.flow_rate.aspirate=200
-    p300_sin.flow_rate.dispense=200
+    p300_sin.flow_rate.aspirate=300
+    p300_sin.flow_rate.dispense=300
     p300_sin.pick_up_tip()
-    p300_sin.mix(5, 300, ampure_beads.bottom(z=15), rate=0.5)
-    p300_sin.touch_tip()
+    p300_sin.mix(5, 300, ampure_beads.bottom(z=15))
+    p300_sin.blow_out()
+    p300_sin.move_to(ampure_beads.top())
     protocol.delay(seconds=1)
+    p300_sin.touch_tip()
     p300_sin.drop_tip()
 
-    p300_sin.flow_rate.aspirate=200
-    p300_sin.flow_rate.dispense=200
-    p300_sin.transfer(50, 
-                    ampure_beads.bottom(z=15), 
-                    dna_well, mix_after=(3, 30), 
-                    touch_tip=True, blow_out=True,
-                    blowout_location="destination_well", new_tip="always")
+    for dest in dna_well:
+        enzyme_transfer(p300_sin, 50, ampure_beads, dest, 1, 50, 50, mix_after=(3, 30))
 
     ## transfer to tube for Hula Mixer (5)
     protocol.pause("1. Move sample tube to Hula Mixer\
@@ -146,7 +137,7 @@ def run(protocol):
 
     ## Remove Supernant (7)
     for src in mag_well:
-        remove_supernantant(p300_sin, 130, src, trash)
+        remove_supernantant(p300_sin, 130, src, trash, asp_rate=50, z=0)
 
     ## EtOH wash
     for _ in range(2):
@@ -160,7 +151,7 @@ def run(protocol):
         p300_sin.drop_tip()
         ## Remove
         for src in mag_well:
-            remove_supernantant(p300_sin, 200, src, trash)
+            remove_supernantant(p300_sin, 200, src, trash, asp_rate=80, z=0)
 
     ## Pause and Remove Samples for Spin Down (15)
     module_magnetic.engage(height_from_base=2)
@@ -171,17 +162,19 @@ def run(protocol):
     ## Remove Residual Ethanol (16)
     protocol.delay(seconds=30)
     for src in mag_well:
-        remove_supernantant(p20_sin, 15, src, trash, asp_rate=10)
+        remove_supernantant(p20_sin, 15, src, trash, asp_rate=10, z=-0.5)
     module_magnetic.disengage()
-    protocol.delay(seconds=30)
+    protocol.delay(seconds=40)
 
     ## Add 61 uL of Nuclease-free Water (17)
-    p300_sin.flow_rate.aspirate = 100
+    p300_sin.flow_rate.aspirate = 50
     p300_sin.flow_rate.dispense = 50
     for src in mag_well:
         p300_sin.transfer(50, water, src.top(3), mix_after=(3,60), new_tip="always")
 
-    module_magnetic.engage()
-    protocol.delay(minutes=3)
+    protocol.delay(minutes=2.5)
+
+    module_magnetic.engage(height_from_base=2.5)
+    protocol.delay(minutes=1)
     protocol.pause("Final step : Elution")
     module_magnetic.disengage()
