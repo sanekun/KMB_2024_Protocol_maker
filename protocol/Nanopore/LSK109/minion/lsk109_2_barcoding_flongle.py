@@ -3,7 +3,7 @@ from opentrons import types, protocol_api
 # this data is from Ligation Sequencing Kit: DNA Repair and End-Prep 
 # modified script from Sakib <sakib.hossain@opentrons.com>
 metadata = {
-    'protocolName': 'Nanopore LSK109(1) DNA endprep_MiniON',
+    'protocolName': 'Nanopore LSK109(2) Barcoding_flongle',
     'author': 'Seong-Kun Bak <tjdrns27@kribb.re.kr>',
     'apiLevel': '2.11',
     'description': 'with movable PCR tube pause the protocol when the tube should move'
@@ -30,23 +30,23 @@ def run(protocol: protocol_api.ProtocolContext):
     p300_sin = protocol.load_instrument("p300_single_gen2", "left", tip_racks=[tiprack_300_sin])
 
     ## Start Tiprack positions
-    p20_sin.starting_tip = tiprack_20_sin.well("B3")
-    p300_sin.starting_tip = tiprack_300_sin.well("A8")
+    p20_sin.starting_tip = tiprack_20_sin.well("A1")
+    p300_sin.starting_tip = tiprack_300_sin.well("A2")
+
+    ## Sample Wells
+    start_position = 0 ## start from A1
+    sample_number = 4 ## sample number is should be same as barcode number!
+    self_elution = True
 
     ## Reagents
     ### All of reagents in Eppendorf 1.5ml lobind tube.
-    repair_buf = enzyme_rack["A1"]
-    repair_enzyme = enzyme_rack["A2"]
-    endprep_buf = enzyme_rack["A3"]
-    endprep_enzyme = enzyme_rack["A4"]
+    barcodes = []
+    native_barcode = enzyme_rack["A1"] #바코드 튜브도 Lobind로 옮길지 고민.
+    TA_master_Mix = enzyme_rack["A2"]    
     water = enzyme_rack["A5"]
 
     ampure_beads = falcon_rack["A1"]
     ethanol_70 = falcon_rack["A2"]
-
-    ## Sample Wells
-    start_position = 0 ## start from A1
-    sample_number = 2
 
     dna_well = [dna_plate.wells()[i] for i in range(start_position, start_position + sample_number)]
     final_well = [dna_plate.wells()[i] for i in range(start_position + 16, start_position + 16 + sample_number)]
@@ -80,13 +80,13 @@ def run(protocol: protocol_api.ProtocolContext):
 
 
     for dest in dna_well:
-        enzyme_transfer(p20_sin, 3.5, repair_buf, dest, 1, 5, 5)
+        enzyme_transfer(p20_sin, 1.75, repair_buf, dest, 1, 5, 5)
     for dest in dna_well:
-        enzyme_transfer(p20_sin, 2, repair_enzyme, dest, 1, 3, 3)
+        enzyme_transfer(p20_sin, 1, repair_enzyme, dest, 1, 3, 3)
     for dest in dna_well:
-        enzyme_transfer(p20_sin, 3.5, endprep_buf, dest, 1, 5, 5)
+        enzyme_transfer(p20_sin, 1.75, endprep_buf, dest, 1, 5, 5)
     for dest in dna_well:
-        enzyme_transfer(p20_sin, 3, endprep_enzyme, dest, 1, 3, 3, mix_after=(2,20))
+        enzyme_transfer(p20_sin, 1.5, endprep_enzyme, dest, 1, 3, 3, mix_after=(2,20))
 
     module_thermocycler.open_lid()
     
@@ -124,7 +124,7 @@ def run(protocol: protocol_api.ProtocolContext):
     p300_sin.drop_tip()
 
     for dest in dna_well:
-        enzyme_transfer(p300_sin, 50, ampure_beads, dest, 1, 50, 50, mix_after=(3, 30))
+        enzyme_transfer(p300_sin, 40, ampure_beads, dest, 1, 50, 50, mix_after=(3, 30))
 
     ## transfer to tube for Hula Mixer (5)
     protocol.pause("1. Move sample tube to Hula Mixer\
@@ -137,14 +137,14 @@ def run(protocol: protocol_api.ProtocolContext):
 
     ## Remove Supernant (7)
     for src in mag_well:
-        remove_supernantant(p300_sin, 130, src, trash, asp_rate=50, z=0)
+        remove_supernantant(p300_sin, 80, src, trash, asp_rate=50, z=0)
 
     ## EtOH wash
     for _ in range(2):
         ## Ethanol
         p300_sin.pick_up_tip()
         for src in mag_well:
-            p300_sin.flow_rate.aspirate=100
+            p300_sin.flow_rate.aspirate=150
             p300_sin.flow_rate.dispense=50
             p300_sin.aspirate(190, ethanol_70)
             p300_sin.dispense(190, src.top(-3))
@@ -166,15 +166,21 @@ def run(protocol: protocol_api.ProtocolContext):
     module_magnetic.disengage()
     protocol.delay(seconds=40)
 
-    ## Add 61 uL of Nuclease-free Water (17)
-    p300_sin.flow_rate.aspirate = 50
-    p300_sin.flow_rate.dispense = 50
+    ## Add 12.5 uL of Nuclease-free Water (17)
+    p20_sin.flow_rate.aspirate = 20
+    p20_sin.flow_rate.dispense = 20
     for src in mag_well:
-        p300_sin.transfer(50, water, src.top(3), mix_after=(3,60), new_tip="always")
+        p20_sin.transfer(12.5, water, src.top(3), mix_after=(3,60), new_tip="always")
 
     protocol.delay(minutes=2.5)
 
     module_magnetic.engage(height_from_base=2.5)
     protocol.delay(minutes=1)
-    protocol.pause("Final step : Elution")
+
+    if self_elution != None:
+        protocol.pause("Final step : Elution")
+    else:
+        for src, dest in zip(mag_well, final_well):
+            p20_sin.transfer(12, src, dest, new_tip="always")
+        
     module_magnetic.disengage()
