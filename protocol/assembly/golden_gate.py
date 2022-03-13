@@ -1,0 +1,3 @@
+"""
+golden gate assembly
+"""
