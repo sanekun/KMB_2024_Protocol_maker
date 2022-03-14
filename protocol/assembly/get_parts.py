@@ -61,21 +61,40 @@ for i in A:
 * 추가로 이렇게 만들어진 output (Well1 = {}, Well2 = {})
 은 실험노트에도 바로 사용할 수 있도록 사람이 읽을 수 있게하자.
 """
-
+# MW 까지는 받아오지만 Volume은 정한 Parameter에 맞춰서 변경 할 수 있도록 해야한다.
 
 # Parameters
+
+pro = ["P1", "P2", 'P3', 'P4']
+rbs = ["R1", "R2", 'R3']
+ter = ["T1", "T2"]
+
 
 # MW (fmol)
 cds_MW = 112
 part_MW = 56
 
-class dna_parts:
-    def __init__(self, length, concentration, MW, Name = None):
+class dna:
+    def __init__(self, length, conc, MW, Name = None):
         self.length = length
-        self.concentration = concentration
+        self.conc = conc
         self.MW = MW
         self.Name = Name
 
 db_path = "/mnt/kun/box/-20/Part_DB.xlsx"
 
 pro_db = pd.read_excel(db_path, sheet_name="pro")
+rbs_db = pd.read_excel(db_path, sheet_name="rbs")
+ter_db = pd.read_excel(db_path, sheet_name="ter")
+# cds는 DB에 없을 경우가 많을 것 같으니 Unknown을 쓸 수 잇도록 (모든 파트가)
+cds_db = pd.read_excel(db_path, sheet_name="cds")
+
+
+"P1" in pro_db["No"]
+
+
+#assembly(pro = [], rbs = [], ter = [], cds = [])
+
+
+B = dna(length = 50, concentration = 100, MW = 200)
+
