@@ -1,4 +1,5 @@
 from opentrons import types, protocol_api
+import pickle
 
 # Unverified
 
@@ -12,17 +13,47 @@ metadata = {
     'description': 'For combinatorial part library assembly & Simultaneous assembly with different part combination'
 }
 
+# Load data
+with open("/mnt/kun/work/script/assembly/data.pickle", 'rb') as f:
+    data = pickle.load(f)
+
+
 def run(protocol: protocol_api.ProtocolContext):
     #============= Deck setting
 
-    # Parameters
+    ## Parameters
 
+    well_number = len(data)
+
+
+    ## Module
+    module_thermocycler = protocol.load_module("thermocycler Module")
+
+    ## Labwares
+    Pro_plate = protocol.load_labware("BioRad96", 1)
+    RBS_plate = protocol.load_labware("BioRad96", 1)
+    Ter_plate = protocol.load_labware("BioRad96", 1)
+
+    tube_rack = protocol.load_labware('opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap', 1)
+    trash = protocol.loaded_labwares[12]["A1"]
+
+    tiprack_20_sin = protocol.load_labware("opentrons_96_tiprack_20ul", 3)
+    tiprack_300_sin = protocol.load_labware("opentrons_96_tiprack_300ul", 6)
+    p20_sin = protocol.load_instrument("p20_single_gen2", "right", tip_racks=[tiprack_20_sin])
+    p300_sin = protocol.load_instrument("p300_single_gen2", "left", tip_racks=[tiprack_300_sin])
+
+    ## Start Tiprack positions
+    p20_sin.starting_tip = tiprack_20_sin.well("G5")
+    p300_sin.starting_tip = tiprack_300_sin.well("E5")
+
+    ## Reagents
+    ### Every reagent should be in 1.5ml Bioneer screw tube.
+    BsaI_enz = tube_rack["A1"]
+    T4_buf_enz = tube_rack["A2"]
+    T4_ligase_enz = tube_rack["A3"]
     
-
-
-
-
-
+    
+    data[0]
 
 
 
