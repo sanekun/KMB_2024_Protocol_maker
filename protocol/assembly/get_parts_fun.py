@@ -6,7 +6,7 @@ class dna:
     # Basic information
     ## MW can calculate with python or Excel.
     ## MW & name is necessary
-    def __init__(self, name, MW=None, vol=None, No=None, well=None, plate=None):
+    def __init__(self, name, MW=None, vol=None, No=None, well=None, plate=None, external=True):
         #self.length = length
         #self.conc = conc
         self.MW = MW
@@ -16,7 +16,10 @@ class dna:
         self.well = well
         self.plate = plate
 
-        self.necessary_parameter()
+        if external:
+            self.necessary_parameter()
+        else:
+            pass
 
     def necessary_parameter(self):
         if (self.vol == None) & (self.MW == None):
@@ -30,6 +33,8 @@ class dna:
     
     # get optimal volume based on [part, cds, vector]_MW parameter.
     def get_volume(self, goal_MW):
+        if self.MW == None:
+            return (self.vol)
         final = (goal_MW/self.MW).round(2)
         return (final)
 
@@ -38,7 +43,6 @@ def parameter_check(part_order, part_number):
     if len(part_order) != part_number:
         print ("Part number is not equal to length of order, Plz check it")
     print ("Parameter Checked")
-    # internal_part check를 여기에서.
 
 def internal_part_check(part_order, db):
     
@@ -56,37 +60,28 @@ def internal_part_check(part_order, db):
 def internal_part_to_dna_form(part_list, part_db):
     return_list = []
     for i in part_list:
-        tmp = part_db[part_db["No"] == i]
-        locals()[f'{i}_dna'] = dna(
-            name = tmp.Name.values[0],
-            MW = tmp.MW.values[0],
-            well = tmp.Well.values[0],
-            No = tmp.No.values[0],
-            plate = tmp.plate.values[0])
-        return_list.append(locals()[f'{i}_dna'])
-    
+        if type(i) == dna:
+            return_list.append(i)
+        else:
+            tmp = part_db[part_db["No"] == i]
+            locals()[f'{i}_dna'] = dna(
+                name = tmp.Name.values[0],
+                MW = tmp.MW.values[0],
+                well = tmp.Well.values[0],
+                No = tmp.No.values[0],
+                plate = tmp.plate.values[0],
+                external=False)
+            return_list.append(locals()[f'{i}_dna'])
+        
     return (return_list)
 
-def read_parts(part_order, db_path):
-    db = pd.read_excel(db_path)
-
-    return_list = []
-    for i1 in part_order:
-        internal_part_check_to_db(i1, db)
-    print ("Internal Part Checked")
-
-
-
-
-
-    return (internal_part_to_dna_form(part_list[1:], df))
 
 # make assembly well
-def check_dilution(dna, vol):
-    if dna.get_volume(vol) < 0.5:
-        return ((dna.get_volume(vol)*5).round(3), 5)
+def check_dilution(dna, target_MW):
+    if dna.get_volume(target_MW) < 0.5:
+        return ((dna.get_volume(target_MW)*5).round(3), 5)
     else:
-        return(dna.get_volume(vol).round(3), 0)
+        return(dna.get_volume(target_MW).round(3), 0)
 
 def assembly(i1, i2, i3, i4, MW, vec_vol=5, final_volume=20):
     

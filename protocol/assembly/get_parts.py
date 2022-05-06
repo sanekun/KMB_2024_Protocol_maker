@@ -44,26 +44,48 @@ db = pd.read_excel(db_path)
 parameter_check(part_order, part_number)
 internal_part_check(part_order, db)
 
-# Read DNAs from DB
-n = 1
-for i in range(part_order):
-    if type(i) == dna:
-        globals()[f'part{n}_dna'] = i
+part_dna = []
+for i1 in part_order:
+    part_dna.append(internal_part_to_dna_form(i1, db))
+
+#====================
+
+def assembly(dna, final_volume):
+    n = 0
+    No_list, name_list, vol_list, well_dict = [], [], [], {}
+    for i2 in dna:
+        vol, dil = 5, 5
+        well_dict[f'part{n}'] = {'well': i2.well, 'vol':vol, 'dil':dil, 'plate':i2.plate}
+        No_list.append(i2.No)
+        name_list.append(i2.name)
+        vol_list.append(vol)
+        n+=1
+    meta_data = {
+        'No':'_'.join(No_list),
+        'name':'_'.join(name_list),
+        'DW': (final_volume*4/5) - sum(vol_list)
+        }
+    well_dict['meta_data'] = meta_data
+
+    return (well_dict)
+
+def set_part_to_assembly(part_dna, n2, target_MW, n1=0):
+
+    if n1 == n2:
+        parts = []
+        for i in range(n2):
+            parts.append(eval(f"part{i}"))
+        dna_well = assembly(dna=parts, final_volume=20)
+        yield (dna_well)
     else:
-        globals()[f'part{n}_dna'] = read_parts(i, db_path)
-    n+=1
+        for globals()[f'part{n1}'] in part_dna[0+n1]:
+            set_part_to_assembly(part_dna, n2=n2, target_MW=target_MW, n1 = n1+1)
 
-def parts_to_dna_form(part_order, db):
-    return_list = []
+#==============
+well_list = []
+test = set_part_to_assembly(part_dna, n2=part_number, target_MW=target_MW, n1=0)
 
 
-part1_dna = read_db(part1, db_path)
-part2_dna = read_db(part2, db_path)
-part3_dna = read_db(part3, db_path)
-part4_dna = read_db(part4, db_path)
-
-# Parameters
-## input Part's No in DB
 
 n = 1
 for i1 in part1_dna:
@@ -76,9 +98,13 @@ print (f'Last Well : {n-1}')
 
 #export_wells_to_xlsx(n, excel_export)
 
+# Pickle Data Export
+
 pickle_export = []
 for i in range(1, n):
     pickle_export.append(eval(f'well{i}'))
 
 with open("/mnt/kun/work/script/assembly/data2.pickle", 'wb') as f:
     pickle.dump(pickle_export, f, protocol=3)
+
+# Excel Data Export
