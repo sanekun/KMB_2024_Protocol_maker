@@ -28,4 +28,8 @@ python dasdf -d [DB] -o [Export]
 
 
 
+###
+
+OT2 template script를 짜놓고 사이사이 variable 부분을 다른 script에서 긁어와서 만들어 지도록하기. (바로작동 X)
+
 

@@ -1,4 +1,3 @@
-import pandas as pd
 import sys
 
 # Functions
@@ -35,7 +34,7 @@ class dna:
     def get_volume(self, goal_MW):
         if self.MW == None:
             return (self.vol)
-        final = (goal_MW/self.MW).round(2)
+        final = round(goal_MW/self.MW, 2)
         return (final)
 
 def parameter_check(part_order, part_number):
@@ -70,6 +69,7 @@ def internal_part_to_dna_form(part_list, part_db):
                 well = tmp.Well.values[0],
                 No = tmp.No.values[0],
                 plate = tmp.plate.values[0],
+                vol = tmp.vol.values[0],
                 external=False)
             return_list.append(locals()[f'{i}_dna'])
         
@@ -79,39 +79,36 @@ def internal_part_to_dna_form(part_list, part_db):
 # make assembly well
 def check_dilution(dna, target_MW):
     if dna.get_volume(target_MW) < 0.5:
-        return ((dna.get_volume(target_MW)*5).round(3), 5)
+        return (round(dna.get_volume(target_MW)*5, 2), 5)
     else:
-        return(dna.get_volume(target_MW).round(3), 0)
+        return (round(dna.get_volume(target_MW), 2), 0)
 
-def assembly(i1, i2, i3, i4, MW, vec_vol=5, final_volume=20):
-    
-    vol, dil = check_dilution(i1, MW[0])
-    pro_asm = {"well": i1.well, "vol": vol, "dil": dil, 'plate': i1.plate}
-
-    vol, dil = check_dilution(i2, MW[1])
-    rbs_asm = {"well": i2.well, "vol": vol, "dil": dil, 'plate': i2.plate}
-
-    vol, dil = check_dilution(i3, MW[2])
-    ter_asm = {"well": i3.well, "vol": vol, "dil": dil, 'plate': i3.plate}
-
-    vol, dil = check_dilution(i4, MW[3])
-    cds_asm = {"well": i4.well, "vol": vol, "dil": dil, 'plate': i4.plate}
-
+def assembly(DNA, target_MW, final_volume):
+    n = 0
+    No_list, name_list, vol_list, well_dict = [], [], [], {}
+    for i2, mw in zip(DNA, target_MW):
+        vol, dil = check_dilution(i2, mw)
+        well_dict[f'part{n}'] = {'well': i2.well, 'vol':vol, 'dil':dil, 'plate':i2.plate}
+        No_list.append(i2.No)
+        name_list.append(i2.name)
+        vol_list.append(vol)
+        n+=1
     meta_data = {
-        "No": '_'.join([i1.No, i2.No, i3.No, i4.No]),
-        "name": '_'.join([i1.name, i2.name, i3.name, i4.name]),
-        "DW" : ((final_volume*4/5) - (pro_asm['vol'] + rbs_asm['vol'] + cds_asm['vol'] + ter_asm['vol'] + vec_vol)).round(3),
-        "vec" : vec_vol
-    }
-    return {
-        "part1":pro_asm, "part2":rbs_asm, 'part3':ter_asm, 'part4':cds_asm,
-        'meta':meta_data
+        'No':'_'.join(No_list),
+        'name':'_'.join(name_list),
+        'DW': round((final_volume*4/5) - sum(vol_list), 2)
         }
+    well_dict['meta'] = meta_data
 
-def assembly2(parts=[], ):
-    """
-    with Shiny based web input form, make flexible input part number(not strict 4)
-    and assemble it.
+    return (well_dict)
 
-    Plate 이름을 metadata안에 같이 기록하도록!
-    """
+def set_part_to_assembly(part_dna, n2, target_MW, final_volume, n1=0):
+    
+    if n1 == n2:
+        parts = []
+        for i in range(n2):
+            parts.append(eval(f"part{i}"))
+        yield assembly(DNA=parts, target_MW = target_MW, final_volume=final_volume)
+    else:
+        for globals()[f'part{n1}'] in part_dna[0+n1]:
+            yield from set_part_to_assembly(part_dna, n2=n2, target_MW=target_MW, final_volume=final_volume, n1 = n1+1)
