@@ -6,16 +6,10 @@ import opentrons.simulate
 with open("/mnt/kun/work/git/ot2/protocol/assembly/get_parts/data.pickle", 'rb') as f:
     meta_data = pickle.load(f)
 
-protocol = opentrons.simulate.get_protocol_api('2.11')
 #======================
 plates = list(filter(None, meta_data[-1]))
 if len(plates) > 4:
     sys.exit("Too many plates !\nMaximum is 4.")
-#======================
-## Module
-module_thermocycler = protocol.load_module("thermocycler Module")
-module_magnetic = protocol.load_module('magnetic module gen2', '4')
-
 #======================
 n = 1
 for i in plates:
@@ -26,28 +20,17 @@ for i in plates:
     n+=1
 #======================
 
-assemble_plate = module_thermocycler.load_labware("biorad_96_wellplate_200ul_pcr")
-tube_rack = protocol.load_labware('opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap', 9)
-trash = protocol.loaded_labwares[12]["A1"]
+use_enz_mix = True
 
+if use_enz_mix:
+    enz_mix = tube_rack['D1']
+else:
+    BsaI = tube_rack["D1"]
+    T4_buf = tube_rack["D2"]
+    T4_ligase = tube_rack["D3"]
+    DW = tube_rack['D5']
+    
 #======================
-# 만약 empty deck이 있으면 tiprack 더놓기.
-tiprack_20_sin = protocol.load_labware("opentrons_96_tiprack_20ul", 6)
-p20_sin = protocol.load_instrument("p20_single_gen2", "right", tip_racks=[tiprack_20_sin])
-
-## Start Tiprack positions
-p20_sin.starting_tip = tiprack_20_sin.well("A1")
-#======================
-
-## Reagents
-### Every reagent should be in 1.5ml Bioneer screw tube.
-enz_mix = tube_rack['D1']
-BsaI = tube_rack["D1"]
-T4_buf = tube_rack["D2"]
-T4_ligase = tube_rack["D3"]
-DW = tube_rack['D5']
-
-#well position이 없는 part들 위치를 지정해야함.
 
 def part_transfer(pipette, volume, src, dest, delay_second=0, top_delay=0, asp_rate=0, dis_rate=0, mix_after=False, drop_tip = True):
     if asp_rate:

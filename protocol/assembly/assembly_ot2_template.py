@@ -1,9 +1,8 @@
 from opentrons import types, protocol_api, simulate
 import pickle
 
-# Unverified
-
-# Default DNA MW is 112 fmol (CDS), 56 fmol (Backborn)
+# DNA assembly template script.
+# Don't Run This script with OT2!
 
 metadata = {
     'protocolName': 'Golden gate assembly used by SBL (96 well plate based)',
@@ -16,42 +15,33 @@ metadata = {
 with open("/mnt/kun/work/git/ot2/protocol/assembly/get_parts/data.pickle", 'rb') as f:
     meta_data = pickle.load(f)
 
+def run(protocol: protocol_api.ProtocolContext):
 
-protocol = simulate.get_protocol_api("2.11")
+    # Deck Setting
+    ## Modules  
+    module_thermocycler = protocol.load_module("thermocycler Module")
+    module_magnetic = protocol.load_module('magnetic module gen2', '4')
 
-# Deck Setting
+    ## Racks
+    '{part_plates}'
 
-well_number = len(meta_data)
+    assemble_plate = module_thermocycler.load_labware("biorad_96_wellplate_200ul_pcr")
+    tube_rack = protocol.load_labware('opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap', 9)
+    trash = protocol.loaded_labwares[12]["A1"]
 
-## Module
-module_thermocycler = protocol.load_module("thermocycler Module")
-module_magnetic = protocol.load_module('magnetic module gen2', '4')
+    tiprack_20_sin = protocol.load_labware("opentrons_96_tiprack_20ul", 6)
+    p20_sin = protocol.load_instrument("p20_single_gen2", "right", tip_racks=[tiprack_20_sin])
 
-## Labwares
-pro = protocol.load_labware("biorad_96_wellplate_200ul_pcr", 1)
-rbs = protocol.load_labware("biorad_96_wellplate_200ul_pcr", 2)
-ter = protocol.load_labware("biorad_96_wellplate_200ul_pcr", 3)
-### assemble plate is on thermocycler
-assemble_plate = module_thermocycler.load_labware("biorad_96_wellplate_200ul_pcr")
+    ## Start Tiprack positions
+    p20_sin.starting_tip = tiprack_20_sin.well("A1")
 
-tube_rack = protocol.load_labware('opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap', 9)
-trash = protocol.loaded_labwares[12]["A1"]
-
-tiprack_20_sin = protocol.load_labware("opentrons_96_tiprack_20ul", 5)
-tiprack_300_sin = protocol.load_labware("opentrons_96_tiprack_300ul", 6)
-p20_sin = protocol.load_instrument("p20_single_gen2", "right", tip_racks=[tiprack_20_sin])
-p300_sin = protocol.load_instrument("p300_single_gen2", "left", tip_racks=[tiprack_300_sin])
-
-## Start Tiprack positions
-p20_sin.starting_tip = tiprack_20_sin.well("A1")
-p300_sin.starting_tip = tiprack_300_sin.well("A1")
-
-## Reagents
-### Every reagent should be in 1.5ml Bioneer screw tube.
-BsaI = tube_rack["A1"]
-T4_buf = tube_rack["A2"]
-T4_ligase = tube_rack["A3"]
-DW = tube_rack['D5']
+    ## Reagents
+    ### Every reagent should be in 1.5ml Bioneer screw tube.
+    enz_mix = tube_rack['D1']
+    BsaI = tube_rack["D1"]
+    T4_buf = tube_rack["D2"]
+    T4_ligase = tube_rack["D3"]
+    DW = tube_rack['D5']
 
 
 ## Protocol
