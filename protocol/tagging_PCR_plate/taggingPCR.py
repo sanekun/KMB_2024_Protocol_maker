@@ -1,5 +1,6 @@
-from signal import SIG_DFL
 from opentrons import types, protocol_api, simulate
+
+from git.ot2.functions import enzyme_transfer
 
 # 96 well plate Tagging PCR
 # Not Verified !
@@ -19,13 +20,15 @@ Add three component.
 3) Cultured Cell
 """
 
+#protocol=simulate.get_protocol_api('2.11')
+
 def run(protocol: protocol_api.ProtocolContext):
 
     # Functions
     
-    def part_transfer(pipette, volume, src, dest, delay_second=[0, 0], top_delay=False, asp_rate=None, dis_rate=None, mix_after=False, drop_tip = True):
-        
-            
+    def enzyme_transfer(pipette, volume, src, dest, delay_second=[0, 0],
+                    top_delay=False, asp_rate=None, dis_rate=None,
+                    mix_after=False, drop_tip = True):
         if asp_rate:
             pipette.flow_rate.aspirate=asp_rate
         if dis_rate:
@@ -38,7 +41,7 @@ def run(protocol: protocol_api.ProtocolContext):
         protocol.delay(seconds=delay_second[0])
         if top_delay:
             pipette.move_to(src.top(z=-3))
-            protocol.delay(seconds=top_delay)
+            protocol.delay(seconds=top_delay[0])
         pipette.dispense(volume, dest)
         protocol.delay(seconds=delay_second[1])
         if type(mix_after) == list:
@@ -49,16 +52,13 @@ def run(protocol: protocol_api.ProtocolContext):
                 pass
             pipette.mix(mix_after[0], mix_after[1])
         pipette.blow_out()
+        if top_delay:
+            pipette.move_to(src.top(z=-3))
+            protocol.delay(seconds=top_delay[1])
         if drop_tip:    
             pipette.drop_tip()
 
-    class Reagent():
-        def __init__(self, name, wells, cols, vol_per_well):
-            self.name
-            self.wells
-            self.cols
 
-            aa
     # Deck Setting
     ## Modules  
     module_thermocycler = protocol.load_module("thermocycler Module")
@@ -69,7 +69,7 @@ def run(protocol: protocol_api.ProtocolContext):
     reverse_primer = protocol.load_labware('biorad_96_wellplate_200ul_pcr', 2)
     cultured_cell = protocol.load_labware('biorad_96_wellplate_200ul_pcr', 1)
     trash = protocol.loaded_labwares[12]["A1"]
-    assemble_plate = module_thermocycler.load_labware('biorad_96_wellplate_200ul_pcr')
+    assemble_plate = module_thermocycler.load_labware('biorad_96_wellplate_200ul_pcr')    
 
     tiprack_20_1 = protocol.load_labware("opentrons_96_tiprack_20ul", 6)
     tiprack_20_2 = protocol.load_labware("opentrons_96_tiprack_20ul", 5)
@@ -90,8 +90,10 @@ def run(protocol: protocol_api.ProtocolContext):
     reverse = reverse_primer.rows_by_name()['A']
     
     ## Protocol RUN
-
-    module_thermocycler.open_lid()
+    if module_thermocycler.lid_position == 'open':
+        pass
+    elif module_thermocycler.lid_position == 'closed':
+        module_thermocycler.open_lid()
 
     # forward transfer
     for_n, for_vol = 0, 500
@@ -103,17 +105,22 @@ def run(protocol: protocol_api.ProtocolContext):
             for_n += 1
             for_vol = 500
             p20_mul.drop_tip()
-        part_transfer(p20_mul, vol, forward[for_n], dest_col, 1, 1, 20, 20, drop_tip=False)
+        enzyme_transfer(p20_mul, vol, forward[for_n].bottom(z=3), dest_col[0], 
+                        delay_second=[1,0], top_delay=[1, 1],
+                        asp_rate=20, dis_rate=20, drop_tip=False)
     
-    p20_mul.drop_tip()
+    if p20_mul._has_tip:
+        p20_mul.drop_tip()
 
     # reverse & cell
     n = 0
-    for src in reverse:
-        for dest in assemble_plate.columns():
+    for src, dest_col in zip(reverse, assemble_plate.columns()):
+        for dest_well in dest_col:
             cell = cultured_cell.wells()[n]
-            part_transfer(p20_mul, 1, src, dest, 0, 0, 5, 5, drop_tip=False)
-            part_transfer(p20_mul, 1, cell, dest, 0, 0, 5, 5)
+            enzyme_transfer(p20_sin, 1, src, dest_well, 
+                            asp_rate=5, dis_rate=5, drop_tip=False)
+            enzyme_transfer(p20_sin, 1, cell, dest_well,
+                            asp_rate=5, dis_rate=5)
             n += 1
 
 
@@ -121,13 +128,15 @@ def run(protocol: protocol_api.ProtocolContext):
     module_thermocycler.close_lid()
     module_thermocycler.set_lid_temperature(105)
 
-    module_thermocycler.set_block_temperature(94, hold_time_minutes=5)
-    profile = [{'temperature': 94, 'hold_time_minutes': 1},
-                {'temperature': 55, 'hold_time_minutes': 1},
-                {'temperature': 72, 'hold_time_minutes': 5}]
+    module_thermocycler.set_block_temperature(98, hold_time_minutes=3)
+    profile = [{'temperature': 95, 'hold_time_seconds': 20},
+                {'temperature': 55, 'hold_time_seconds': 20},
+                {'temperature': 72, 'hold_time_seconds': 90}]
     module_thermocycler.execute_profile(steps=profile, repetitions=30, block_max_volume=20)
-    module_thermocycler.set_block_temperature(72, hold_time_minutes=5)
-    module_thermocycler.set_block_temperature(4, hold_time_minutes=10)
+    module_thermocycler.set_block_temperature(72, hold_time_minutes=3)
+    module_thermocycler.set_block_temperature(4, hold_time_minutes=5)
 
     module_thermocycler.deactivate()
     module_thermocycler.open_lid()
+
+

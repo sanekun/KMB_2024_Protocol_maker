@@ -24,7 +24,7 @@ def enzyme_transfer(pipette, volume, src, dest, delay_second=[0, 0],
     protocol.delay(seconds=delay_second[0])
     if top_delay:
         pipette.move_to(src.top(z=-3))
-        protocol.delay(seconds=top_delay)
+        protocol.delay(seconds=top_delay[0])
     pipette.dispense(volume, dest)
     protocol.delay(seconds=delay_second[1])
     if type(mix_after) == list:
@@ -35,6 +35,9 @@ def enzyme_transfer(pipette, volume, src, dest, delay_second=[0, 0],
             pass
         pipette.mix(mix_after[0], mix_after[1])
     pipette.blow_out()
+    if top_delay:
+        pipette.move_to(src.top(z=-3))
+        protocol.delay(seconds=top_delay[1])
     if drop_tip:    
         pipette.drop_tip()
 
