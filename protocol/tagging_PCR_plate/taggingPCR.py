@@ -1,10 +1,8 @@
 from opentrons import types, protocol_api, simulate
-
 from git.ot2.functions import enzyme_transfer
 
 # 96 well plate Tagging PCR
-# Not Verified !
-# Verified at 22-05-10 by kun.
+# Verified at 22-05-11 by kun.
 
 metadata = {
     'protocolName': 'Tagging colony PCR (96 well plate based)',
@@ -20,15 +18,17 @@ Add three component.
 3) Cultured Cell
 """
 
-#protocol=simulate.get_protocol_api('2.11')
+protocol=simulate.get_protocol_api('2.11')
 
 def run(protocol: protocol_api.ProtocolContext):
 
     # Functions
     
-    def enzyme_transfer(pipette, volume, src, dest, delay_second=[0, 0],
+    def enzyme_transfer(pipette, volume, src, dest, delay_second=None,
                     top_delay=False, asp_rate=None, dis_rate=None,
                     mix_after=False, drop_tip = True):
+        # top_delay = list, delay_second= list, mix_after = list
+        
         if asp_rate:
             pipette.flow_rate.aspirate=asp_rate
         if dis_rate:
@@ -51,18 +51,49 @@ def run(protocol: protocol_api.ProtocolContext):
             except:
                 pass
             pipette.mix(mix_after[0], mix_after[1])
-        pipette.blow_out()
         if top_delay:
             pipette.move_to(src.top(z=-3))
             protocol.delay(seconds=top_delay[1])
         if drop_tip:    
             pipette.drop_tip()
 
+    
+    def enzyme_transfer2(pipette, volume, src, dest, delay_second=None,
+                    top_delay=False, asp_rate=None, dis_rate=None,
+                    mix_after=False, drop_tip = True):
+        # top_delay = list, delay_second= list, mix_after = list
+        
+        if asp_rate:
+            pipette.flow_rate.aspirate=asp_rate
+        if dis_rate:
+            pipette.flow_rate.dispense=dis_rate            
+        
+        if pipette._has_tip == False:
+            pipette.pick_up_tip()
+
+        pipette.aspirate(volume, src.bottom(z=3))
+        protocol.delay(seconds=delay_second[0])
+        if top_delay:
+            pipette.move_to(src.top(z=-3))
+            protocol.delay(seconds=top_delay[0])
+        pipette.dispense(volume, dest)
+        protocol.delay(seconds=delay_second[1])
+        if type(mix_after) == list:
+            try:
+                pipette.flow_rate.aspirate=mix_after[2]
+                pipette.flow_rate.dispense=mix_after[2]
+            except:
+                pass
+            pipette.mix(mix_after[0], mix_after[1])
+        if top_delay:
+            pipette.move_to(src.top(z=-3))
+            protocol.delay(seconds=top_delay[1])
+        if drop_tip:    
+            pipette.drop_tip()
 
     # Deck Setting
     ## Modules  
     module_thermocycler = protocol.load_module("thermocycler Module")
-    module_magnetic = protocol.load_module('magnetic module gen2', '4')
 
     ## Racks
     forward_mix = protocol.load_labware('usascientific_96_wellplate_2.4ml_deep', 3)
@@ -88,6 +119,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
     forward = [forward_mix.columns_by_name()['1'][0], forward_mix.columns_by_name()['2'][0]] 
     reverse = reverse_primer.rows_by_name()['A']
+    cell_row = cultured_cell.rows_by_name()['A']
     
     ## Protocol RUN
     if module_thermocycler.lid_position == 'open':
@@ -97,31 +129,34 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # forward transfer
     for_n, for_vol = 0, 500
-    for dest_col in assemble_plate.rows():
+    a = 1
+    for dest_col in assemble_plate.rows_by_name()['A']:
         vol = 18
         for_vol -= vol
+
+        if a > 4:
+            p20_mul.drop_tip()
+            a = 0
 
         if for_vol <= 0:
             for_n += 1
             for_vol = 500
             p20_mul.drop_tip()
-        enzyme_transfer(p20_mul, vol, forward[for_n].bottom(z=3), dest_col[0], 
+        enzyme_transfer2(p20_mul, vol, forward[for_n], dest_col, 
                         delay_second=[1,0], top_delay=[1, 1],
                         asp_rate=20, dis_rate=20, drop_tip=False)
-    
+        a += 1
     if p20_mul._has_tip:
         p20_mul.drop_tip()
 
-    # reverse & cell
+    # reverse & cell Multi
     n = 0
-    for src, dest_col in zip(reverse, assemble_plate.columns()):
-        for dest_well in dest_col:
-            cell = cultured_cell.wells()[n]
-            enzyme_transfer(p20_sin, 1, src, dest_well, 
-                            asp_rate=5, dis_rate=5, drop_tip=False)
-            enzyme_transfer(p20_sin, 1, cell, dest_well,
-                            asp_rate=5, dis_rate=5)
-            n += 1
+    for src, cell, dest in zip(reverse, cell_row, assemble_plate.rows_by_name()['A']):
+        enzyme_transfer(p20_mul, 1, src, dest, 
+                        asp_rate=5, dis_rate=5, drop_tip=False)
+        enzyme_transfer(p20_mul, 1, cell, dest,
+                        asp_rate=5, dis_rate=2)
+        n += 1
 
 
     # PCR
@@ -138,5 +173,3 @@ def run(protocol: protocol_api.ProtocolContext):
 
     module_thermocycler.deactivate()
     module_thermocycler.open_lid()
-
-
