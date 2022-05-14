@@ -2,7 +2,7 @@ from opentrons import types, protocol_api, simulate
 from git.ot2.functions import enzyme_transfer
 
 # 96 well plate Tagging PCR
-# Verified at 22-05-11 by kun.
+# Not Verified at 22-05-11 by kun.
 
 metadata = {
     'protocolName': 'Tagging colony PCR (96 well plate based)',
@@ -24,16 +24,17 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # Functions
     
-    def enzyme_transfer(pipette, volume, src, dest, delay_second=None,
+
+    def enzyme_transfer(pipette, volume, src, dest, delay_second=[0, 0],
                     top_delay=False, asp_rate=None, dis_rate=None,
                     mix_after=False, drop_tip = True):
         # top_delay = list, delay_second= list, mix_after = list
-        
+
         if asp_rate:
             pipette.flow_rate.aspirate=asp_rate
         if dis_rate:
             pipette.flow_rate.dispense=dis_rate            
-        
+
         if pipette._has_tip == False:
             pipette.pick_up_tip()
 
@@ -44,6 +45,7 @@ def run(protocol: protocol_api.ProtocolContext):
             protocol.delay(seconds=top_delay[0])
         pipette.dispense(volume, dest)
         protocol.delay(seconds=delay_second[1])
+        pipette.dispense(1, dest.top(z=-3))
         if type(mix_after) == list:
             try:
                 pipette.flow_rate.aspirate=mix_after[2]
@@ -134,7 +136,7 @@ def run(protocol: protocol_api.ProtocolContext):
         vol = 18
         for_vol -= vol
 
-        if a > 4:
+        if a == 4:
             p20_mul.drop_tip()
             a = 0
 
@@ -161,14 +163,15 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # PCR
     module_thermocycler.close_lid()
-    module_thermocycler.set_lid_temperature(105)
+    module_thermocycler.set_lid_temperature(95)
 
-    module_thermocycler.set_block_temperature(98, hold_time_minutes=3)
+    module_thermocycler.set_block_temperature(95, hold_time_minutes=3)
     profile = [{'temperature': 95, 'hold_time_seconds': 20},
                 {'temperature': 55, 'hold_time_seconds': 20},
                 {'temperature': 72, 'hold_time_seconds': 90}]
     module_thermocycler.execute_profile(steps=profile, repetitions=30, block_max_volume=20)
     module_thermocycler.set_block_temperature(72, hold_time_minutes=3)
+    module_thermocycler.deactivate_lid()
     module_thermocycler.set_block_temperature(4, hold_time_minutes=5)
 
     module_thermocycler.deactivate()

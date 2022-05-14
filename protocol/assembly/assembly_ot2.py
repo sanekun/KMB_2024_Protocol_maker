@@ -1,10 +1,10 @@
 import pickle
 import sys
-import opentrons.simulate
+from opentrons import simulate
 
-# Load assembled well data
-with open("/mnt/kun/work/git/ot2/protocol/assembly/get_parts/data.pickle", 'rb') as f:
-    meta_data = pickle.load(f)
+protocol = simulate.get_protocol_api('2.12')
+
+
 
 #======================
 plates = list(filter(None, meta_data[-1]))
@@ -13,9 +13,6 @@ if len(plates) > 4:
 #======================
 n = 1
 for i in plates:
-    # prevent crash with magnetic position
-    if n == 4:
-        n+=1
     globals()[f'{i}'] = protocol.load_labware('biorad_96_wellplate_200ul_pcr', n)
     n+=1
 #======================
@@ -32,32 +29,7 @@ else:
     
 #======================
 
-def part_transfer(pipette, volume, src, dest, delay_second=0, top_delay=0, asp_rate=0, dis_rate=0, mix_after=False, drop_tip = True):
-    if asp_rate:
-        pipette.flow_rate.aspirate=asp_rate
-    if dis_rate:
-        pipette.flow_rate.dispense=dis_rate            
-    pipette.pick_up_tip()
-    pipette.aspirate(volume, src)
-    protocol.delay(seconds=delay_second)
-    if top_delay:
-        pipette.move_to(src.top(z=-3))
-        protocol.delay(seconds=top_delay)
-    pipette.dispense(volume, dest)
-    protocol.delay(seconds=delay_second/2)
-    if type(mix_after) == list:
-        # list가 낫지않을까?
-        try:
-            pipette.flow_rate.aspirate=mix_after[2]
-            pipette.flow_rate.dispense=mix_after[2]
-        except:
-            pass
-        pipette.mix(mix_after[0], mix_after[1])
-    pipette.blow_out()
-    if drop_tip:    
-        pipette.drop_tip()
-    else:
-        pass
+
 
 module_thermocycler.open_lid()
 

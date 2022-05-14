@@ -1,7 +1,7 @@
 from opentrons import types, protocol_api, simulate
 
 # 96 well Pooling
-# Not Verified
+# Verified 22-05-12 by kun
 
 metadata = {
     'protocolName': 'Tagging colony PCR (96 well plate based)',
@@ -20,21 +20,26 @@ protocol=simulate.get_protocol_api('2.11')
 def run(protocol: protocol_api.ProtocolContext):
 
     # parmeters
-    num_of_plate = 2
-    target_columns = 12
+    """
+    Every Plate shoud be in Deck 1 to 4
+    (if you want 2 plate, use deck [1, 2])
+    """
+
+    num_of_plate = 2 # maximum is 4
+    target_columns = 12 # target_columns in every plate.
 
     # Functions
     
-    def enzyme_transfer(pipette, volume, src, dest, delay_second=None,
+    def enzyme_transfer(pipette, volume, src, dest, delay_second=[0, 0],
                     top_delay=False, asp_rate=None, dis_rate=None,
                     mix_after=False, drop_tip = True):
         # top_delay = list, delay_second= list, mix_after = list
-        
+
         if asp_rate:
             pipette.flow_rate.aspirate=asp_rate
         if dis_rate:
             pipette.flow_rate.dispense=dis_rate            
-        
+
         if pipette._has_tip == False:
             pipette.pick_up_tip()
 
@@ -45,6 +50,7 @@ def run(protocol: protocol_api.ProtocolContext):
             protocol.delay(seconds=top_delay[0])
         pipette.dispense(volume, dest)
         protocol.delay(seconds=delay_second[1])
+        pipette.dispense(1, dest.top(z=-3))
         if type(mix_after) == list:
             try:
                 pipette.flow_rate.aspirate=mix_after[2]
@@ -64,15 +70,16 @@ def run(protocol: protocol_api.ProtocolContext):
         else:
             return (well)
 
-    def well_mix(pipette, dest, mix_params, flow_rate):
+    def well_mix(pipette, dest, mix_params, flow_rate, protocol = protocol):
         if pipette._has_tip != True:
             pipette.pick_up_tip()
-        pipette.flow_rate = flow_rate
+        pipette.flow_rate.aspirate = flow_rate
+        pipette.flow_rate.dispense = flow_rate
         pipette.move_to(dest.bottom())
         pipette.mix(mix_params[0], mix_params[1])
         pipette.blow_out()
         pipette.move_to(dest.top(z=-3))
-        pipette.delay(seconds=2)
+        protocol.delay(seconds=2)
         pipette.drop_tip()
 
     # Deck Setting
@@ -119,6 +126,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
             if tip_trial == 4:
                 p20_mul.drop_tip()
+                tip_trial = 0
         
         ### Mix
         well_mix(p20_mul, dest=dest, mix_params=[5, 10], flow_rate=10)
@@ -137,5 +145,6 @@ def run(protocol: protocol_api.ProtocolContext):
             
             if tip_trial == 4:
                 p20_sin.drop_tip()
+                tip_trial = 0
 
         well_mix(p20_sin, dest=dest, mix_params=[5, 10], flow_rate=10)
