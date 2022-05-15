@@ -1,4 +1,5 @@
-from opentrons import simulate, types
+#from opentrons import simulate, types
+#protocol=simulate.get_protocol_api('2.11')
 
 metadata = {
     'protocolName': 'OT2 Functions',
@@ -7,8 +8,7 @@ metadata = {
     'description': 'Basic OT2 Functions'
 }
 
-protocol=simulate.get_protocol_api('2.11')
-
+from math import floor
 
 def enzyme_transfer(pipette, volume, src, dest, delay_second=[0, 0],
                 top_delay=False, asp_rate=None, dis_rate=None,
@@ -44,7 +44,6 @@ def enzyme_transfer(pipette, volume, src, dest, delay_second=[0, 0],
     if drop_tip:    
         pipette.drop_tip()
 
-
 def get_well(well):
     #check가 되도록해야할듯.
     if type(well) == list:
@@ -52,8 +51,7 @@ def get_well(well):
     else:
         return (well)
 
-
-def well_mix(pipette, dest, mix_params, flow_rate, protocol = protocol):
+def well_mix(pipette, dest, mix_params, flow_rate):
     if pipette._has_tip != True:
         pipette.pick_up_tip()
     pipette.flow_rate.aspirate = flow_rate
@@ -64,3 +62,42 @@ def well_mix(pipette, dest, mix_params, flow_rate, protocol = protocol):
     pipette.move_to(dest.top(z=-3))
     protocol.delay(seconds=2)
     pipette.drop_tip()
+
+def serial_distribute(pipette, volume, src, dest, asp_rate, dis_rate, max_repeat, delay_seconds=[0,0]):
+    # dest should be well list
+    def get_repeat_num():
+        dis_num = (pipette.max_volume - 0.5) / volume
+        if dis_num > max_repeat:
+            return (max_repeat)
+        else:
+            return floor(dis_num)
+
+    dis_num = get_repeat_num()
+    n = 0
+
+    if n + dis_num > len(dest):
+        dest_tmp = dest[n:]
+    else:
+        dest_tmp = dest[n:n+dis_num]
+    
+    if pipette._has_tip == False:
+        pipette.pick_up_tip()
+    
+    if asp_rate:
+        pipette.flow_rate.aspirate = asp_rate
+    if dis_rate:
+        pipette.flow_rate.dispense = dis_rate
+    
+    pipette.aspirate(volume*dis_num+0.5, src)
+    protocol.delay(seconds=delay_seconds[0])
+    if top_delay:
+        pass
+
+    for dest_well in dest_tmp:
+        pipette.dispense(volume, dest_well)
+        #delay
+        protocol.delay(seconds=delay_seconds[1])
+    
+    if drop_tip:
+        pipette.drop_tip()
+

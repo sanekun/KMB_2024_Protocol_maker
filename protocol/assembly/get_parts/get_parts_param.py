@@ -1,10 +1,10 @@
 import sys
-sys.path.append('/mnt/kun/work/git/ot2/protocol/assembly/get_parts')
+sys.path.append('/mnt/kun/git/ot2/protocol/assembly/get_parts')
 import pandas as pd
 from get_parts_fun import dna, parameter_check, internal_part_check
 
 # Parameters
-db_path = "/mnt/kun/box/-20/Part_DB_ot2.xlsx"
+db_path = "/mnt/kun/git/ot2/protocol/assembly/sample/Part_DB_ot2.xlsx"
 part_number = 5
 final_volume = 20
 

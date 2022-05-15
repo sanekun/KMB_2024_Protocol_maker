@@ -1,5 +1,5 @@
 import sys
-sys.path.append('/mnt/kun/work/git/ot2/protocol/assembly/get_parts')
+sys.path.append('/mnt/kun/git/ot2/protocol/assembly/get_parts')
 from get_parts_param import *
 from xlsx_fun import *
 
@@ -19,7 +19,7 @@ def get_args():
     parser=argparse.ArgumentParser()
     parser.add_argument('-o', help='pickle output path', default="./data.pickle" , required=False)
     # 호출 or not으로 수정..
-    parser.add_argument('--xlsx', help='xlsx output path', default='./data_export.xlsx', required=False)
+    parser.add_argument('--xlsx', help='xlsx output path', default=None, required=False)
     
     args=parser.parse_args()
     return args
