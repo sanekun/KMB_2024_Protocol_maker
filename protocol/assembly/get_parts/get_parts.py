@@ -17,9 +17,8 @@ Mode4 = make OT2 (get script directly)
 
 def get_args():
     parser=argparse.ArgumentParser()
-    parser.add_argument('-o', help='pickle output path', default="./data.pickle" , required=False)
-    # 호출 or not으로 수정..
-    parser.add_argument('--xlsx', help='xlsx output path', default=None, required=False)
+    parser.add_argument('-o', type=str, help='pickle output path', default="./data.pickle" , required=False)
+    parser.add_argument('--xlsx', type=str, help='xlsx output path', required=False)
     
     args=parser.parse_args()
     return args
@@ -29,15 +28,29 @@ def main():
     for i1 in part_order:
         part_dna.append(internal_part_to_dna_form(i1, db))
 
-    # plate정보 모으기
+    # Export data
+    ## plate data
     plates = []
     for i in sum(part_dna, []):
         plates.append(i.plate)
     plates = list(set(plates))
 
+    ## External DNA data
+    if 'EXT' in plates:
+        ext_dna = []
+        n = 0
+
+        for i in sum(part_order, []):
+            if type(i) == dna:
+                ext_dna.append(i)
+
+        for i in ext_dna:
+            i.well = EXT_dna_wells[n]
+            n += 1
+
     well_gen = set_part_to_assembly(part_dna, n2=part_number, target_MW=target_MW, final_volume=final_volume, n1=0)
 
-    well_list = []
+    well_list = [] 
     for i in well_gen:
         well_list.append(i)
     well_list.append(plates)

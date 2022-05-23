@@ -1,47 +1,35 @@
-from opentrons import types, protocol_api, simulate
-import sys
-sys.path.append('/mnt/kun/git/ot2/')
-import ot2_kun_func as ot2
-import pickle
-
+from opentrons import types, protocol_api
 from math import floor
 
 # DNA assembly template script.
-# Don't Run This script with OT2!
+# Don't Run This script directly with OT2!
 
-metadata = {
+metadata = {{
     'protocolName': 'Golden gate assembly used by SBL (96 well plate based)',
     'author': 'Seong-Kun Bak <tjdrns27@kribb.re.kr>',
     'apiLevel': '2.11',
-    'description': 'For combinatorial part library assembly & Simultaneous assembly with different part combination'
-}
-
-# arguments
-
-meta_path
-part_plates
-enzyme_mix_vol = 4
-
+    'description': 'Simultaneous part assembly with different part combination',
+    'date' : '{date}'
+}}
 
 # Load assembled well data
-with open(f'{meta_path}', 'rb') as f:
-    meta_data = pickle.load(f)
+meta_data = {meta_data}
 
 def run(protocol: protocol_api.ProtocolContext):
 
-    # get global parameters
+    ## get global parameters
     well_data = meta_data[:-1]
-    enz_vol = f'{enzyme_mix_vol}'
+    enz_vol = {enzyme_mix_vol}
 
     # Deck Setting
     ## Modules  
     module_thermocycler = protocol.load_module("thermocycler Module")
 
     ## Racks
-    f'{part_plates}'
+    {load_plate}
 
     assemble_plate = module_thermocycler.load_labware("biorad_96_wellplate_200ul_pcr")
-    tube_rack = protocol.load_labware('opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap', 9)
+    EXT = protocol.load_labware('opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap', 9)
     trash = protocol.loaded_labwares[12]["A1"]
 
     tiprack_20_1 = protocol.load_labware("opentrons_96_tiprack_20ul", 6)
@@ -53,12 +41,12 @@ def run(protocol: protocol_api.ProtocolContext):
 
     ## Reagents
     ### Every reagent should be in 1.5ml Bioneer screw tube.
-    enz_mix = tube_rack['D1']
-    DW = tube_rack['D5']
+    enz_mix = EXT['D1']
+    DW = EXT['D5']
 
 
-    ## Protocol
-    ### Functions
+    # Protocol
+    ## Functions
     def enzyme_transfer(pipette, volume, src, dest, delay_second=[0, 0],
                     top_delay=False, asp_rate=None, dis_rate=None,
                     mix_after=False, drop_tip = True):
@@ -94,19 +82,14 @@ def run(protocol: protocol_api.ProtocolContext):
             pipette.drop_tip()
 
     ## Enzyme Transfer
-    # Mix를 그냥 사용하는게 현명한듯 하나씩 넣는건 너무 힘들다.
-
-
-    # get repeated_use value
+    ### get repeated_use value
     enz_dis_num = (19.5 / enz_vol)
     if enz_dis_num > 4:
         enz_dis_num = 4
     else:
         enz_dis_num = floor(enz_dis_num)
 
-
-    # Enzyme distribute
-
+    ### Enzyme distribute
     src = enz_mix
     dest_wells = assemble_plate.wells()[:len(well_data)]
 
@@ -138,27 +121,27 @@ def run(protocol: protocol_api.ProtocolContext):
         if n > enz_dis_num:
             break
 
-    ## Part Transfer
-    
+    ### Part Transfer
     for i in range(well_data):
         data = well_data[i]
         dest = assemble_plate.wells()[i]
 
         for i2 in range(len(data)-1):
-            
-            tmp = data.get(f'part{i2}')
+            tmp = data.get(f'part{{i2}}')
             vol = tmp['vol']
             # plate가 ext 포지션일 때는 name을 기준으로 well을 정해두기.
-            if tmp['plate'] == None:
-                """
-                # getpart에서 metadata의 [-2]에 포지션을 정의하도록 하기 그냥 A1부터 쭉.!
-                tmp_no = data['meta']['No'].split('_')[i2-1]
-                src = tube_rack.wells_by_name()['C5']
-                """
-            else:
-                src = eval(tmp['plate']).wells_by_name()[tmp['well']]
+            src = eval(tmp['plate']).wells_by_name()[tmp['well']]
             enzyme_transfer(p20_sin, vol, src, dest,
                             asp_rate = 5, dis_rate =5, drop_tip=True)
 
 
-# Thermocycling
+    ## Thermocycling
+    if module_thermocycler.lid_position == 'close':
+        module_thermocycler.open_lid()
+
+    module_thermocycler.set_temperature(37)
+    module_thermocycler.set_temperature(37)
+    module_thermocycler.set_temperature(37)
+
+    protocol.pause("Protocol END \nIf you close this message, thermocycler open and deactivate.")
+    protocol.disconnect()

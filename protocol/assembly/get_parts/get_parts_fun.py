@@ -5,7 +5,7 @@ class dna:
     # Basic information
     ## MW can calculate with python or Excel.
     ## MW & name is necessary
-    def __init__(self, name, MW=None, vol=None, No=None, well=None, plate=None, external=True):
+    def __init__(self, name, MW=None, vol=None, No=None, well=None, plate="EXT", external=True):
         #self.length = length
         #self.conc = conc
         self.MW = MW
@@ -48,6 +48,7 @@ def internal_part_check(part_order, db):
     for i1 in part_order:
         for i2 in i1:
             if type(i2) == dna:
+                # External DNA
                 continue
             if i2 in db['No'].values:
                 continue
@@ -112,3 +113,5 @@ def set_part_to_assembly(part_dna, n2, target_MW, final_volume, n1=0):
     else:
         for globals()[f'part{n1}'] in part_dna[0+n1]:
             yield from set_part_to_assembly(part_dna, n2=n2, target_MW=target_MW, final_volume=final_volume, n1 = n1+1)
+
+EXT_dna_wells = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6']

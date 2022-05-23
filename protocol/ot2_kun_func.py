@@ -1,14 +1,15 @@
 #from opentrons import simulate, types
 #protocol=simulate.get_protocol_api('2.11')
 
-metadata = {
+from math import floor
+
+"""
     'protocolName': 'OT2 Functions',
     'author': 'Seong-Kun Bak <tjdrns27@kribb.re.kr>',
-    'apiLevel': '2.11',
+    'apiLevel': '2.12',
     'description': 'Basic OT2 Functions'
-}
+"""
 
-from math import floor
 
 def enzyme_transfer(pipette, volume, src, dest, delay_second=[0, 0],
                 top_delay=False, asp_rate=None, dis_rate=None,
