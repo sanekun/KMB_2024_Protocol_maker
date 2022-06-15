@@ -1,15 +1,15 @@
 from opentrons import types, protocol_api
 from math import floor
 
-# DNA assembly template script.
-# Don't Run This script directly with OT2!
+#|# DNA assembly template script. #|#
+#|# Don't Run This script directly with OT2! #|#
 
 metadata = {
     'protocolName': 'Golden gate assembly used by SBL (96 well plate based)',
     'author': 'Seong-Kun Bak <tjdrns27@kribb.re.kr>',
     'apiLevel': '2.11',
     'description': 'Simultaneous part assembly with different part combination',
-    'date' : '05/23/22'
+    'date' : '06/15/22'
 }
 
 # Load assembled well data
@@ -123,8 +123,8 @@ def run(protocol: protocol_api.ProtocolContext):
         if n > enz_dis_num:
             break
 
-    ### Part Transfer # Error occured.
-    for i in range(len(well_data)):
+    ### Part Transfer
+    for i in range(well_data):
         data = well_data[i]
         dest = assemble_plate.wells()[i]
 
@@ -141,13 +141,9 @@ def run(protocol: protocol_api.ProtocolContext):
     if module_thermocycler.lid_position == 'close':
         module_thermocycler.open_lid()
 
-    module_thermocycler.close_lid()
-
-    module_thermocycler.set_lid_temperature(95)
     module_thermocycler.set_temperature(37)
-    module_thermocycler.set_temperature(16)
-    module_thermocycler.lid_deactivate()
-    module_thermocycler.set_temperature(4, minutes=5)
+    module_thermocycler.set_temperature(37)
+    module_thermocycler.set_temperature(37)
 
     protocol.pause("Protocol END \nIf you close this message, thermocycler open and deactivate.")
     protocol.disconnect()

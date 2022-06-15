@@ -2,6 +2,7 @@ import pickle
 import sys
 import argparse
 import datetime
+import re
 
 """
 썩 깔끔하지 않네
@@ -11,6 +12,7 @@ Write script
 with template py file and pickle data.
 Write specific research's script.
 """
+
 def get_args():
     parser=argparse.ArgumentParser()
     parser.add_argument('-m', type=str, help='meta_data path', required=True)
@@ -23,7 +25,6 @@ def get_args():
 def main():
     args = get_args()
     # Parameters
-
     save_path = args.o
 
     ## Load metadata
@@ -59,6 +60,9 @@ def main():
         n+=1
 
     #======================================================
+    #template.replace
+    hash_tag = re.compile("#!#.+#!#")
+    template = re.sub(hash_tag, "", template)
     new_script = template.format(date = time, meta_data = str(meta_data), enzyme_mix_vol=enz_vol, load_plate='\n    '.join(load_plate))
 
     with open(save_path, 'w') as f:

@@ -1,8 +1,8 @@
 from opentrons import types, protocol_api
 from math import floor
 
-# DNA assembly template script.
-# Don't Run This script directly with OT2!
+#|# DNA assembly template script. #|#
+#|# Don't Run This script directly with OT2! #|#
 
 metadata = {{
     'protocolName': 'Golden gate assembly used by SBL (96 well plate based)',
