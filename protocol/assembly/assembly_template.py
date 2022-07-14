@@ -12,6 +12,11 @@ metadata = {{
     'date' : '{date}'
 }}
 
+# Parameters from protocol writer.
+
+META_DATA = {meta_data}
+
+
 # Load assembled well data
 meta_data = {meta_data}
 
@@ -81,6 +86,9 @@ def run(protocol: protocol_api.ProtocolContext):
         if drop_tip:    
             pipette.drop_tip()
 
+    if module_thermocycler.lid_position == 'close':
+        module_thermocycler.open_lid()
+
     ## Enzyme Transfer
     ### get repeated_use value
     enz_dis_num = (19.5 / enz_vol)
@@ -122,7 +130,7 @@ def run(protocol: protocol_api.ProtocolContext):
             break
 
     ### Part Transfer
-    for i in range(well_data):
+    for i in range(len(well_data)):
         data = well_data[i]
         dest = assemble_plate.wells()[i]
 
@@ -136,12 +144,17 @@ def run(protocol: protocol_api.ProtocolContext):
 
 
     ## Thermocycling
-    if module_thermocycler.lid_position == 'close':
-        module_thermocycler.open_lid()
+    module_thermocycler.set_lid_temperature(90)
+    
+    profile = [{{'temperature': 37, 'hold_time_minutes':1}},
+            {{'temperature': 16, 'hold_time_minutes': 1}}]
 
-    module_thermocycler.set_temperature(37)
-    module_thermocycler.set_temperature(37)
-    module_thermocycler.set_temperature(37)
+    module_thermocycler.execute_profile(steps=profile, repetitions=30, block_max_volume=20)
+    module_thermocycler.deactivate_lid()
+    module_thermocycler.set_block_temperature(4, hold_time_minutes=5)
 
     protocol.pause("Protocol END \nIf you close this message, thermocycler open and deactivate.")
+    module_thermocycler.deactivate()
+    module_thermocycler.open_lid()
+
     protocol.disconnect()

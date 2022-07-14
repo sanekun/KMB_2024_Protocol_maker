@@ -1,5 +1,7 @@
 from opentrons import types, protocol_api
 
+# Verified at 22.01.17 by kun
+
 # this data is from Ligation Sequencing Kit: DNA Repair and End-Prep 
 # modified script from Sakib <sakib.hossain@opentrons.com>
 metadata = {
@@ -131,7 +133,6 @@ def run(protocol: protocol_api.ProtocolContext):
         remove_supernantant(p300_sin, 110, src, trash, asp_rate=50, dis_rate=150)
 
     ## LFB_SFB wash
-    # 아직 검증못함.
     module_magnetic.disengage()
     for _ in range(2):
         for dest in mag_well:
@@ -157,12 +158,11 @@ def run(protocol: protocol_api.ProtocolContext):
     ## Pause and Remove Samples for Spin Down (15)
     module_magnetic.engage(height_from_base=2)
 
-    #여기 빨리 안빼주면 조금 안좋을듯
     protocol.pause('1. Spindown\
                 \n2. replace tube in magnetic_well\
                 \n3. Resume')
 
-     ## Remove Residual Ethanol (16)
+    ## Remove Residual Ethanol (16)
     protocol.delay(minutes=2)
     for src in mag_well:
         remove_supernantant(p20_sin, 15, src, trash, asp_rate=10, dis_rate=45, xyz=(-1,0,-0.5))

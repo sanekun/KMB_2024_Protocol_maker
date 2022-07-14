@@ -1,6 +1,19 @@
-# ot2
+# SBL OT2 protocols
 
-[Setting up OT-2 in personal computer using SSH](https://support.opentrons.com/en/articles/3203681-setting-up-ssh-access-to-your-ot-2)
-[Connect OT-2 with SSH](https://support.opentrons.com/en/articles/3287453-connecting-to-your-ot-2-with-ssh)
+The OT2 protocols used in synthetic biology research center (SBL)
 
-`ssh -i ot2_ssh_key root@ROBOT_IP`
+
+# Verified Protocols
+
+**Nanopore** : For construct nanopore sequencing library (LSK109)
+
+**Plate replication** : For plate replication, primer dispense ... with well plate
+
+
+## With Script Writer
+
+With template script, make convertable own script based on protocol.
+can change the number of sample, parameters. 
+
+**DNA assembler** : For making DNA library, DNA part assembly.
+
