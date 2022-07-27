@@ -5,7 +5,6 @@ import datetime
 import re
 
 """
-썩 깔끔하지 않네
 Write script
 ---------------------------------
 
@@ -19,7 +18,7 @@ def get_args():
     parser.add_argument('-p', type=str, default = 'assembly', choices=['assembly', 'pooling'], help='protocol', required=True)
     parser.add_argument('-t', type=str, help = 'template.py file path', required=True)
     parser.add_argument('-o', type=str, help='script output', default="./assembly.py" , required=True)
-    
+
     args=parser.parse_args()
     return args
 
