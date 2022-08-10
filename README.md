@@ -7,12 +7,12 @@ The OT2 protocols used in KRIBB synthetic biology center [SBL](https://oak.kribb
 
 ## Verified Protocols
 
-**Nanopore** : For construction of nanopore sequencing library (LSK109)
+**Nanopore** : For construction of nanopore sequencing library (LSK109 & NBD)
 
-**Plate replication** : For plate replication, primer dispense ... with 96-well plate
+**Plate replication** : 96-well plate replication, Primer dispense ...
 
 ## With Script Writer
 
-Make convertable own protocols using script writer & template by setting parameters.
+To make flexible protocols use script writer & template with specific parameters.
 
-[**DNA assembler**](https://github.com/Lelp27/DNAssembler) : For making DNA library, DNA part assembly.
+[**DNA assembler**](https://github.com/Lelp27/DNAssembler) : DNA part assembly, golden gate assembly, DNA library generation
