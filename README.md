@@ -22,7 +22,7 @@ Contact about Protocols : <tjdrns227@gmail.com>
 
 # Streamlit Usage
 
-![](/protocols/DNAssembler/stramlit_main.png)
+![Streamlit](/protocols/DNAssembler/stramlit_main.png)
 * The Docker containers are getting ready.
 
 ## In preparation
