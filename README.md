@@ -1,18 +1,22 @@
 # SBL OT2 protocols
 
-The OT2 protocols used in KRIBB synthetic biology center [SBL](https://oak.kribb.re.kr/handle/201005/19496/tab-browse?sort_by=2&order=DESC)  
+OT2 liquid-handler[(OT2)](https://opentrons.com/ot-2/) Protocols for Synthetic Biology 
 
+The Protocols are using in KRIBB Synthetic biology Research Center[(SBL)](https://oak.kribb.re.kr/handle/201005/19496/tab-browse?sort_by=2&order=DESC)  
+Contact about Protocols : <tjdrns227@gmail.com>
 
 # Protocols  
 
 ## Verified Protocols
 
-**Nanopore** : For construction of nanopore sequencing library (LSK109)
+* Every Protocol have own Setup Process and Programs refer to each README.md    
+  
 
-**Plate replication** : For plate replication, primer dispense ... with 96-well plate
+**Nanopore** : For construction of nanopore sequencing library (Ligation Sequencing Kit)  
+**well_pooling.py** : Pool every wells from 96 well plate.
+**Tag_dispense** : Dispense the Tagging Primer according to column and row.  
+[**DNA assembler**](https://github.com/Lelp27/DNAssembler) : DNA part assembly, golden gate assembly, DNA library generation (Refer to Own repository)
 
-## With Script Writer
+## In preparation
 
-Make convertable own protocols using script writer & template by setting parameters.
-
-[**DNA assembler**](https://github.com/Lelp27/DNAssembler) : For making DNA library, DNA part assembly.
+**Plate_replication** : Replicate 96-well plate according to specified column and row.  
