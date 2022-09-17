@@ -13,9 +13,16 @@ Contact about Protocols : <tjdrns227@gmail.com>
   
 
 **Nanopore** : For construction of nanopore sequencing library (Ligation Sequencing Kit)  
-**well_pooling.py** : Pool every wells from 96 well plate.
-**Tag_dispense** : Dispense the Tagging Primer according to column and row.  
-[**DNA assembler**](https://github.com/Lelp27/DNAssembler) : DNA part assembly, golden gate assembly, DNA library generation (Refer to Own repository)
+
+**well_pooling.py** : Pool every wells from 96 well plate.  
+
+**Tag_dispense** : Dispense the Tagging Primer according to column and row.   
+
+**DNAssembler** : **Use Streamlit** DNA part assembly, golden gate assembly, DNA library generation (Refer to Own repository)
+
+# Streamlit Usage
+
+* The Docker containers are getting ready.
 
 ## In preparation
 
