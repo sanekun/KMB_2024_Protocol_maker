@@ -26,7 +26,7 @@ Contact about Protocols : <tjdrns227@gmail.com>
 * Use Streamlit Web App for handling parameters.  
 * The Docker containers are getting ready.  
 
-``` python
+``` bash
 streamlit run /protocols/DNAssembler/streamlit_DNAssembler.py
 ```
 
