@@ -22,8 +22,13 @@ Contact about Protocols : <tjdrns227@gmail.com>
 
 # Streamlit Usage
 
-![](./protocols/DNAssembler/stramlit_main.png)
-* The Docker containers are getting ready.
+![](/protocols/DNAssembler/streamlit_main.png)
+* Use Streamlit Web App for handling parameters.  
+* The Docker containers are getting ready.  
+
+``` python
+streamlit run /protocols/DNAssembler/streamlit_DNAssembler.py
+```
 
 ## In preparation
 
