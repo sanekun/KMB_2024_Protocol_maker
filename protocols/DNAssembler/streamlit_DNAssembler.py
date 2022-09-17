@@ -1,6 +1,6 @@
 # Streamlit page for DNAssembler
 import sys
-sys.path.append('/mnt/d/workspace/git/DNAssembler/DNAssembly')
+sys.path.append('/mnt/d/workspace/git/automated-protocol-ot2/protocols/DNAssembler')
 from assembly_functions import *
 import streamlit as st
 from streamlit_ace import st_ace
@@ -27,7 +27,7 @@ def load_template(path):
     return (template)
 
 def export_protocol():
-    data = calculate_metadata(input_path=input_wells, db_path="/mnt/d/workspace/git/DNAssembler/DNAssembly/Part_DB.xlsx", final_volume=20)
+    data = calculate_metadata(input_path=input_wells, db_path="//mnt/d/workspace/git/automated-protocol-ot2/protocols/DNAssembler/Part_DB.xlsx", final_volume=20)
     plate = data['plate']
 
     if len(plate) > 4:
@@ -64,7 +64,7 @@ thermocycler = st.selectbox("RUN Thermocycler", ('False', 'True'), help = "Direc
 st.text("")
 
 #Load_template
-template = load_template(path = "/mnt/d/workspace/git/DNAssembler/DNAssembly/assembly_template.py")
+template = load_template(path = "/mnt/d/workspace/git/automated-protocol-ot2/protocols/DNAssembler/assembly_template.py")
 
 if 'make_protocol' not in st.session_state:
     st.session_state.make_protocol = False
