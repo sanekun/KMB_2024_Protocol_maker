@@ -18,7 +18,7 @@ Contact about Protocols : <tjdrns227@gmail.com>
 
 **Tag_dispense** : Dispense the Tagging Primer according to column and row.   
 
-**DNAssembler** : **Use Streamlit** DNA part assembly, golden gate assembly, DNA library generation (Refer to Own repository)
+**DNAssembler** : Use [Streamlit](https://docs.streamlit.io/library/get-started/installation) DNA part assembly, golden gate assembly, DNA library generation (Refer to Own repository)
 
 # Streamlit Usage
 
