@@ -3,3 +3,4 @@ ot2_ssh_key
 ./calibration
 OpentronsPythonAPIV2.pdf
 ./progress_code
+*/__pycache__

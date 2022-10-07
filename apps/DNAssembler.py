@@ -32,17 +32,18 @@ def part_check(uni_parts, db):
         if i1 in db['No'].values:
             continue
         else:
-            print (f"Break! {i1} isn't in DB")
+            st.error(f"Break! {i1} isn't in DB", icon="🚨")
             #sys.exit('Parts No Error')
-    print ("Parts confirmed")
+    #print ("Parts confirmed")
 
 def parameter_check(wells):
     for well in wells.iloc():
         part_num = len(well['DNA'].split('_'))
         vol_num = len(well['Volume'].split('_'))
         if part_num != vol_num:
-            sys.exit(f"Warning!, {well['DNA']}'s Volume must be same length with part number \nExit Protocol.")
-    print ("Parameters Confrimed")
+            st.error(f"Warning!, {well['DNA']}'s Volume must be same length with part number \nExit Protocol.", icon="🚨")
+            st.stop()
+    #print ("Parameters Confrimed")
 
 def part_to_dna_form(uni_parts, db):
     tmp = db[db["No"] == uni_parts]
@@ -206,10 +207,35 @@ def app():
         st.selectbox("Select", ("Single", "Library"))
 
     with tab3:
-        st.header("DB")
         df = pd.read_excel(DB)
-        plate = st.selectbox("Well Plate", np.delete(df['plate'].unique(), 0))
-        st.dataframe(df[df['plate'] == plate])
+        st.header("Part DB")
+        st.warning("In this Page, Only can add data temporarly")
+        st.warning("If you want to add data permanently, Move to Part DB on sidebar")
+        col1, col2 = st.columns([2,1])
 
-        st.subheader("Insert Data")
-        st.write("DB에 Data넣기")
+        with col1:
+            plate = st.selectbox("Well Plate", np.delete(df['plate'].unique(), 0))
+            st.dataframe(df[df['plate'] == plate])
+        #df[df['plate'] == plate]
+        #['No', 'Name', 'Sequence', 'MW', 'plate', 'Well']
+
+        with col2:
+            if 'count' not in st.session_state:
+                st.session_state.count = 1
+
+            with st.form("col2", clear_on_submit=True):
+                st.markdown('**Add temporary data**')
+                name = st.text_input('Name')
+                vol = st.text_input('Volume')
+                st.text_input('Plate', 'ext', disabled=True, help='Temporary data only can add as ext')
+                st.text_input('No', f'e{st.session_state.count}', disabled=True, help='Temporary data only can add as ext')
+                if st.form_submit_button('Add data', help = 'Fill all of sections'):
+                    if (name == '') | (vol == ''):
+                        st.error('Fill All of sections!')
+                    else:
+                        st.success(f"Succesfully Add as e{st.session_state.count}")
+                        st.session_state.count += 1
+                        #form 초기화 필요
+
+if __name__=='__main__':
+    app()
