@@ -32,7 +32,8 @@ def part_check(uni_parts, db):
         if i1 in db['No'].values:
             continue
         else:
-            st.error(f"Break! {i1} isn't in DB", icon="🚨")
+            st.error(f"Part Error ! '{i1}' isn't in DB", icon="🚨")
+            st.stop()
             #sys.exit('Parts No Error')
     #print ("Parts confirmed")
 
@@ -41,7 +42,7 @@ def parameter_check(wells):
         part_num = len(well['DNA'].split('_'))
         vol_num = len(well['Volume'].split('_'))
         if part_num != vol_num:
-            st.error(f"Warning!, {well['DNA']}'s Volume must be same length with part number \nExit Protocol.", icon="🚨")
+            st.error(f"Volume Error!, {well['DNA']}'s Volume must be same length with part number \nExit Protocol.", icon="🚨")
             st.stop()
     #print ("Parameters Confrimed")
 
@@ -77,18 +78,15 @@ def assembly(well, part_list, part_list_dna, final_volume):
 
 def calculate_metadata(**kwargs):
     """
-    kwargs : input_path, db_path, 
+    kwargs : input_path, db_path
     """
     ## input parameter
-    db = pd.read_excel(kwargs['db_path'])
-    wells = pd.read_excel(kwargs['input_path']).iloc()[:,:2].fillna(0)
+    db = pd.read_csv(kwargs['db_path'])
+    wells = kwargs['df'].iloc()[:,:3].fillna(0)
     well_parts = [i.split('_') for i in wells['DNA']]
     part_list = list(set(sum(well_parts, [])))
     part_check(part_list, db)
     parameter_check(wells)
-
-    print (f"Final Well number: {len(wells['DNA'])}")
-    print (f"Used Parts: {part_list}")
 
     ## convert to dna class
     part_list_dna = [part_to_dna_form(i, db) for i in part_list]
@@ -114,11 +112,15 @@ def calculate_metadata(**kwargs):
     meta_data['plate'] = plates
     meta_data['EXT'] = ext_dna
 
+    meta_data['log'] = f"Final Well Number: {len(wells['DNA'])}  \n Used Parts: {part_list}"
+
     return (meta_data)
 
+## Additional Data
 ## tmp_dna's well The well's architechture is from opentrons 24 wells plate.
 EXT_wells = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6']
-DB = "./data/Part_DB.xlsx"
+_gen_wells = [str(j)+str(i) for j in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'] for i in [1,2,3,4,5,6,7,8]]
+DB = "./data/Part_DB.csv"
 
 def app():
     # Side bar
@@ -138,7 +140,7 @@ def app():
         return (template)
 
     def export_protocol():
-        data = calculate_metadata(input_path=input_wells, db_path = DB, final_volume=20)
+        data = calculate_metadata(df=df, db_path = DB, final_volume=20)
         plate = data['plate']
 
         if len(plate) > 4:
@@ -159,16 +161,24 @@ def app():
     st.caption("Author : Seong-Kun Bak <<tjdrns227@gmail.com>>")
     st.text("")
 
-    tab1, tab2, tab3 = st.tabs(["Protocol generation", "Make input file", "DB"])
+    # Session Data
+    if 'DB' not in st.session_state:
+        st.session_state.DB = pd.read_csv(DB)
+    if 'gen_well' not in st.session_state:
+        st.session_state.gen_well = pd.DataFrame({'Well': [],'DNA':[], 'Volume':[]})
+    if '_gen_well_count' not in st.session_state:
+        st.session_state._gen_well_count = 0
+
+    tab1, tab2, = st.tabs(["Protocol generation", "Generate Input File"])
 
     with tab1:
         st.subheader("Necessary input")
         with st.container():
             date = st.date_input("Date")
-            input_wells = st.file_uploader("Upload Wells", type=".xlsx", key='uploaded')
+            input_wells = st.file_uploader("Upload Wells", type=".csv", key='uploaded')
             #sample_input = st.checkbox("Sample", False)
             if input_wells:
-                df = pd.read_excel(input_wells)
+                df = pd.read_csv(input_wells)
                 st.subheader("Preview")
                 st.dataframe(df.head())
             st.text("")
@@ -189,12 +199,13 @@ def app():
 
         st.download_button("⬇️ Download Protocol", template, file_name="DNAssembler.py", disabled=(st.session_state.make_protocol is not True))
 
-        with st.expander("Deck Position"):
-            st.warning("For the Detail informations,\\\nCheck the Opentrons App")
-            if 'data' in globals():
+        with st.expander("Detail Information"):
+            st.warning("For more informations like Deck Position,\\\nCheck the Opentrons App")
+            if input_wells:
                 st.write('')
-                st.markdown(f'**Plate** : {data["plate"]}')
-                st.markdown(f'**Extra Samples** : {data["EXT"]}')
+                st.markdown(f'**Used Plate** : {data["plate"]}')
+                st.markdown(f'**Used part** : {data["part"]}')
+                st.markdown(f'**EXT Positions** : {data["EXT"]}')
             else:
                 st.write("Empty")
 
@@ -202,40 +213,79 @@ def app():
             edit_code = st_ace(template, language='python', theme='dracula')
             st.download_button("⬇️ Editied Protocol", edit_code, file_name='DNAssembler.py')
 
+
     with tab2:
-        st.header("Wells")
-        st.selectbox("Select", ("Single", "Library"))
+        with st.container():
+            st.subheader("Generate Input")
+            col1_1, col1_2 = st.columns([1,1])
+            with col1_1:
+                st.selectbox("Form", ("Single", "Library"), help = "'Library' make all of variables can assemble")
+            with col1_2:
+                part_num = st.number_input("Part Numbers", min_value = 1, max_value=4, help="Max is 4")
 
-    with tab3:
-        df = pd.read_excel(DB)
-        st.header("Part DB")
-        st.warning("In this Page, Only can add data temporarly")
-        st.warning("If you want to add data permanently, Move to Part DB on sidebar")
-        col1, col2 = st.columns([2,1])
+            col2_1, col2_2, col2_3, col2_4, col2_5 = st.columns([1,3,2,2,1])
+            col2_1.markdown("##")
+            col2_2.markdown("**No**")
+            col2_3.markdown("**Volume (uL)**")
+            col2_4.markdown("**MW (fmol)**")
+            col2_5.markdown("**Use MW**")
+            for i in range(part_num):
+                if f'usemw{i+1}' not in st.session_state:
+                    st.session_state[f'usemw{i+1}'] = False
 
-        with col1:
-            plate = st.selectbox("Well Plate", np.delete(df['plate'].unique(), 0))
-            st.dataframe(df[df['plate'] == plate])
-        #df[df['plate'] == plate]
-        #['No', 'Name', 'Sequence', 'MW', 'plate', 'Well']
+            for i in range(part_num):
+                col2_1.write("")
+                col2_1.markdown(f"Part{i+1}")
+                col2_2.text_input(f"no{i+1}", key =f'no{i+1}', label_visibility='collapsed')
+                col2_3.number_input(f"vol{i+1}", key= f'vol{i+1}', label_visibility='collapsed', disabled = st.session_state[f'usemw{i+1}']) 
+                col2_4.text_input(f"mw{i+1}", key=f'mw{i+1}', label_visibility='collapsed', disabled = not st.session_state[f'usemw{i+1}'])
+                col2_5.write("")
+                col2_5.checkbox("", key=f"usemw{i+1}")
+            if st.button("Submit"):
+                DNA, VOLUME = [], []
+                for i in range(part_num):
+                    DNA.append(st.session_state[f'no{i+1}'])
+                    VOLUME.append(str(st.session_state[f'vol{i+1}']))
+                new_well = {'Well': _gen_wells[st.session_state._gen_well_count], 'DNA':['_'.join(DNA)], 'Volume': ['_'.join(VOLUME)]}
+                st.session_state._gen_well_count += 1
+                st.session_state.gen_well = pd.concat([st.session_state.gen_well, pd.DataFrame(new_well)], ignore_index=True, axis=0)
 
-        with col2:
-            if 'count' not in st.session_state:
-                st.session_state.count = 1
+        with st.expander("Submitted Wells", expanded=True):
+            st.dataframe(st.session_state.gen_well, use_container_width=True)
+            st.download_button('⬇️ Download', st.session_state.gen_well.to_csv(), file_name='assembly_input.csv')
 
-            with st.form("col2", clear_on_submit=True):
-                st.markdown('**Add temporary data**')
-                name = st.text_input('Name')
-                vol = st.text_input('Volume')
-                st.text_input('Plate', 'ext', disabled=True, help='Temporary data only can add as ext')
-                st.text_input('No', f'e{st.session_state.count}', disabled=True, help='Temporary data only can add as ext')
-                if st.form_submit_button('Add data', help = 'Fill all of sections'):
-                    if (name == '') | (vol == ''):
-                        st.error('Fill All of sections!')
-                    else:
-                        st.success(f"Succesfully Add as e{st.session_state.count}")
-                        st.session_state.count += 1
-                        #form 초기화 필요
+
+
+        with st.container():
+            st.subheader("Part DB")
+            st.warning("In this Page, Only can add data temporarly \\\nIf you want to add data permanently, Move to Part DB on sidebar")
+            col1, col2 = st.columns([2,1])
+
+            with col1:
+                plate = st.selectbox("Well Plate", np.delete(st.session_state.DB['plate'].unique(), 0))
+                st.dataframe(st.session_state.DB.query(f"plate == '{plate}'"))
+            #['No', 'Name', 'Sequence', 'MW', 'plate', 'Well']
+
+            with col2:
+                if 'count' not in st.session_state:
+                    st.session_state.count = 1
+
+                with st.form("cont2", clear_on_submit=True):
+                    st.markdown('**Add temporary data**')
+                    name = st.text_input('Name')
+                    vol = st.text_input('Volume')
+                    st.text_input('Plate', 'ext', disabled=True, help='Temporary data only can add as ext')
+                    st.text_input('No', f'e{st.session_state.count}', disabled=True, help='Temporary data only can add as ext')
+                    if st.form_submit_button('Add data', help = 'Fill all of sections'):
+                        if (name == '') | (vol == ''):
+                            st.error('Fill All of sections!')
+                        else:
+                            df2 = ({'Name': name, 'plate':'ext', 'No': f'e{st.session_state.count}'})
+                            st.session_state.DB = st.session_state.DB.append(df2, ignore_index=True)
+                            st.success(f"Succesfully Add as e{st.session_state.count}")
+                            st.session_state.count += 1
+                            st.experimental_rerun()
+                            #form 초기화 필요
 
 if __name__=='__main__':
     app()
