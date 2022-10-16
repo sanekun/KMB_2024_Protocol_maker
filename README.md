@@ -29,11 +29,10 @@ Contact about Protocols : <tjdrns227@gmail.com>
 * The Docker containers are getting ready.  
 ``` bash
 docker pull tjdrns27/streamlit:v0.2
+
+docker run --rm -it -p 5001:5001 tjdrns27/streamlit:v0.2
 ```
-* in docker container
-``` bash
-streamlit run ./apps.py
-```
+* if you run docker, The Web Applications automatically run.
 
 ## In preparation
 
