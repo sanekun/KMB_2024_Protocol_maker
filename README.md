@@ -32,7 +32,7 @@ docker pull tjdrns27/streamlit:v0.2
 
 docker run --rm -it -p 5001:5001 tjdrns27/streamlit:v0.2
 ```
-* if you run docker, The Web Applications automatically run.
+* If you run docker, The Web Applications automatically run. `localhost:5001`
 
 ## In preparation
 
