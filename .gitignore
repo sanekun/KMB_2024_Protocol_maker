@@ -1,6 +1,5 @@
 ot2_ssh_key
-./__pycache__
 ./calibration
-OpentronsPythonAPIV2.pdf
 ./progress_code
-*/__pycache__
+__pycache__/
+*.pyc
