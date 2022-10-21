@@ -20,7 +20,7 @@ Contact about Protocols : <tjdrns227@gmail.com>
 
 **DNAssembler** : Use [Streamlit](https://docs.streamlit.io/library/get-started/installation) DNA part assembly, golden gate assembly, DNA library generation (Refer to Own repository)
 
-# Usage
+# Getting Started
 
 <img src = "https://raw.githubusercontent.com/Lelp27/automated-protocol-ot2/main/streamlit_main.png" width="30%" height="30%">
 
