@@ -1,3 +1,7 @@
+"""
+DB를 JSON으로 처음부터 갔었으면 쉬웠을듯.
+"""
+
 # Functions
 import sys
 import streamlit as st
@@ -169,7 +173,7 @@ def app():
     if '_gen_well_count' not in st.session_state:
         st.session_state._gen_well_count = 0
 
-    tab1, tab2, = st.tabs(["Protocol generation", "Generate Input File"])
+    tab1, tab2, tab3 = st.tabs(["Protocol generation", "Generate Input File", "Part DB"])
 
     with tab1:
         st.subheader("Necessary input")
@@ -253,39 +257,35 @@ def app():
         with st.expander("Submitted Wells", expanded=True):
             st.dataframe(st.session_state.gen_well, use_container_width=True)
             st.download_button('⬇️ Download', st.session_state.gen_well.to_csv(), file_name='assembly_input.csv')
-
-
-
+    
+    with tab3:
         with st.container():
             st.subheader("Part DB")
             st.warning("In this Page, Only can add data temporarly \\\nIf you want to add data permanently, Move to Part DB on sidebar")
-            col1, col2 = st.columns([2,1])
 
-            with col1:
-                plate = st.selectbox("Well Plate", np.delete(st.session_state.DB['plate'].unique(), 0))
-                st.dataframe(st.session_state.DB.query(f"plate == '{plate}'"))
-            #['No', 'Name', 'Sequence', 'MW', 'plate', 'Well']
+            if 'count' not in st.session_state:
+                st.session_state.count = 1
 
-            with col2:
-                if 'count' not in st.session_state:
-                    st.session_state.count = 1
+            with st.form("cont2", clear_on_submit=True):
+                st.markdown('**Add temporary data**')
+                name = st.text_input('Name')
+                vol = st.text_input('Volume')
+                st.text_input('Plate', 'ext', disabled=True, help='Temporary data only can add as ext')
+                st.text_input('No', f'e{st.session_state.count}', disabled=True, help='Temporary data only can add as ext')
+                if st.form_submit_button('Add data', help = 'Fill all of sections'):
+                    if (name == '') | (vol == ''):
+                        st.error('Fill All of sections!')
+                    else:
+                        df2 = ({'Name': name, 'plate':'ext', 'No': f'e{st.session_state.count}'})
+                        st.session_state.DB = st.session_state.DB.append(df2, ignore_index=True)
+                        st.success(f"Succesfully Add as e{st.session_state.count}")
+                        st.session_state.count += 1
+                        st.experimental_rerun()
+                        #form 초기화 필요
 
-                with st.form("cont2", clear_on_submit=True):
-                    st.markdown('**Add temporary data**')
-                    name = st.text_input('Name')
-                    vol = st.text_input('Volume')
-                    st.text_input('Plate', 'ext', disabled=True, help='Temporary data only can add as ext')
-                    st.text_input('No', f'e{st.session_state.count}', disabled=True, help='Temporary data only can add as ext')
-                    if st.form_submit_button('Add data', help = 'Fill all of sections'):
-                        if (name == '') | (vol == ''):
-                            st.error('Fill All of sections!')
-                        else:
-                            df2 = ({'Name': name, 'plate':'ext', 'No': f'e{st.session_state.count}'})
-                            st.session_state.DB = st.session_state.DB.append(df2, ignore_index=True)
-                            st.success(f"Succesfully Add as e{st.session_state.count}")
-                            st.session_state.count += 1
-                            st.experimental_rerun()
-                            #form 초기화 필요
+        plate = st.selectbox("Well Plate", np.delete(st.session_state.DB['plate'].unique(), 0))
+        st.dataframe(st.session_state.DB.query(f"plate == '{plate}'"))
+        #['No', 'Name', 'Sequence', 'MW', 'plate', 'Well']
 
 if __name__=='__main__':
     app()

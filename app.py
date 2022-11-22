@@ -6,8 +6,8 @@ app = MultiApp()
 
 # Add all your application here
 app.add_app("DNAssembler", DNAssembler.app)
-app.add_app("Tag dispense", Tag_dispenser.app)
-app.add_app("Pooling", Pooling.app)
+#app.add_app("Tag dispense", Tag_dispenser.app)
+#app.add_app("Pooling", Pooling.app)
 
 # The main app
 if __name__ == "__main__":
