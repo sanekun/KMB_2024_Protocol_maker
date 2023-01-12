@@ -1,5 +1,6 @@
 """
 DB를 JSON으로 처음부터 갔었으면 쉬웠을듯.
+= 다른 사람들은 외부에서 excel을 열 수 있어야 하긴함..
 """
 
 # Functions
@@ -9,6 +10,14 @@ import pandas as pd
 from streamlit_ace import st_ace
 import numpy as np
 import re
+
+# Necessary Data
+# EXT well is opentrons 24 wells plate form.
+EXT_wells = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6']
+_gen_wells = [str(j)+str(i) for j in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'] for i in [1,2,3,4,5,6,7,8]]
+DB = "./data/Part_DB.csv"
+template_path = './data/protocols/DNAssembler/assembly_template.py'
+
 
 class dna:
     # Basic information
@@ -30,7 +39,6 @@ class dna:
         final = round(goal_MW/self.MW, 2)
         return (final)
 
-# 220726
 def part_check(uni_parts, db):
     for i1 in uni_parts:
         if i1 in db['No'].values:
@@ -120,17 +128,8 @@ def calculate_metadata(**kwargs):
 
     return (meta_data)
 
-## Additional Data
-## tmp_dna's well The well's architechture is from opentrons 24 wells plate.
-EXT_wells = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6']
-_gen_wells = [str(j)+str(i) for j in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'] for i in [1,2,3,4,5,6,7,8]]
-DB = "./data/Part_DB.csv"
-
 def app():
-    # Side bar
-#    st.sidebar.title("OT2 Protocols")
-#    st.sidebar.caption("github.com/Lelp27/automated-protocol-ot2")
-
+    
     def load_template(path):
         template = path
 
@@ -176,15 +175,16 @@ def app():
     tab1, tab2, tab3 = st.tabs(["Protocol generation", "Generate Input File", "Part DB"])
 
     with tab1:
-        st.subheader("Necessary input")
         with st.container():
             date = st.date_input("Date")
             input_wells = st.file_uploader("Upload Wells", type=".csv", key='uploaded')
-            #sample_input = st.checkbox("Sample", False)
+            if st.checkbox("Use Sample", False, key='sample'):
+                input_wells = './data/assembly_input.csv'
+                
             if input_wells:
                 df = pd.read_csv(input_wells)
-                st.subheader("Preview")
-                st.dataframe(df.head())
+                with st.expander('Preview'):
+                    st.dataframe(df.head())
             st.text("")
 
         st.subheader("Parameters")
@@ -192,12 +192,12 @@ def app():
         st.text("")
 
         #Load_template
-        template = load_template(path = "./data/protocols/DNAssembler/assembly_template.py")
+        template = load_template(path = template_path)
 
         if 'make_protocol' not in st.session_state:
             st.session_state.make_protocol = False
 
-        if st.session_state.uploaded:
+        if st.session_state.uploaded or st.session_state.sample:
             st.session_state.make_protocol = True
             data, template = export_protocol()
 
@@ -206,12 +206,13 @@ def app():
         with st.expander("Detail Information"):
             st.warning("For more informations like Deck Position,\\\nCheck the Opentrons App")
             if input_wells:
-                st.write('')
-                st.markdown(f'**Used Plate** : {data["plate"]}')
-                st.markdown(f'**Used part** : {data["part"]}')
-                st.markdown(f'**EXT Positions** : {data["EXT"]}')
+                f"""
+                **Plate** : {data['plate']}  
+                **Part**  : {data['part']}  
+                **EXT**   : {data['EXT']}
+                """
             else:
-                st.write("Empty")
+                pass
 
         with st.expander("Change Script (Only for Developer)"):
             edit_code = st_ace(template, language='python', theme='dracula')
@@ -223,7 +224,8 @@ def app():
             st.subheader("Generate Input")
             col1_1, col1_2 = st.columns([1,1])
             with col1_1:
-                st.selectbox("Form", ("Single", "Library"), help = "'Library' make all of variables can assemble")
+                library = st.selectbox("Form", ("Single", "Library"), 
+                                       help = "If you use 'library', Please separate part No with comma")
             with col1_2:
                 part_num = st.number_input("Part Numbers", min_value = 1, max_value=4, help="Max is 4")
 
@@ -241,7 +243,7 @@ def app():
                 col2_1.write("")
                 col2_1.markdown(f"Part{i+1}")
                 col2_2.text_input(f"no{i+1}", key =f'no{i+1}', label_visibility='collapsed')
-                col2_3.number_input(f"vol{i+1}", key= f'vol{i+1}', label_visibility='collapsed', disabled = st.session_state[f'usemw{i+1}']) 
+                col2_3.number_input(f"vol{i+1}", key= f'vol{i+1}', step=0.1, label_visibility='collapsed', disabled = st.session_state[f'usemw{i+1}']) 
                 col2_4.text_input(f"mw{i+1}", key=f'mw{i+1}', label_visibility='collapsed', disabled = not st.session_state[f'usemw{i+1}'])
                 col2_5.write("")
                 col2_5.checkbox("", key=f"usemw{i+1}")
@@ -259,9 +261,13 @@ def app():
             st.download_button('⬇️ Download', st.session_state.gen_well.to_csv(), file_name='assembly_input.csv')
     
     with tab3:
+        st.subheader("Part DB")
+        st.warning("In this Page, Only can add data temporarly \\\nIf you want to add data permanently, Move to Part DB on sidebar")
+        
+        plate = st.selectbox("Well Plate", np.delete(st.session_state.DB['plate'].unique(), 0))
+        st.dataframe(st.session_state.DB.query(f"plate == '{plate}'"))
+        
         with st.container():
-            st.subheader("Part DB")
-            st.warning("In this Page, Only can add data temporarly \\\nIf you want to add data permanently, Move to Part DB on sidebar")
 
             if 'count' not in st.session_state:
                 st.session_state.count = 1
@@ -282,10 +288,6 @@ def app():
                         st.session_state.count += 1
                         st.experimental_rerun()
                         #form 초기화 필요
-
-        plate = st.selectbox("Well Plate", np.delete(st.session_state.DB['plate'].unique(), 0))
-        st.dataframe(st.session_state.DB.query(f"plate == '{plate}'"))
-        #['No', 'Name', 'Sequence', 'MW', 'plate', 'Well']
 
 if __name__=='__main__':
     app()
