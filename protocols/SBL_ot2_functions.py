@@ -1,19 +1,17 @@
-#from opentrons import simulate, types
-#protocol=simulate.get_protocol_api('2.11')
-
+from opentrons import simulate, types
 from math import floor
 
-"""
-    'protocolName': 'OT2 Functions',
-    'author': 'Seong-Kun Bak <tjdrns27@kribb.re.kr>',
-    'apiLevel': '2.12',
-    'description': 'Basic OT2 Functions'
-"""
+protocol=simulate.get_protocol_api('2.11')
 
+
+def flow_rate(pipette, **kwargs):
+    assert (item in ['aspirate', 'dispense', 'blow_out'] for item in kwargs.keys()), "Error Keywords in Flow Rate."
+    for i in kwargs.keys:
+        pipette.flow_rate[i] = kwargs[i]
 
 def enzyme_transfer(pipette, volume, src, dest, delay_second=[0, 0],
                 top_delay=False, asp_rate=None, dis_rate=None,
-                mix_after=False, drop_tip = True):
+                mix_after: list = [], drop_tip = True):
     # top_delay = list, delay_second= list, mix_after = list
 
     if asp_rate:
