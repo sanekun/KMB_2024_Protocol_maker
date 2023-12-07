@@ -4,6 +4,23 @@ from opentrons import types, protocol_api
 # 23-10-20 Simulated by kun.
 
 # PARAMETERS
+# Primer, Template Input을 Dict (JSON)으로 받는다고 가정.
+
+PARAMETER={
+    "plate_type":"nest_96_wellplate_200ul_flat",
+    "PLATE": {
+        "Plate1": {
+            "NewRiboJ-F": "A1",
+            "NewRiboJ-R": "A2"
+            },
+        "Plate2": {
+            "TemplateDNA": "B1"
+            }
+        },
+    "PARAM1": 1,
+    "PARAM2": 0
+}
+
 MULTI_PIPETTE=False
 
 metadata = {
@@ -26,16 +43,21 @@ def run(protocol: protocol_api.ProtocolContext):
     # Deck Setting
     ## Modules 
     tc_mod = protocol.load_module(module_name="thermocyclerModuleV1")
-    mag_mod = protocol.load_module(module_name="magneticModuleV2", location=1)
     
     ## Pipette
-    p20_tip = protocol.load_labware("opentrons_96_tiprack_20ul", 2)
+    p20_tip = protocol.load_labware("opentrons_96_tiprack_20ul", 1)
     if MULTI_PIPETTE:
         p20 = protocol.load_instrument("p20_multi_gen2", "left", tip_racks=[p20_tip])
     else:
         p20 = protocol.load_instrument("p20_single_gen2", "left", tip_racks=[p20_tip])
     
     ## Plates
+    
+    for i in range(len(PARAMETER["PLATE"])):
+        protocol.load_labware(PARAMETER["plate_type"], location=i)
+    PARAMETER["PLATE"].keys()
+    
+    
     source_plate = protocol.load_labware("nest_96_wellplate_200ul_flat", location=3)
     tc_plate = tc_mod.load_labware("nest_96_wellplate_200ul_flat")
     mag_plate = mag_mod.load_labware("nest_96_wellplate_200ul_flat")
