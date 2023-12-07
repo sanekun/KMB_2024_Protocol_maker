@@ -1,4 +1,7 @@
 # Cloning
+
+Macrogen 96-well plate Input을 받아 바로 Assembly를 진행할 수 있게 설계  
+
 PCR 부터 Transformation 까지 `Full-automation` 진행  
 `Input Materials`
 > Template[Vector, Insert]  
