@@ -4,6 +4,26 @@ from opentrons import types, protocol_api
 # 23-10-20 Simulated by kun.
 
 # PARAMETERS
+# Input Plate
+# df["Name"]:df["Well"]
+PARAMETERS = {
+    "PLATE": {
+        "plate1": {
+            "pACBB_vec-F1":"A1",
+            "pACBB_vec-R1":"B1",
+            "primer3":"B6",
+            "primer4":"C2",
+            "primer5":"E7",
+            "primer6":"F9"
+        },
+        "plate2":{
+            "pACBB_4-5"
+        }
+    }
+}
+
+
+
 MULTI_PIPETTE=False
 
 metadata = {
