@@ -3,35 +3,16 @@
 OT2 liquid-handler[(OT2)](https://opentrons.com/ot-2/) Protocols for Synthetic Biology 
 
 The Protocols are using in KRIBB Synthetic biology Research Center[(SBL)](https://oak.kribb.re.kr/handle/201005/19496/tab-browse?sort_by=2&order=DESC)  
-Contact about Protocols : <tjdrns227@gmail.com>
+Contact about Protocols : <sanekun@kaist.ac.kr>
 
 # Protocols  
 
-## Verified Protocols
+* Every Protocol have own Setup Process and Web Programs refer to each README.md    
 
-* Every Protocol have own Setup Process and Programs refer to each README.md    
-  
+[v] Nanopore: Ligation Sequencing Kit
+[v] NEBuilder HiFi Assembly: PCR - Assembly - Transformation
 
-**Nanopore** : For construction of nanopore sequencing library (Ligation Sequencing Kit)  
+# Web Application
 
-**well_pooling.py** : Pool every wells from 96 well plate.  
-
-**Tag_dispense** : Dispense the Tagging Primer according to column and row.   
-
-**DNAssembler** : Use [Streamlit](https://docs.streamlit.io/library/get-started/installation) DNA part assembly, golden gate assembly, DNA library generation (Refer to Own repository)
-
-# Getting Started
-
-* Use Streamlit Web App for handling parameters.  
-
-* The Docker containers are getting ready.  
-``` bash
-docker pull tjdrns27/streamlit:v0.2
-
-docker run --rm -it -p 5001:5001 tjdrns27/streamlit:v0.2
-```
-* If you run docker, The Web Applications automatically run. `localhost:5001`
-
-## In preparation
-
-**Plate_replication** : Replicate 96-well plate according to specified column and row.  
+[ ] Plate Registeration
+[v] NEBuilder HiFi Assembly
