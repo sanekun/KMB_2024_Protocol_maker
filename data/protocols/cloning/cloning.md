@@ -50,7 +50,24 @@ flowchart TB
 
 </details>
 
-## Usage
+## Usage (Web)
+### Make Plate
+Type, Deck Position 결정하여 Plate 생성
+
+### DNA 등록
+사용할 DNA (Primer, Template) 각 Plate에 등록
+- Wide or Long form으로 Excel or 개별입력
+
+### REACTION 등록
+DNA 와 동일한 방식으로 Input 입력
+
+### Save Protocol
+1. 겹치는 Deck, Well 있는 지 확인
+2. 사용할 Tip 수 확인
+3. Protocol 출력 
+
+
+## Input (MD)
 ### Input (Plate1)
 #### Long-form
 | Well | Name         |
@@ -80,16 +97,16 @@ flowchart TB
 | B1   | pET28a    |
 
 ### PCR Reaction (Plate3)
-| Well | Tag | DNA (0.5) | DNA (0.75)   | DNA (0.75)   | Enzyme (12.5) | DW (25) |
-| ---- | --- | --------- | ------------ | ------------ | ------------- | ------- |
-| A1   | S1  | pACBB_4-5 | pACBB_vec-F1 | pACBB_vec-R1 | KODone        | DW      |
-| B1   | S2  | pACBB_4-5 | pACBB_vec-F2 | pACBB_vec-R2 | KODone        | DW      |
-| C1   | S3  | pACBB_4-5 | pACBB_T7-F1  | pACBB_T7-R1  | KODone        | DW      |
-| D1   | S4  | pACBB_4-5 | pACBB_T7-F2  | pACBB_T7-R2  | KODone        | DW      |
-| F1   | S5  | pACBB_4-5 | pET28_MCS-F1 | pET28_MCS-R1 | KODone        | DW      |
+| Well | Name | DNA1 (0.5) | DNA2 (0.75)  | DNA3 (0.75)  | Enzyme (12.5) | DW (25) |
+| ---- | --- | ---------- | ------------ | ------------ | ------------- | ------- |
+| A1   | S1  | pACBB_4-5  | pACBB_vec-F1 | pACBB_vec-R1 | KODone        | DW      |
+| B1   | S2  | pACBB_4-5  | pACBB_vec-F2 | pACBB_vec-R2 | KODone        | DW      |
+| C1   | S3  | pACBB_4-5  | pACBB_T7-F1  | pACBB_T7-R1  | KODone        | DW      |
+| D1   | S4  | pACBB_4-5  | pACBB_T7-F2  | pACBB_T7-R2  | KODone        | DW      |
+| F1   | S5  | pACBB_4-5  | pET28_MCS-F1 | pET28_MCS-R1 | KODone        | DW      |
 
 ### Assembly Reaction (Plate3)
-| Well | Tag  | DNA1 | DNA2 | DNA3 | Enzyme (10)               | DW (20) |
+| Well | Name  | DNA1 | DNA2 | DNA3 | Enzyme (10)               | DW (20) |
 | ---- | ---- | ---- | ---- | ---- | ------------------------- | ------- |
 | A9   | vec1 | S1   | S2   |      | NEBuilder HiFi Master Mix | DW      |
 | B9   | vec2 | S1   | S3   |      | NEBuilder HiFi Master Mix | DW      |
@@ -98,20 +115,25 @@ flowchart TB
 | E9   | vec5 | S3   |      |      | NEBuilder HiFi Master Mix | DW      |
 
 ### Transformation (Plate4)
-| Well | Name         |
-| ---- | ------------ |
+| Well | Name |
+| ---- | ---- |
 | A1   | vec1 |
 | A2   | vec1 |
-| A3   | vec1      |
-| B1   | vec2      |
-| B2   | vec2      |
-| B3   | vec2      |
-| C1   | vec3      |
-| C2   | vec3      |
-| C3   | vec3      |
-| D1   | vec4      |
-| D2   | vec4      |
-| D3   | vec4      |
-| E1   | vec5      |
-| E2   | vec5      |
-| E3   | vec5      |
+| A3   | vec1 |
+| B1   | vec2 |
+| B2   | vec2 |
+| B3   | vec2 |
+| C1   | vec3 |
+| C2   | vec3 |
+| C3   | vec3 |
+| D1   | vec4 |
+| D2   | vec4 |
+| D3   | vec4 |
+| E1   | vec5 |
+| E2   | vec5 |
+| E3   | vec5 |
+
+## Input (JSON)
+``` JSON
+
+```

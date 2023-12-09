@@ -1,24 +1,63 @@
 from opentrons import types, protocol_api
+import pandas as pd
 
 # Cell + Substrate transfer to 96 well plate
 # 23-10-20 Simulated by kun.
 
 # PARAMETERS
-# Primer, Template Input을 Dict (JSON)으로 받는다고 가정.
+# Primer, Template Input을 Web으로부터 Dict(JSON)으로 받는다고 가정.
 
-PARAMETER={
-    "plate_type":"nest_96_wellplate_200ul_flat",
-    "PLATE": {
-        "Plate1": {
-            "NewRiboJ-F": "A1",
-            "NewRiboJ-R": "A2"
-            },
-        "Plate2": {
-            "TemplateDNA": "B1"
-            }
-        },
-    "PARAM1": 1,
-    "PARAM2": 0
+## 먼저 사용할 모든 Plate 등록 (Transformation 받을 것 까지)
+## Thermocycler Plate 1개 등록
+PLATE = {
+    "Plate1": {
+        "Deck": 4,
+        "Type": "nest_96_wellplate_200ul_flat"
+    },
+    "Plate2": {
+        "Deck": 5,
+        "Type": "nest_96_wellplate_200ul_flat"
+    },
+    "Plate3": {
+        "Deck": 9,
+        "Type": "nest_96_wellplate_200ul_flat"
+    },
+    "Plate4": {
+        "Deck": 6,
+        "Type": "nest_96_wellplate_200ul_flat"
+    },
+}
+
+## 사용할 DNA 등록 (Plate별로)
+INPUT= {
+    "Plate1": pd.DataFrame({
+        "Well":["A1","B1","B6","C2","E7","F9"],
+        "Name":["pACBB_vec-F1", "pACBB_vec-R1", "primer3", "primer4", "primer5", "primer6"]}),
+    "Plate2": pd.DataFrame({
+        "Well":["A1","B1"],
+        "Name":["pACBB_4-5", "pET28a"]})
+}
+
+REACTION = {
+    "PCR":  pd.DataFrame({
+        "Well": ['A1','B1','C1','D1','F1'],
+        'Name': ['S1','S2','S3','S4','S5'],
+        'DNA1 (0.5)': ['pACBB_4-5','pACBB_4-5','pACBB_4-5','pACBB_4-5','pACBB_4-5'],
+        'DNA2 (0.75)': ['pACBB_vec-F1','pACBB_vec-F2','pACBB_T7-F1', 'pACBB_T7-F2','pACBB_MCS-F1'],
+        'DNA3 (0.75)': ['pACBB_vec-R1','pACBB_vec-R2','pACBB_T7-R1', 'pACBB_T7-R2','pACBB_MCS-R1'],
+        'Enzyme (12.5)': ['KODone','KODone','KODone','KODone','KODone'],
+        'DW (25)': ['DW','DW','DW','DW','DW']
+        }),
+    "Assembly": pd.DataFrame({
+        'Well': ['A9','B9','C9','D9','E9'],
+        'Name': ['vec1','vec2','vec3','vec4','vec5'],
+        'DNA1': ['S1','S1','S2','S1','S3'],
+        'DNA2': ['S2','S3','S3','S2',''],
+        'DNA3': ['S2','S3','S3','S2',''],
+        'Enzyme (10)': ['NEBuilder HiFi Master Mix','NEBuilder HiFi Master Mix','NEBuilder HiFi Master Mix','NEBuilder HiFi Master Mix','NEBuilder HiFi Master Mix'],
+        'DW (20)': ['DW','DW','DW','DW','DW']
+        }),
+    "Transformation": {}
 }
 
 MULTI_PIPETTE=False
