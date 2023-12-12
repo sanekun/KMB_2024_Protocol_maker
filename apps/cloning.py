@@ -21,16 +21,16 @@ def plate_initialization(i, plate_type: str, table_type='empty'):
             'DNA1': [None for _ in range(96)],
             'DNA2': [None for _ in range(96)],
             'DNA3': [None for _ in range(96)],
-            'Enzyme (12.5)': ["KODone" for _ in range(96)],
-            'DW (25)': ['DW' for _ in range(96)]
+            'Enzyme1': ["KODone" for _ in range(96)],
+            'DW': ['DW' for _ in range(96)]
         }),
         'Assembly': pd.DataFrame({
             'Well': ['A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1', 'A2', 'B2', 'C2', 'D2', 'E2', 'F2', 'G2', 'H2', 'A3', 'B3', 'C3', 'D3', 'E3', 'F3', 'G3', 'H3', 'A4', 'B4', 'C4', 'D4', 'E4', 'F4', 'G4', 'H4', 'A5', 'B5', 'C5', 'D5', 'E5', 'F5', 'G5', 'H5', 'A6', 'B6', 'C6', 'D6', 'E6', 'F6', 'G6', 'H6', 'A7', 'B7', 'C7', 'D7', 'E7', 'F7', 'G7', 'H7', 'A8', 'B8', 'C8', 'D8', 'E8', 'F8', 'G8', 'H8', 'A9', 'B9', 'C9', 'D9', 'E9', 'F9', 'G9', 'H9', 'A10', 'B10', 'C10', 'D10', 'E10', 'F10', 'G10', 'H10', 'A11', 'B11', 'C11', 'D11', 'E11', 'F11', 'G11', 'H11', 'A12', 'B12', 'C12', 'D12', 'E12', 'F12', 'G12', 'H12'],
             'Name': [None for _ in range(96)],
             'DNA1': [None for _ in range(96)],
             'DNA2': [None for _ in range(96)],
-            'Enzyme (10)': ['NEBuilder HiFi Master Mix'] * 96,
-            'DW (20)': ['DW'] * 96
+            'Enzyme1': ['NEBuilder HiFi Master Mix'] * 96,
+            'DW': ['DW'] * 96
         }),
     }
     if f"{plate_type}_plate_{i}_name" not in st.session_state:
@@ -63,6 +63,19 @@ def plate_transformation(df, data_form):
         
         return new_df
 
+def add_column_button(df, column_type):
+    # Check current df's column name (like DNA1, DNA2, DNA3) add final number
+    column_names = df.columns
+    # grep column_type+[0-9]+ string in column_names
+    column_numbers = [int(re.findall(rf'{column_type}(\d+)', column_name)[0]) for column_name in column_names if re.findall(rf'{column_type}(\d+)', column_name)]
+    df[f'{column_type}{max(column_numbers)+1}'] = [None for _ in range(len(df))]
+    # column order is 'well', 'name', ['DNA\d+', 'Enzyme[+]', 'DW'']
+    df = df.reindex(['Well', 'Name'] + 
+               sorted([column_name for column_name in df.columns if re.findall(rf'DNA(\d+)', column_name)]) + 
+               sorted([column_name for column_name in df.columns if re.findall(rf'Enzyme(\d+)', column_name)]) + 
+               ['DW'], axis=1)
+    return df
+
 def Example():
     PCR_df = pd.DataFrame({
         'Well': ['A1', 'B1', 'C1', 'D1', 'F1'],
@@ -70,8 +83,8 @@ def Example():
         'DNA1': ['pACBB_4-5', 'pACBB_4-5', 'pACBB_4-5', 'pACBB_4-5', 'pACBB_4-5'],
         'DNA2': ['pACBB_vec-F1', 'pACBB_vec-F2', 'pACBB_T7-F1', 'pACBB_T7-F2', 'pET28_MCS-F1'],
         'DNA3': ['pACBB_vec-R1', 'pACBB_vec-R2', 'pACBB_T7-R1', 'pACBB_T7-R2', 'pET28_MCS-R1'],
-        'Enzyme (12.5)': ['KODone', 'KODone', 'KODone', 'KODone', 'KODone'],
-        'DW (25)': ['DW', 'DW', 'DW', 'DW', 'DW']
+        'Enzyme': ['KODone', 'KODone', 'KODone', 'KODone', 'KODone'],
+        'DW': ['DW', 'DW', 'DW', 'DW', 'DW']
         }),
     Assembly_df = pd.DataFrame({
         'Well': ['A9', 'B9', 'C9', 'D9', 'E9'],
@@ -83,14 +96,6 @@ def Example():
         'DW (20)': ['DW'] * 5
         }),
 
-def add_column_button(df, column_type):
-    # Check current df's column name (like DNA1, DNA2, DNA3) add final number
-    column_names = df.columns
-    # grep column_type+[0-9]+ string in column_names
-    column_numbers = [int(re.findall(rf'{column_type}(\d+)', column_name)[0]) for column_name in column_names if re.findall(rf'{column_type}(\d+)', column_name)]
-    df[f'{column_type}{max(column_numbers)+1}'] = [None for _ in range(len(df))]
-    # column order is 'well', 'name', ['DNA\d+', 'Enzyme[+]', 'DW'']
-    df = df[['Well', 'Name'] + sorted([column_name for column_name in df.columns if re.findall(rf'{column_type}(\d+)', column_name)]) + ['Enzyme (12.5)', 'DW (25)']]
 
 
 st.session_state['labwares'] = ["nest_96_wellplate_200ul_flat"]
@@ -148,9 +153,10 @@ with st.expander("Reaction - PCR", expanded=True):
                 with st.container(border=True):
                     column_type = st.selectbox('Add Column', ['DNA', 'Enzyme'], label_visibility='collapsed',
                                  key=f'{plate_type}_{reaction_type}_plate_{i}_selecttype')
-                    st.button('Add Column',
-                              on_click=add_column_button,
-                              kwargs={'df': st.session_state[f'{reaction_type}_plate_{i}_df'], 'column_type': column_type})
+                    if st.button('Add Column', key=f'{plate_type}_{reaction_type}_plate_{i}_addcolumn'):
+                        st.session_state[f'{reaction_type}_plate_{i}_df'] = add_column_button(df=st.session_state[f'{reaction_type}_plate_{i}_df'],
+                                                                                              column_type= column_type)
+                        st.rerun()
 
 with st.expander("Reaction - Assembly", expanded=True):
     reaction_type = 'Assembly'
@@ -171,9 +177,11 @@ with st.expander("Reaction - Assembly", expanded=True):
                 with st.container(border=True):
                     column_type = st.selectbox('Add Column', ['DNA', 'Enzyme'], label_visibility='collapsed',
                                  key=f'{plate_type}_{reaction_type}_plate_{i}_selecttype')
-                    st.button('Add Column',
-                              on_click=add_column_button,
-                              kwargs={'df': st.session_state[f'{reaction_type}_plate_{i}_df'], 'column_type': column_type})
+                    if st.button('Add Column', key=f'{plate_type}_{reaction_type}_plate_{i}_addcolumn'):
+                        st.session_state[f'{reaction_type}_plate_{i}_df'] = add_column_button(df=st.session_state[f'{reaction_type}_plate_{i}_df'],
+                                                                                              column_type= column_type)
+                        st.rerun()
+
 
 ## Transformation
 with st.expander("Transformation", expanded=True):
@@ -195,4 +203,9 @@ with st.expander("Transformation", expanded=True):
             else:
                 st.session_state[f'{plate_type}_plate_{i}_df'] = plate_transformation(df = st.data_editor(plate_transformation(st.session_state[f'{plate_type}_plate_{i}_df'], data_form='long'),
                                                                                             use_container_width=True, key=f'{plate_type}_plate_{i}_long'),
-                                                                        data_form = 'wide')            
+                                                                        data_form = 'wide')
+
+protocol = False
+if st.button("Make Protocol"):
+    protocol = True
+st.download_button(label="Download Protocol", data="test", file_name="test.txt", disabled=not bool(protocol))
