@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
+import re
 
 # Statics
 def empty_plate_df():
@@ -83,6 +83,16 @@ def Example():
         'DW (20)': ['DW'] * 5
         }),
 
+def add_column_button(df, column_type):
+    # Check current df's column name (like DNA1, DNA2, DNA3) add final number
+    column_names = df.columns
+    # grep column_type+[0-9]+ string in column_names
+    column_numbers = [int(re.findall(rf'{column_type}(\d+)', column_name)[0]) for column_name in column_names if re.findall(rf'{column_type}(\d+)', column_name)]
+    df[f'{column_type}{max(column_numbers)+1}'] = [None for _ in range(len(df))]
+    # column order is 'well', 'name', ['DNA\d+', 'Enzyme[+]', 'DW'']
+    df = df[['Well', 'Name'] + sorted([column_name for column_name in df.columns if re.findall(rf'{column_type}(\d+)', column_name)]) + ['Enzyme (12.5)', 'DW (25)']]
+
+
 st.session_state['labwares'] = ["nest_96_wellplate_200ul_flat"]
 st.set_page_config(page_title="Cloning",
                    layout="wide")
@@ -135,11 +145,12 @@ with st.expander("Reaction - PCR", expanded=True):
                     key=f'{plate_type}_{reaction_type}_plate_{i}_wide'
                 )
             with col2:
-                with st.form(key=f'{plate_type}_{reaction_type}_plate_{i}_addcolumn'):
-                    st.selectbox('Add Column', ['DNA', 'Enzyme'], label_visibility='collapsed', key=f'{plate_type}_{reaction_type}_plate_{i}_selecttype')
-                    if st.form_submit_button('Add Column'):
-                        # Add new column in this plate
-                        pass
+                with st.container(border=True):
+                    column_type = st.selectbox('Add Column', ['DNA', 'Enzyme'], label_visibility='collapsed',
+                                 key=f'{plate_type}_{reaction_type}_plate_{i}_selecttype')
+                    st.button('Add Column',
+                              on_click=add_column_button,
+                              kwargs={'df': st.session_state[f'{reaction_type}_plate_{i}_df'], 'column_type': column_type})
 
 with st.expander("Reaction - Assembly", expanded=True):
     reaction_type = 'Assembly'
@@ -157,11 +168,12 @@ with st.expander("Reaction - Assembly", expanded=True):
                     key=f'{plate_type}_{reaction_type}_plate_{i}_wide'
                 )
             with col2:
-                with st.form(key=f'{plate_type}_{reaction_type}_plate_{i}_addcolumn'):
-                    st.selectbox('Add Column', ['DNA', 'Enzyme'], label_visibility='collapsed', key=f'{plate_type}_{reaction_type}_plate_{i}_selecttype')
-                    if st.form_submit_button('Add Column'):
-                        # Add new column in this plate
-                        pass
+                with st.container(border=True):
+                    column_type = st.selectbox('Add Column', ['DNA', 'Enzyme'], label_visibility='collapsed',
+                                 key=f'{plate_type}_{reaction_type}_plate_{i}_selecttype')
+                    st.button('Add Column',
+                              on_click=add_column_button,
+                              kwargs={'df': st.session_state[f'{reaction_type}_plate_{i}_df'], 'column_type': column_type})
 
 ## Transformation
 with st.expander("Transformation", expanded=True):
