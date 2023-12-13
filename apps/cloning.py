@@ -96,11 +96,9 @@ def Example():
         'DW (20)': ['DW'] * 5
         }),
 
-
-
-st.session_state['labwares'] = ["nest_96_wellplate_200ul_flat"]
 st.set_page_config(page_title="Cloning",
                    layout="wide")
+st.session_state['labwares'] = ["nest_96_wellplate_200ul_flat"]
 
 # Main
 st.button('Use Example')
@@ -114,7 +112,7 @@ with st.expander("DNA Plate", expanded=True):
     for i in range(len(plates)):
         plate_initialization(i, plate_type=plate_type, table_type='empty')
         with plates[i]:
-            st.text_input("Name", value=st.session_state[f'{plate_type}_plate_{i}_name'], key=f'{plate_type}_plate_{i}_name')
+            st.text_input("Name", placeholder=f'{plate_type}_plate_{i+1}_name', value=st.session_state[f'{plate_type}_plate_{i}_name'], key=f'{plate_type}_plate_{i}_name')
             st.selectbox("Labware", options=st.session_state['labwares'], key=f'{plate_type}_plate_{i}_labware')
 
             st.toggle("Long Form", key=f'{plate_type}_plate_{i}_toggle')
@@ -209,3 +207,37 @@ protocol = False
 if st.button("Make Protocol"):
     protocol = True
 st.download_button(label="Download Protocol", data="test", file_name="test.txt", disabled=not bool(protocol))
+
+st.expander("Developer Only", expanded=False).markdown(
+    """
+    # Flow
+    Number of Plate = st.session_state['num_of_plate'] + st.session_state['num_of_reaction_plate'] + st.session_state['num_of_TF_plate']
+    Plate_type = ['DNA', 'Reaction', 'Transformation']
+    `plate name` = st.session_state[f'{plate_type}_plate_{i}_name']
+    `plate df` = st.session_state[f'{plate_type}_plate_{i}_df']
+    
+    Reaction_type = ['PCR', 'Assembly']
+    `plate_df = merge(`reaction df` = st.session_state[f'{reaction_type}_plate_{i}_df'])
+    
+    1. Check Number of plate and plate type can access to Device  
+    2. Check whole DNA used in Reaction be in DNA plate.  
+    3. Check whole Reacted Sample used in Transformation be in Reaction plate.  
+    4. Check and Notice Enzyme and DW using in this Protocol.  
+    5. Check Number of Reaction and How many tips need.  
+    6. Make Report and Protocol with upper information.    
+    ---
+    # Output Information
+    For output information, use another script `Script`.
+    
+    JSON format {
+        "Labwares": {
+            f"st.session_state[f'{plate_type}_plate_{i}_name']": {
+                
+            }
+        }
+    }
+    Number of DNA_plate = st.session_state['num_of_DNA_plate']
+    `DNA plates` = st.session_state['DNA_plate_0_df'], st.session_state['DNA_plate_1_df'], ...
+    
+    """
+    )
