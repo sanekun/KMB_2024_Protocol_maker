@@ -101,6 +101,108 @@ st.set_page_config(page_title="Cloning",
 st.session_state['labwares'] = ["nest_96_wellplate_200ul_flat"]
 
 # Main
+with st.expander("Manual", expanded=True):
+    manual_tabs = st.tabs(['How to use', 'Developer only'])
+    with manual_tabs[0]:
+        st.markdown(
+            """
+            # How to use
+            ***This method is optimized for `cloning` with `OT-2`.***  
+            (PCR - Assembly - Transformation)
+            """)
+        st.success(
+            """
+            - The Maximum number of plates is 5
+            - Using OT-2 the reaction plate should be One on thermocycler
+            - **If name of sample is empty, the sample will be skipped**
+            """
+            )
+        st.markdown(
+            """
+            1. Fill the `Sample Plate` in the order of the following table
+
+            2. Describe the Reaction using Sample you write in `Sample Plate`
+
+            3. Fill the `TF plate` in the order of the following table.
+            - You can spot the same sample several times
+
+            4. Click `Make Protocol` button.
+            - Automatically check the error. 
+                - same sample name, no sample name ...
+            - The Report will be displayed
+                - Transformed Plate on each sample is recorded
+                - Parameters used in this protocol
+            - Download and Transfer `protocol.py` file to OT-2
+            - Run the protocol with appropriate samples
+            """)            
+    
+    with manual_tabs[1]:
+        st.markdown(
+            """
+            # Flow
+            1. Check Number of plate and plate type can access to Device  
+            2. Check whole DNA used in Reaction be in DNA plate.  
+            3. Check whole Reacted Sample used in Transformation be in Reaction plate.  
+            4. Check and Notice Enzyme and DW using in this Protocol.  
+            5. Check Number of Reaction and How many tips need.  
+            6. Make Report and Protocol with upper information.    
+            ---
+            
+            # Output Information  
+            `Number of Plate` = st.session_state['num_of_plate'] + st.session_state['num_of_reaction_plate'] + st.session_state['num_of_TF_plate']  
+            `Plate_type` = ['DNA', 'Reaction', 'Transformation']  
+            `Reaction_type` = ['PCR', 'Assembly']  
+            `plate_name` = st.session_state[f'{plate_type}_plate_{i}_name']  
+            `plate_df` = st.session_state[f'{plate_type}_plate_{i}_df']  
+            """
+            )
+        st.json({
+            "Plates": {
+                # DNA plate (for loop)
+                "st.session_state[f'{plate_type}_plate_{i}_name']": {
+                    "data": "st.session_state[f'{plate_type}_plate_{i}_df'].to_dict()",
+                    "labware": "st.session_state[f'{plate_type}_plate_{i}_labware']",
+                    "type": "DNA"
+                },
+                # Reaction plate (for loop)
+                # Merge {reaction_type}_plate to reaction_plate
+                "st.session_state[f'{plate_type}_plate_{i}_name']": {
+                    "data": "st.session_state[f'{plate_type}_plate_{i}_df'].to_dict()",
+                    "labware": "st.session_state[f'{plate_type}_plate_{i}_labware']",
+                    "type": "reaction"
+                },
+                # Transformation plate (for loop)
+                "st.session_state[f'{plate_type}_plate_{i}_name']": {
+                    "data": "st.session_state[f'{plate_type}_plate_{i}_df'].to_dict()",
+                    "labware": "st.session_state[f'{plate_type}_plate_{i}_labware']",
+                    "type": "TF"
+            }},
+            "Reactions":{
+                # PCR reaction
+                "st.session_state[f'{reaction_type}_plate_{i}_name']": {
+                    "data": "st.session_state[f'{reaction_type}_plate_{i}_df'].to_dict()",
+                    "type": "PCR"
+                },
+                # Assembly reaction
+                "st.session_state[f'{reaction_type}_plate_{i}_name']": {
+                    "data": "st.session_state[f'{reaction_type}_plate_{i}_df'].to_dict()",
+                    "type": "Assembly"
+            }
+            },
+            "Parameters": {
+                "Number of Plate": "st.session_state['num_of_plate'] + st.session_state['num_of_reaction_plate'] + st.session_state['num_of_TF_plate']",
+                "Plate_type": "['DNA', 'Reaction', 'Transformation']",
+                "Reaction_type": "['PCR', 'Assembly']",
+                "Enzyme": "st.session_state['Enzyme']",
+                "DW": "st.session_state['DW']",
+                "Tips": "st.session_state['Tips']"
+            },
+            "Volumn": {
+                "DW": ""
+                "DNA_PCR": ""
+                }
+        }
+        )
 st.button('Use Example')
 
 ## DNA Plate
@@ -207,37 +309,3 @@ protocol = False
 if st.button("Make Protocol"):
     protocol = True
 st.download_button(label="Download Protocol", data="test", file_name="test.txt", disabled=not bool(protocol))
-
-st.expander("Developer Only", expanded=False).markdown(
-    """
-    # Flow
-    Number of Plate = st.session_state['num_of_plate'] + st.session_state['num_of_reaction_plate'] + st.session_state['num_of_TF_plate']
-    Plate_type = ['DNA', 'Reaction', 'Transformation']
-    `plate name` = st.session_state[f'{plate_type}_plate_{i}_name']
-    `plate df` = st.session_state[f'{plate_type}_plate_{i}_df']
-    
-    Reaction_type = ['PCR', 'Assembly']
-    `plate_df = merge(`reaction df` = st.session_state[f'{reaction_type}_plate_{i}_df'])
-    
-    1. Check Number of plate and plate type can access to Device  
-    2. Check whole DNA used in Reaction be in DNA plate.  
-    3. Check whole Reacted Sample used in Transformation be in Reaction plate.  
-    4. Check and Notice Enzyme and DW using in this Protocol.  
-    5. Check Number of Reaction and How many tips need.  
-    6. Make Report and Protocol with upper information.    
-    ---
-    # Output Information
-    For output information, use another script `Script`.
-    
-    JSON format {
-        "Labwares": {
-            f"st.session_state[f'{plate_type}_plate_{i}_name']": {
-                
-            }
-        }
-    }
-    Number of DNA_plate = st.session_state['num_of_DNA_plate']
-    `DNA plates` = st.session_state['DNA_plate_0_df'], st.session_state['DNA_plate_1_df'], ...
-    
-    """
-    )
