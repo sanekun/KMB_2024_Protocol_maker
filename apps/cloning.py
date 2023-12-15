@@ -6,51 +6,39 @@ import re
 def empty_plate_df():
     # Define rows and columns
     rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-    columns = range(1, 13)
+    columns = [str(i) for i in range(1, 13)]
 
     # Create a DataFrame with row names and column names
     plate_df = pd.DataFrame(index=rows, columns=columns)
     return plate_df
 
-initial_tables = {
-    'empty': empty_plate_df(),
-    'PCR': pd.DataFrame({
-        'Name': [None for _ in range(96)],
-        'DNA1': [None for _ in range(96)],
-        'DNA2': [None for _ in range(96)],
-        'DNA3': [None for _ in range(96)],
-        'Enzyme1': ["PCRMix" for _ in range(96)],
-        'DW': ['DW' for _ in range(96)]
-    }),
-    'Assembly': pd.DataFrame({
-        'Name': [None for _ in range(96)],
-        'DNA1': [None for _ in range(96)],
-        'DNA2': [None for _ in range(96)],
-        'Enzyme1': ['AssemblyMix' for _ in range(96)],
-        'DW': ['DW' for _ in range(96)]
-    }),
-}
 def plate_initialization(i, plate_type: str, table_type='empty'):
+    # Make Default Plate Map
+    # Make Default session state value
     initial_tables = {
         'empty': empty_plate_df(),
         'PCR': pd.DataFrame({
-            'Name': [None for _ in range(96)],
-            'DNA1': [None for _ in range(96)],
-            'DNA2': [None for _ in range(96)],
-            'DNA3': [None for _ in range(96)],
-            'Enzyme1': ["PCRMix" for _ in range(96)],
-            'DW': ['DW' for _ in range(96)]
+            'Name': [None for _ in range(1)],
+            'DNA1': [None for _ in range(1)],
+            'DNA2': [None for _ in range(1)],
+            'DNA3': [None for _ in range(1)],
+            'Enzyme1': ["PCRMix" for _ in range(1)],
+            'DW': ['DW' for _ in range(1)]
         }),
         'Assembly': pd.DataFrame({
-            'Name': [None for _ in range(96)],
-            'DNA1': [None for _ in range(96)],
-            'DNA2': [None for _ in range(96)],
-            'Enzyme1': ['AssemblyMix' for _ in range(96)],
-            'DW': ['DW' for _ in range(96)]
+            'Name': [None for _ in range(1)],
+            'DNA1': [None for _ in range(1)],
+            'DNA2': [None for _ in range(1)],
+            'Enzyme1': ['AssemblyMix' for _ in range(1)],
+            'DW': ['DW' for _ in range(1)]
         }),
     }
-    if f"{plate_type}_plate_{i}_name" not in st.session_state:
-        st.session_state[f"{plate_type}_plate_{i}_name"] = f"{plate_type}_plate_{i+1}"
+    if table_type == 'empty':
+        if f"{plate_type}_plate_{i}_name" not in st.session_state:
+            st.session_state[f"{plate_type}_plate_{i}_name"] = f"{plate_type}_plate_{i+1}"
+        if f'{plate_type}_plate_{i}_toggle' not in st.session_state:
+            st.session_state[f'{plate_type}_plate_{i}_toggle'] = False
+
     if f"{plate_type}_plate_{i}_df" not in st.session_state:
         st.session_state[f"{plate_type}_plate_{i}_df"] = initial_tables[table_type]
 
@@ -86,7 +74,7 @@ def add_column_button(df, column_type):
     column_numbers = [int(re.findall(rf'{column_type}(\d+)', column_name)[0]) for column_name in column_names if re.findall(rf'{column_type}(\d+)', column_name)]
     df[f'{column_type}{max(column_numbers)+1}'] = [None for _ in range(len(df))]
     # column order is 'well', 'name', ['DNA\d+', 'Enzyme[+]', 'DW'']
-    df = df.reindex(['Well', 'Name'] + 
+    df = df.reindex(['Name'] + 
                sorted([column_name for column_name in df.columns if re.findall(rf'DNA(\d+)', column_name)]) + 
                sorted([column_name for column_name in df.columns if re.findall(rf'Enzyme(\d+)', column_name)]) + 
                ['DW'], axis=1)
@@ -106,18 +94,31 @@ def check_overlap_name(df1, df2):
         return False
     return list(df1_names) + list(df2_names)
 
-def _handle_table_changed(self, key_name: str):
-    new_state = st.session_state[key_name]
-    if "edited_rows" in new_state:
-        for index, change_dict in new_state["edited_rows"].items():
-            source_object = self.data[index]
-            for changed_field, new_value in change_dict.items():
-                # the getattr() check is required because streamlit does not remove entries from the modification
-                # dictionary. 
-                if getattr(source_object, changed_field) != new_value:
-                    setattr(source_object, changed_field, new_value)
-        # new_state["edited_rows"].clear() Disabled because no effect
+def editor_update(editor_key, df, df_form):
+    # For convert long form to wide form
+    
+    # Cuz of the st.data_editor's behavior.
+    # It store the edited data in the dictionary
+    # And if script re-run by another behavior If update the dataframe and send to output.
+    # If I make the output will be the original dataframe, It updated every time when i change table and re-read again for make data_editor.
+    # If makes some errors to editing tables.
+    
+    # So if we change toogle value, we need to update directly the dataframe and transform.
+    if df_form == 'wide':
+        editor = st.session_state[editor_key]['edited_rows']
+        for rows, updates in editor.items():
+            for cols, value in updates.items():
+                df.loc[df.index[rows], cols] = value
+        editor = st.session_state[editor_key]['added_rows']
+        for i in editor:
+            df.loc[len(df)] = i
 
+    if df_form == 'long':
+        editor = st.session_state[editor_key]['edited_rows']
+        for rows, updates in editor.items():
+            row, col = re.match('([A-Z]+)(\d+)', plate_transformation(df, 'long').index[rows]).groups()
+            for _, value in updates.items():
+                df.loc[row, col] = value
 
 def Example():
     PCR_df = pd.DataFrame({
@@ -263,16 +264,19 @@ with st.expander("DNA Plate", expanded=True):
             st.text_input("Name", placeholder=f'{plate_type}_plate_{i+1}_name', key=f'{plate_type}_plate_{i}_name')
             st.selectbox("Labware", options=st.session_state['labwares'], key=f'{plate_type}_plate_{i}_labware')
 
-            st.toggle("Long Form", key=f'{plate_type}_plate_{i}_toggle')
+            st.toggle("Long Form", key=f'{plate_type}_plate_{i}_toggle',
+                      on_change=editor_update,
+                      kwargs={'editor_key': f'{plate_type}_plate_{i}_long' if st.session_state[f'{plate_type}_plate_{i}_toggle'] else f'{plate_type}_plate_{i}_wide',
+                              'df': st.session_state[f'{plate_type}_plate_{i}_df'],
+                              'df_form': 'long' if st.session_state[f'{plate_type}_plate_{i}_toggle'] else 'wide'})
             if not st.session_state[f'{plate_type}_plate_{i}_toggle']:
                 st.data_editor(data=st.session_state[f'{plate_type}_plate_{i}_df'],
                                use_container_width=True,
                                key=f'{plate_type}_plate_{i}_wide')
             else:
-                long_df = plate_transformation(df = st.session_state[f'{plate_type}_plate_{i}_df'], data_form='long').copy(deep=True)
-                st.session_state[f'{plate_type}_plate_{i}_df'] = plate_transformation(df = st.data_editor(long_df,
-                                                                                            use_container_width=True, key=f'{plate_type}_plate_{i}_long'),
-                                                                        data_form = 'wide')
+                st.data_editor(data=plate_transformation(st.session_state[f'{plate_type}_plate_{i}_df'], data_form='long'),
+                               use_container_width=True,
+                               key=f'{plate_type}_plate_{i}_long')
             st.file_uploader("Upload", key=f'{plate_type}_plate_{i}_uploader', disabled=True)
 
 st.markdown("## Reaction")
@@ -281,17 +285,21 @@ with st.expander("Reaction - PCR", expanded=True):
     plate_initialization(i, plate_type=reaction_type, table_type='PCR')
     col1, col2 = st.columns([10, 2])
     with col1:
-        st.session_state[f'{reaction_type}_plate_{i}_df'] = st.data_editor(
+        st.data_editor(
             data = st.session_state[f'{reaction_type}_plate_{i}_df'],
             num_rows='dynamic',
             use_container_width=True,
-            key=f'{plate_type}_{reaction_type}_plate_{i}_wide'
+            key=f'{reaction_type}_plate_{i}_wide'
         )
     with col2:
         with st.container(border=True):
             column_type = st.selectbox('Add Column', ['DNA', 'Enzyme'], label_visibility='collapsed',
-                            key=f'{plate_type}_{reaction_type}_plate_{i}_selecttype')
-            if st.button('Add Column', key=f'{plate_type}_{reaction_type}_plate_{i}_addcolumn'):
+                            key=f'{plate_type}_plate_{i}_selecttype')
+            if st.button('Add Column', key=f'{plate_type}_plate_{i}_addcolumn',
+                         on_click=editor_update,
+                         kwargs={'editor_key': f'{reaction_type}_plate_{i}_wide',
+                                 'df': st.session_state[f'{reaction_type}_plate_{i}_df'],
+                                 'df_form': 'wide'}):
                 st.session_state[f'{reaction_type}_plate_{i}_df'] = add_column_button(df=st.session_state[f'{reaction_type}_plate_{i}_df'],
                                                                                         column_type= column_type)
                 st.rerun()
@@ -301,17 +309,21 @@ with st.expander("Reaction - Assembly", expanded=True):
     plate_initialization(i, plate_type=reaction_type, table_type='Assembly')
     col1, col2 = st.columns([10, 2])
     with col1:
-        st.session_state[f'{reaction_type}_plate_{i}_df'] = st.data_editor(
+        st.data_editor(
             data = st.session_state[f'{reaction_type}_plate_{i}_df'],
             num_rows='dynamic',
             use_container_width=True,
-            key=f'{plate_type}_{reaction_type}_plate_{i}_wide'
+            key=f'{reaction_type}_plate_{i}_wide'
         )
     with col2:
         with st.container(border=True):
             column_type = st.selectbox('Add Column', ['DNA', 'Enzyme'], label_visibility='collapsed',
-                            key=f'{plate_type}_{reaction_type}_plate_{i}_selecttype')
-            if st.button('Add Column', key=f'{plate_type}_{reaction_type}_plate_{i}_addcolumn'):
+                            key=f'{plate_type}_plate_{i}_selecttype')
+            if st.button('Add Column', key=f'{plate_type}_plate_{i}_addcolumn',
+                         on_click=editor_update,
+                         kwargs={'editor_key': f'{reaction_type}_plate_{i}_wide',
+                                 'df': st.session_state[f'{reaction_type}_plate_{i}_df'],
+                                 'df_form': 'wide'}):
                 st.session_state[f'{reaction_type}_plate_{i}_df'] = add_column_button(df=st.session_state[f'{reaction_type}_plate_{i}_df'],
                                                                                         column_type= column_type)
                 st.rerun()
@@ -329,17 +341,21 @@ with st.expander("Reaction Plate", expanded=True):
             st.text_input("Name", key=f'{plate_type}_plate_{i}_name')
             st.selectbox("Labware", options=st.session_state['labwares'], key=f'{plate_type}_plate_{i}_labware')
 
-            st.toggle("Long Form", key=f'{plate_type}_plate_{i}_toggle')
+            st.toggle("Long Form", key=f'{plate_type}_plate_{i}_toggle',
+                      on_change=editor_update,
+                      kwargs={'editor_key': f'{plate_type}_plate_{i}_long' if st.session_state[f'{plate_type}_plate_{i}_toggle'] else f'{plate_type}_plate_{i}_wide',
+                              'df': st.session_state[f'{plate_type}_plate_{i}_df'],
+                              'df_form': 'long' if st.session_state[f'{plate_type}_plate_{i}_toggle'] else 'wide'})
             if not st.session_state[f'{plate_type}_plate_{i}_toggle']:
-                st.session_state[f'{plate_type}_plate_{i}_df'] = st.data_editor(data=st.session_state[f'{plate_type}_plate_{i}_df'],
-                                                                use_container_width=True,
-                                                                key=f'{plate_type}_plate_{i}_wide',
-                                                                column_config={str(i): st.column_config.SelectboxColumn(options=reaction_names) for i in range(1, 13)})
+                st.data_editor(data=st.session_state[f'{plate_type}_plate_{i}_df'],
+                               use_container_width=True,
+                               key=f'{plate_type}_plate_{i}_wide',
+                               column_config={str(i): st.column_config.SelectboxColumn(options=reaction_names) for i in range(1, 13)})
             else:
-                st.session_state[f'{plate_type}_plate_{i}_df'] = plate_transformation(df = st.data_editor(
-                    plate_transformation(st.session_state[f'{plate_type}_plate_{i}_df'], data_form='long'),
-                    use_container_width=True, key=f'{plate_type}_plate_{i}_long',
-                    column_config={"Value": st.column_config.SelectboxColumn(options=reaction_names)}), data_form = 'wide')
+                st.data_editor(data=plate_transformation(st.session_state[f'{plate_type}_plate_{i}_df'], data_form='long'),
+                               use_container_width=True,
+                               key=f'{plate_type}_plate_{i}_long',
+                               column_config={"Value": st.column_config.SelectboxColumn(options=reaction_names)})
             st.file_uploader("Upload", key=f'{plate_type}_plate_{i}_uploader', disabled=True)
 
 ## Transformation
@@ -355,15 +371,21 @@ with st.expander("Transformation", expanded=True):
             st.text_input("Name", key=f'{plate_type}_plate_{i}_name')
             st.selectbox("Labware", options=st.session_state['labwares'], key=f'{plate_type}_plate_{i}_labware')
             
-            st.toggle("Long Form", key=f'{plate_type}_plate_{i}_toggle')
+            st.toggle("Long Form", key=f'{plate_type}_plate_{i}_toggle',
+                      on_change=editor_update,
+                      kwargs={'editor_key': f'{plate_type}_plate_{i}_long' if st.session_state[f'{plate_type}_plate_{i}_toggle'] else f'{plate_type}_plate_{i}_wide',
+                              'df': st.session_state[f'{plate_type}_plate_{i}_df'],
+                              'df_form': 'long' if st.session_state[f'{plate_type}_plate_{i}_toggle'] else 'wide'})
             if not st.session_state[f'{plate_type}_plate_{i}_toggle']:
-                st.session_state[f'{plate_type}_plate_{i}_df'] = st.data_editor(data=st.session_state[f'{plate_type}_plate_{i}_df'],
-                                                                use_container_width=True, key=f'{plate_type}_plate_{i}_wide',
-                                                                column_config={str(i): st.column_config.SelectboxColumn(options=reaction_names) for i in range(1, 13)})
+                st.data_editor(data=st.session_state[f'{plate_type}_plate_{i}_df'],
+                               use_container_width=True,
+                               key=f'{plate_type}_plate_{i}_wide',
+                               column_config={str(i): st.column_config.SelectboxColumn(options=reaction_names) for i in range(1, 13)})
             else:
-                st.session_state[f'{plate_type}_plate_{i}_df'] = plate_transformation(df = st.data_editor(plate_transformation(st.session_state[f'{plate_type}_plate_{i}_df'], data_form='long'),
-                                                                                            use_container_width=True, key=f'{plate_type}_plate_{i}_long',
-                                                                                            column_config={"Value": st.column_config.SelectboxColumn(options=reaction_names)}), data_form = 'wide')
+                st.data_editor(data=plate_transformation(st.session_state[f'{plate_type}_plate_{i}_df'], data_form='long'),
+                               use_container_width=True,
+                               key=f'{plate_type}_plate_{i}_long',
+                               column_config={"Value": st.column_config.SelectboxColumn(options=reaction_names)})
 
 st.markdown("## Advanced")
 with st.expander("Advanced", expanded=False):
