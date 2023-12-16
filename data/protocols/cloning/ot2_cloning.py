@@ -9,6 +9,8 @@ import pandas as pd
 
 ## 먼저 사용할 모든 Plate 등록 (Transformation 받을 것 까지)
 ## Thermocycler Plate 1개 등록
+
+
 PLATE = {
     "Plate1": {
         "Deck": 4,
@@ -70,8 +72,8 @@ metadata = {
     'description': ''
 }
 
-from opentrons import simulate
-protocol=simulate.get_protocol_api('2.15')
+# from opentrons import simulate
+# protocol=simulate.get_protocol_api('2.15')
 
 def flow_rate(pipette, **kwargs):
     assert (item in ['aspirate', 'dispense', 'blow_out'] for item in kwargs.keys()), "Error Keywords in Flow Rate."

@@ -16,3 +16,8 @@ Contact about Protocols : <sanekun@kaist.ac.kr>
 
 [ ] Plate Registeration
 [v] NEBuilder HiFi Assembly
+
+# Flow
+Plate, Reaction, Transformation 등 기본적인 골격을 함수 단위로 유지  
+Tip 수 등 각 프로토콜마다 달라지는 값들을 protocol.py 안에 개별적으로 관리  
+해당 프로토콜에서 함수를 불러와서 계산 후 생성

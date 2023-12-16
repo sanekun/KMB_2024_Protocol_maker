@@ -1,14 +1,20 @@
+import sys
 import streamlit as st
 import pandas as pd
 import re
+from datetime import datetime
+
+sys.path.append('/home/kun/workspace/webservice/automated-protocol-ot2/data')
+from protocols.cloning.check_protocol import check_tips, enzyme_position
+# I wanna use ot2_cloning.py's function in this script.
+# But I don't want import imported module in ot2_cloning.py
+
 
 # Statics
 def empty_plate_df():
-    # Define rows and columns
+    # Empty 96-well plate DataFrame
     rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
     columns = [str(i) for i in range(1, 13)]
-
-    # Create a DataFrame with row names and column names
     plate_df = pd.DataFrame(index=rows, columns=columns)
     return plate_df
 
@@ -43,6 +49,7 @@ def plate_initialization(i, plate_type: str, table_type='empty'):
         st.session_state[f"{plate_type}_plate_{i}_df"] = initial_tables[table_type]
 
 def plate_transformation(df, data_form):
+    # Change data form to [long or wide]
     assert data_form in ["wide", "long"], "data_form Error"
     if data_form == 'long':
         new_df = (df
@@ -66,33 +73,6 @@ def plate_transformation(df, data_form):
         new_df.index.name = None
         
         return new_df
-
-def add_column_button(df, column_type):
-    # Check current df's column name (like DNA1, DNA2, DNA3) add final number
-    column_names = df.columns
-    # grep column_type+[0-9]+ string in column_names
-    column_numbers = [int(re.findall(rf'{column_type}(\d+)', column_name)[0]) for column_name in column_names if re.findall(rf'{column_type}(\d+)', column_name)]
-    df[f'{column_type}{max(column_numbers)+1}'] = [None for _ in range(len(df))]
-    # column order is 'well', 'name', ['DNA\d+', 'Enzyme[+]', 'DW'']
-    df = df.reindex(['Name'] + 
-               sorted([column_name for column_name in df.columns if re.findall(rf'DNA(\d+)', column_name)]) + 
-               sorted([column_name for column_name in df.columns if re.findall(rf'Enzyme(\d+)', column_name)]) + 
-               ['DW'], axis=1)
-    return df
-
-def check_overlap_name(df1, df2):
-    # Check overlap in each dataframe first If overlap name exist, return False
-    # Check overlap between df1 and df2
-    # If overlap name exist, return False
-    df1_names = df1.dropna().unique()
-    df2_names = df2.dropna().unique()
-    if len(df1_names) != len(set(df1_names)):
-        return False
-    if len(df2_names) != len(set(df2_names)):
-        return False
-    if len(set(df1_names) & set(df2_names)) != 0:
-        return False
-    return list(df1_names) + list(df2_names)
 
 def editor_update(editor_key, df, df_form):
     # For convert long form to wide form
@@ -120,7 +100,39 @@ def editor_update(editor_key, df, df_form):
             for _, value in updates.items():
                 df.loc[row, col] = value
 
+def add_column_button(df, column_type):
+    # DNA, Enzyme 등 마지막 열 옆에 새로운 열 추가
+    
+    # Check current df's column name (like DNA1, DNA2, DNA3) add final number
+    column_names = df.columns
+    # grep column_type+[0-9]+ string in column_names
+    column_numbers = [int(re.findall(rf'{column_type}(\d+)', column_name)[0]) for column_name in column_names if re.findall(rf'{column_type}(\d+)', column_name)]
+    df[f'{column_type}{max(column_numbers)+1}'] = [None for _ in range(len(df))]
+    # column order is 'well', 'name', ['DNA\d+', 'Enzyme[+]', 'DW'']
+    df = df.reindex(['Name'] + 
+               sorted([column_name for column_name in df.columns if re.findall(rf'DNA(\d+)', column_name)]) + 
+               sorted([column_name for column_name in df.columns if re.findall(rf'Enzyme(\d+)', column_name)]) + 
+               ['DW'], axis=1)
+    return df
+
+def check_overlap_name(df1, df2):
+    # Reaction, TF table에서 등록한 Name만 활용하기 위하여 Overlap 이름 확인
+    # Check overlap in each dataframe first If overlap name exist, return False
+    # Check overlap between df1 and df2
+    # If overlap name exist, return False
+    df1_names = df1.dropna().unique()
+    df2_names = df2.dropna().unique()
+    if len(df1_names) != len(set(df1_names)):
+        return False
+    if len(df2_names) != len(set(df2_names)):
+        return False
+    if len(set(df1_names) & set(df2_names)) != 0:
+        return False
+    return list(df1_names) + list(df2_names)
+
+
 def Example():
+    # Example Data set
     PCR_df = pd.DataFrame({
         'Well': ['A1', 'B1', 'C1', 'D1', 'F1'],
         'Name': ['S1', 'S2', 'S3', 'S4', 'S5'],
@@ -143,6 +155,7 @@ def Example():
 st.set_page_config(page_title="Cloning",
                    layout="wide")
 st.session_state['labwares'] = ["nest_96_wellplate_200ul_flat"]
+export_JSON = False
 
 # Main
 with st.expander("Manual", expanded=True):
@@ -151,33 +164,47 @@ with st.expander("Manual", expanded=True):
         st.markdown(
             """
             # How to use
-            ***This method is optimized for `cloning` with `OT-2`.***  
-            (PCR - Assembly - Transformation)
+            ***This method is for `Cloning` and optimized in `OT-2`.***  
+            (`PCR` - `Assembly` - `Transformation`)
             """)
         st.success(
             """
             - The Maximum number of plates is 5
-            - Using OT-2 the reaction plate should be One on thermocycler
-            - **If name of sample is empty, the sample will be skipped**
+            - Using OT-2 the reaction plate should be 1 on thermocycler
             """
             )
+        st.warning(
+            """
+            - The `Name` in each table is necessary!
+            - If name of sample is **overlaped**, protocol makes error.
+            - If name of sample is **empty**, the sample will be skipped
+            """
+        )
         st.markdown(
             """
-            1. Fill the `Sample Plate` in the order of the following table
+            1. Fill the `DNA Plate` in the order of the following table
 
-            2. Describe the Reaction using Sample you write in `Sample Plate`
+            2. Describe the Reaction using Sample Name write in `Sample Plate`
 
-            3. Fill the `TF plate` in the order of the following table.
-            - You can spot the same sample several times
+            3. Fill the `Reaction plate` in the order of the following table
+            
+            4. Fill the `TF plate` in the order of the following table
+                - You can spot the same sample several times
 
-            4. Click `Make Protocol` button.
-            - Automatically check the error. 
-                - same sample name, no sample name ...
-            - The Report will be displayed
+            5. If you don't use default setting, check advanced tab
+                - If you add additional enzyme you fill the volume for it
+                - It can adjust volume and condition
+                - It's `advanced` options the protocol only optimized deafult condition.
+            
+            6. Click `Make Protocol` button.
+                - Automatically check the error. 
+                    - same sample name, empty sample name ...
+                - The Report will be displayed
                 - Transformed Plate on each sample is recorded
                 - Parameters used in this protocol
-            - Download and Transfer `protocol.py` file to OT-2
-            - Run the protocol with appropriate samples
+            7. Download and Transfer `protocol.py` file to OT-2
+            
+            8. Run the protocol with appropriate samples
             """)            
     
     with manual_tabs[1]:
@@ -231,8 +258,7 @@ with st.expander("Manual", expanded=True):
                 "st.session_state[f'{reaction_type}_plate_{i}_name']": {
                     "data": "st.session_state[f'{reaction_type}_plate_{i}_df'].to_dict()",
                     "type": "Assembly"
-            }
-            },
+            }},
             "Parameters": {
                 "Number of Plate": "st.session_state['num_of_plate'] + st.session_state['num_of_reaction_plate'] + st.session_state['num_of_TF_plate']",
                 "Plate_type": "['DNA', 'Reaction', 'Transformation']",
@@ -244,9 +270,24 @@ with st.expander("Manual", expanded=True):
             "Volumn": {
                 "DW": "",
                 "DNA_PCR": ""
-                }
-        }
-        )
+            }
+        })
+        st.json({
+            "PCR": {
+                "DNA1": 0.5,
+                "DNA2": 0.75,
+                "DNA3": 0.75,
+                "Enzyme1": 12.5,
+                "DW": 25
+            },
+            "Assembly": {
+                "DNA1": 1,
+                "DNA2": 1,
+                "Enzyme1": 10,
+                "DW": 20
+            }
+        })
+
 st.button('Use Example')
 st.markdown("---")
 
@@ -289,13 +330,14 @@ with st.expander("Reaction - PCR", expanded=True):
             data = st.session_state[f'{reaction_type}_plate_{i}_df'],
             num_rows='dynamic',
             use_container_width=True,
-            key=f'{reaction_type}_plate_{i}_wide'
+            key=f'{reaction_type}_plate_{i}_wide',
+            hide_index=True
         )
     with col2:
         with st.container(border=True):
             column_type = st.selectbox('Add Column', ['DNA', 'Enzyme'], label_visibility='collapsed',
-                            key=f'{plate_type}_plate_{i}_selecttype')
-            if st.button('Add Column', key=f'{plate_type}_plate_{i}_addcolumn',
+                            key=f'{reaction_type}_plate_{i}_selecttype')
+            if st.button('Add Column', key=f'{reaction_type}_plate_{i}_addcolumn',
                          on_click=editor_update,
                          kwargs={'editor_key': f'{reaction_type}_plate_{i}_wide',
                                  'df': st.session_state[f'{reaction_type}_plate_{i}_df'],
@@ -313,13 +355,14 @@ with st.expander("Reaction - Assembly", expanded=True):
             data = st.session_state[f'{reaction_type}_plate_{i}_df'],
             num_rows='dynamic',
             use_container_width=True,
-            key=f'{reaction_type}_plate_{i}_wide'
+            key=f'{reaction_type}_plate_{i}_wide',
+            hide_index=True
         )
     with col2:
         with st.container(border=True):
             column_type = st.selectbox('Add Column', ['DNA', 'Enzyme'], label_visibility='collapsed',
-                            key=f'{plate_type}_plate_{i}_selecttype')
-            if st.button('Add Column', key=f'{plate_type}_plate_{i}_addcolumn',
+                            key=f'{reaction_type}_plate_{i}_selecttype')
+            if st.button('Add Column', key=f'{reaction_type}_plate_{i}_addcolumn',
                          on_click=editor_update,
                          kwargs={'editor_key': f'{reaction_type}_plate_{i}_wide',
                                  'df': st.session_state[f'{reaction_type}_plate_{i}_df'],
@@ -356,7 +399,6 @@ with st.expander("Reaction Plate", expanded=True):
                                use_container_width=True,
                                key=f'{plate_type}_plate_{i}_long',
                                column_config={"Value": st.column_config.SelectboxColumn(options=reaction_names)})
-            st.file_uploader("Upload", key=f'{plate_type}_plate_{i}_uploader', disabled=True)
 
 ## Transformation
 st.markdown("## Transformation")
@@ -389,9 +431,85 @@ with st.expander("Transformation", expanded=True):
 
 st.markdown("## Advanced")
 with st.expander("Advanced", expanded=False):
-    pass
+    st.success("Please adjust here as last step")
+    # Reaction-PCR: DNA, Enzyme, DW(up to)
+    # Reaction-Assembly: DNA, Enzyme, DW(up to)
+    
+    # Make Empty DataFrame with existing column name of PCR and Assembly
+    PCR_volume = pd.DataFrame(columns=st.session_state['PCR_plate_0_df'].columns).drop(columns=['Name'])
+    PCR_volume.loc[0, ['DNA1', 'DNA2', 'DNA3', 'Enzyme1', 'DW']] = ['0.5', '0.75', '0.75', '12.5', '25']
+
+    Assembly_volume = pd.DataFrame(columns=st.session_state['Assembly_plate_0_df'].columns).drop(columns=['Name'])
+    Assembly_volume.loc[0, ['DNA1', 'DNA2', 'Enzyme1', 'DW']] = ['1', '1', '10', '20']
+    
+    st.markdown("### PCR volume")
+    update_PCR_volume = st.data_editor(data=PCR_volume,
+                   use_container_width=True,
+                   key='PCR_volume')
+    st.markdown("### Assembly volume")
+    update_Assembly_volume = st.data_editor(data=Assembly_volume,
+                   use_container_width=True,
+                   key='Assembly_volume')
 
 protocol = False
 if st.button("Make Protocol"):
+    export_JSON = {"Plates": {}, "Reactions": {}, "Reaction_volume": {}, "Parameters": {}}
+    
+    plate_types = ['DNA', 'Reaction', 'TF']
+    for plate_type in plate_types:
+        for num in range(st.session_state[f'num_of_{plate_type}_plate']):
+            if st.session_state[f'{plate_type}_plate_{num}_toggle']:
+                editor_update(editor_key=f'{plate_type}_plate_{num}_long', df=st.session_state[f'{plate_type}_plate_{num}_df'], df_form='long')
+            else:
+                editor_update(editor_key=f'{plate_type}_plate_{num}_wide', df=st.session_state[f'{plate_type}_plate_{num}_df'], df_form='wide')
+            
+            # Json append
+            # With Long form
+            export_JSON["Plates"][f'{plate_type}_plate_{num}_name'] = {
+                "data": (plate_transformation(st.session_state[f'{plate_type}_plate_{num}_df'], "long")
+                         .dropna()
+                         .reset_index()
+                         .set_index('Value')).to_dict()['well'],
+                "labware": st.session_state[f'{plate_type}_plate_{num}_labware'],
+                "type": plate_type
+                }
+
+    reaction_types = ['PCR', 'Assembly']
+    for reaction_type in reaction_types:
+        editor_update(editor_key=f'{reaction_type}_plate_{0}_wide', df=st.session_state[f'{reaction_type}_plate_{0}_df'], df_form='wide')
+        
+        export_JSON["Reactions"][f'{reaction_type}_plate_{0}_name'] = {
+            "data": st.session_state[f'{reaction_type}_plate_{0}_df'].to_dict(),
+            "type": reaction_type
+            }
+        
+        # Reaction Volume
+        editor_update(editor_key=f'{reaction_type}_volume', df=eval(f'{reaction_type}_volume'), df_form='wide')
+        export_JSON["Reaction_volume"][f"{reaction_type}"] = eval(f'{reaction_type}_volume').dropna(how='all').to_dict()
+    
+    # Protocol 별 검사 (Tip 수, Plate 수, Volume 최대 등)
+    # Plate에서 ['well']을 위해 최소 1개 이상의 값이 있어야함.
+    
+    # All Enzymes in PCR and Assembly
+    PCR_enzyme = [column_name for column_name in st.session_state['PCR_plate_0_df'].columns if re.findall(r'Enzyme(\d+)', column_name)]
+    Assembly_enzyme = [column_name for column_name in st.session_state['Assembly_plate_0_df'].columns if re.findall(r'Enzyme(\d+)', column_name)]
+
+    export_JSON["Parameters"] = {
+        "Number of Plate": sum([st.session_state[f'num_of_{i}_plate'] for i in plate_types]),
+        "Plate_type": plate_types,
+        "Reaction_type": reaction_types,
+        "Enzyme_position": enzyme_position(enzyme_list = list(set(PCR_enzyme + Assembly_enzyme))),
+        "number_of_tips": check_tips(),
+        }
+    
     protocol = True
-st.download_button(label="Download Protocol", data="test", file_name="test.txt", disabled=not bool(protocol))
+    with open('data/protocols/cloning/ot2_cloning.py', 'r') as f:
+        protocol = f.read()
+        protocol = protocol.replace("#[Remove]", "")
+        new_protocol = protocol.replace('export_JSON', str(export_JSON))
+    
+st.download_button(label="Download Protocol", data=new_protocol if protocol else "",
+                   file_name=f"{datetime.now().strftime('%Y%m%d')[2:]}-ot2_cloning.py", disabled=not bool(protocol))
+if export_JSON:
+    with st.expander("Report", expanded=True):
+        st.json(export_JSON)
