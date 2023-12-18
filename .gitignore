@@ -3,3 +3,4 @@ ot2_ssh_key
 ./progress_code
 __pycache__/
 *.pyc
+certificate/
