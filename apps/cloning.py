@@ -371,7 +371,6 @@ with st.expander("Reaction - Assembly", expanded=True):
                                                                                         column_type= column_type)
                 st.rerun()
 
-reaction_names = check_overlap_name(st.session_state['PCR_plate_0_df']['Name'], st.session_state['Assembly_plate_0_df']['Name'])
 with st.expander("Reaction Plate", expanded=True):
     plate_type = 'Reaction'
     number_of_plate = st.number_input(f"Number of {plate_type}_plate", min_value=1, step=1, value=1, key=f'num_of_{plate_type}_plate',
@@ -392,13 +391,11 @@ with st.expander("Reaction Plate", expanded=True):
             if not st.session_state[f'{plate_type}_plate_{i}_toggle']:
                 st.data_editor(data=st.session_state[f'{plate_type}_plate_{i}_df'],
                                use_container_width=True,
-                               key=f'{plate_type}_plate_{i}_wide',
-                               column_config={str(i): st.column_config.SelectboxColumn(options=reaction_names) for i in range(1, 13)})
+                               key=f'{plate_type}_plate_{i}_wide')
             else:
                 st.data_editor(data=plate_transformation(st.session_state[f'{plate_type}_plate_{i}_df'], data_form='long'),
                                use_container_width=True,
-                               key=f'{plate_type}_plate_{i}_long',
-                               column_config={"Value": st.column_config.SelectboxColumn(options=reaction_names)})
+                               key=f'{plate_type}_plate_{i}_long')
 
 ## Transformation
 st.markdown("## Transformation")
@@ -421,13 +418,11 @@ with st.expander("Transformation", expanded=True):
             if not st.session_state[f'{plate_type}_plate_{i}_toggle']:
                 st.data_editor(data=st.session_state[f'{plate_type}_plate_{i}_df'],
                                use_container_width=True,
-                               key=f'{plate_type}_plate_{i}_wide',
-                               column_config={str(i): st.column_config.SelectboxColumn(options=reaction_names) for i in range(1, 13)})
+                               key=f'{plate_type}_plate_{i}_wide')
             else:
                 st.data_editor(data=plate_transformation(st.session_state[f'{plate_type}_plate_{i}_df'], data_form='long'),
                                use_container_width=True,
-                               key=f'{plate_type}_plate_{i}_long',
-                               column_config={"Value": st.column_config.SelectboxColumn(options=reaction_names)})
+                               key=f'{plate_type}_plate_{i}_long')
 
 st.markdown("## Advanced")
 with st.expander("Advanced", expanded=False):
@@ -452,9 +447,8 @@ with st.expander("Advanced", expanded=False):
                    key='Assembly_volume')
 
 protocol = False
-if st.button("Make Protocol"):
+if st.button("Make Protocol"):    
     export_JSON = {"Plates": {}, "Reactions": {}, "Reaction_volume": {}, "Parameters": {}}
-    
     plate_types = ['DNA', 'Reaction', 'TF']
     for plate_type in plate_types:
         for num in range(st.session_state[f'num_of_{plate_type}_plate']):
@@ -462,7 +456,6 @@ if st.button("Make Protocol"):
                 editor_update(editor_key=f'{plate_type}_plate_{num}_long', df=st.session_state[f'{plate_type}_plate_{num}_df'], df_form='long')
             else:
                 editor_update(editor_key=f'{plate_type}_plate_{num}_wide', df=st.session_state[f'{plate_type}_plate_{num}_df'], df_form='wide')
-            
             # Json append
             # With Long form
             export_JSON["Plates"][f'{plate_type}_plate_{num}_name'] = {
@@ -473,7 +466,7 @@ if st.button("Make Protocol"):
                 "labware": st.session_state[f'{plate_type}_plate_{num}_labware'],
                 "type": plate_type
                 }
-
+    
     reaction_types = ['PCR', 'Assembly']
     for reaction_type in reaction_types:
         editor_update(editor_key=f'{reaction_type}_plate_{0}_wide', df=st.session_state[f'{reaction_type}_plate_{0}_df'], df_form='wide')
@@ -487,18 +480,61 @@ if st.button("Make Protocol"):
         editor_update(editor_key=f'{reaction_type}_volume', df=eval(f'{reaction_type}_volume'), df_form='wide')
         export_JSON["Reaction_volume"][f"{reaction_type}"] = eval(f'{reaction_type}_volume').dropna(how='all').to_dict()
     
-    # Protocol 별 검사 (Tip 수, Plate 수, Volume 최대 등)
-    # Plate에서 ['well']을 위해 최소 1개 이상의 값이 있어야함.
+    # Check overlap name in DNA and Reaction
+    # DNA overlap from export_JSON["Plates"]
+    DNA_names, Reaction_names, TF_names = [], [], []
+    for plate_name, plate_info in export_JSON["Plates"].items():
+        if plate_info['type'] == 'DNA':
+            DNA_names += list(plate_info['data'].keys())
+        elif plate_info['type'] == 'Reaction':
+            Reaction_names += list(plate_info['data'].keys())
+        elif plate_info['type'] == 'TF':
+            TF_names += list(plate_info['data'].keys())
+
+    assert len(DNA_names) == len(set(DNA_names)), "DNA names are overlaped"
+    assert len(Reaction_names) == len(set(Reaction_names)), "Reaction names are overlaped"
+    for i in TF_names:
+        assert i in Reaction_names, f"{i} is not in Reaction Name"
+    del TF_names, Reaction_names
+    
+    # All DNAs in PCR and Assembly
+    PCR_DNA_columns = [column_name for column_name in st.session_state['PCR_plate_0_df'].columns if re.findall(r'DNA(\d+)', column_name)]
+    PCR_DNA = st.session_state['PCR_plate_0_df'][PCR_DNA_columns].values
+    Assembly_DNA_columns = [column_name for column_name in st.session_state['Assembly_plate_0_df'].columns if re.findall(r'DNA(\d+)', column_name)]
+    Assembly_DNA = st.session_state['Assembly_plate_0_df'][Assembly_DNA_columns].values
+    
+    # Make list from nested nd.array
+    PCR_DNA = [i for j in PCR_DNA for i in j]
+    Assembly_DNA = [i for j in Assembly_DNA for i in j]
+    
+    for i in list(set(PCR_DNA)):
+        if i == None:
+            continue
+        assert i in DNA_names, f"{i} is not in DNA plate"
+    for i in list(set(Assembly_DNA)):
+        if i == None:
+            continue
+        if i in st.session_state['PCR_plate_0_df']['Name'].dropna().unique():
+            pass
+        else:
+            assert i in DNA_names, f"{i} is not in DNA plate"
+    del PCR_DNA_columns, Assembly_DNA_columns, PCR_DNA, Assembly_DNA, DNA_names
     
     # All Enzymes in PCR and Assembly
-    PCR_enzyme = [column_name for column_name in st.session_state['PCR_plate_0_df'].columns if re.findall(r'Enzyme(\d+)', column_name)]
-    Assembly_enzyme = [column_name for column_name in st.session_state['Assembly_plate_0_df'].columns if re.findall(r'Enzyme(\d+)', column_name)]
-
+    PCR_enzyme_columns = [column_name for column_name in st.session_state['PCR_plate_0_df'].columns if re.findall(r'Enzyme(\d+)', column_name)]
+    Assembly_enzyme_columns = [column_name for column_name in st.session_state['Assembly_plate_0_df'].columns if re.findall(r'Enzyme(\d+)', column_name)]
+    PCR_enzyme = st.session_state['PCR_plate_0_df'][PCR_enzyme_columns].dropna().values
+    Assembly_enzyme = st.session_state['Assembly_plate_0_df'][Assembly_enzyme_columns].dropna().values
+    
+    PCR_enzyme = [i for j in PCR_enzyme for i in j]
+    Assembly_enzyme = [i for j in Assembly_enzyme for i in j]
+    
+    # Protocol 별 검사 (Tip 수, Plate 수, Volume 최대 등)
     export_JSON["Parameters"] = {
         "Number of Plate": sum([st.session_state[f'num_of_{i}_plate'] for i in plate_types]),
         "Plate_type": plate_types,
         "Reaction_type": reaction_types,
-        "Enzyme_position": enzyme_position(enzyme_list = list(set(PCR_enzyme + Assembly_enzyme))),
+        "Enzyme_position": enzyme_position(enzyme_list = list(set(PCR_enzyme) | set(Assembly_enzyme))),
         "number_of_tips": check_tips(),
         }
     
