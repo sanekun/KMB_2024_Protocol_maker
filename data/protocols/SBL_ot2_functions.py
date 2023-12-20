@@ -1,9 +1,3 @@
-from opentrons import simulate, types
-from math import floor
-
-protocol=simulate.get_protocol_api('2.11')
-
-
 def flow_rate(pipette, **kwargs):
     assert (item in ['aspirate', 'dispense', 'blow_out'] for item in kwargs.keys()), "Error Keywords in Flow Rate."
     for i in kwargs.keys:

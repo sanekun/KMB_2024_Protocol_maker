@@ -1,80 +1,159 @@
 from opentrons import types, protocol_api
 import pandas as pd
 
-# Cell + Substrate transfer to 96 well plate
 # 23-10-20 Simulated by kun.
+# Parameters
 
-# PARAMETERS
-# Primer, Template Input을 Web으로부터 Dict(JSON)으로 받는다고 가정.
-
-## 먼저 사용할 모든 Plate 등록 (Transformation 받을 것 까지)
-## Thermocycler Plate 1개 등록
-
-
-PLATE = {
-    "Plate1": {
-        "Deck": 4,
-        "Type": "nest_96_wellplate_200ul_flat"
+#[PARAMETERS]
+PARAMETERS = {
+  "Plates": {
+    "DNA_plate_0_name": {
+      "data": {
+        "Template1": "A1",
+        "Primer1": "B1",
+        "Primer2": "C1",
+        "Template2": "A2",
+        "Primer3": "B2",
+        "Primer4": "C2"
+      },
+      "labware": "nest_96_wellplate_200ul_flat",
+      "type": "DNA"
     },
-    "Plate2": {
-        "Deck": 5,
-        "Type": "nest_96_wellplate_200ul_flat"
+    "DNA_plate_1_name": {
+      "data": {},
+      "labware": "nest_96_wellplate_200ul_flat",
+      "type": "DNA"
     },
-    "Plate3": {
-        "Deck": 9,
-        "Type": "nest_96_wellplate_200ul_flat"
+    "Reaction_plate_0_name": {
+      "data": {
+        "Assembled_vector": "A1"
+      },
+      "labware": "nest_96_wellplate_200ul_flat",
+      "type": "Reaction"
     },
-    "Plate4": {
-        "Deck": 6,
-        "Type": "nest_96_wellplate_200ul_flat"
+    "TF_plate_0_name": {
+      "data": {
+        "Assembled_vector": "A3"
+      },
+      "labware": "nest_96_wellplate_200ul_flat",
+      "type": "TF"
+    }
+  },
+  "Reactions": {
+    "PCR_plate_0_name": {
+      "data": {
+        "Name": {
+          "0": "Vector",
+          "1": "Insert"
+        },
+        "DNA1": {
+          "0": "Template1",
+          "1": "Template2"
+        },
+        "DNA2": {
+          "0": "Primer1",
+          "1": "Primer3"
+        },
+        "DNA3": {
+          "0": "Primer2",
+          "1": "Primer4"
+        },
+        "Enzyme1": {
+          "0": "PCRMix",
+          "1": ""
+        },
+        "DW": {
+          "0": "DW",
+          "1": ""
+        }
+      },
+      "type": "PCR"
     },
+    "Assembly_plate_0_name": {
+      "data": {
+        "Name": {
+          "0": "Assembled_vector"
+        },
+        "DNA1": {
+          "0": "Vector"
+        },
+        "DNA2": {
+          "0": "Insert"
+        },
+        "Enzyme1": {
+          "0": "AssemblyMix"
+        },
+        "DW": {
+          "0": "DW"
+        }
+      },
+      "type": "Assembly"
+    }
+  },
+  "Reaction_volume": {
+    "PCR": {
+      "DNA1": {
+        "0": "0.5"
+      },
+      "DNA2": {
+        "0": "0.75"
+      },
+      "DNA3": {
+        "0": "0.75"
+      },
+      "Enzyme1": {
+        "0": "12.5"
+      },
+      "DW": {
+        "0": "25"
+      }
+    },
+    "Assembly": {
+      "DNA1": {
+        "0": "1"
+      },
+      "DNA2": {
+        "0": "1"
+      },
+      "Enzyme1": {
+        "0": "10"
+      },
+      "DW": {
+        "0": "20"
+      }
+    }
+  },
+  "Parameters": {
+    "Number of Plate": 4,
+    "Plate_type": [
+      "DNA",
+      "Reaction",
+      "TF"
+    ],
+    "Reaction_type": [
+      "PCR",
+      "Assembly"
+    ],
+    "Enzyme_position": {
+      "AssemblyMix": "A1",
+      "PCRMix": "A2"
+    },
+    "number_of_tips": None
+  }
 }
-
-## 사용할 DNA 등록 (Plate별로)
-INPUT= {
-    "Plate1": pd.DataFrame({
-        "Well":["A1","B1","B6","C2","E7","F9"],
-        "Name":["pACBB_vec-F1", "pACBB_vec-R1", "primer3", "primer4", "primer5", "primer6"]}),
-    "Plate2": pd.DataFrame({
-        "Well":["A1","B1"],
-        "Name":["pACBB_4-5", "pET28a"]})
-}
-
-REACTION = {
-    "PCR":  pd.DataFrame({
-        "Well": ['A1','B1','C1','D1','F1'],
-        'Name': ['S1','S2','S3','S4','S5'],
-        'DNA1 (0.5)': ['pACBB_4-5','pACBB_4-5','pACBB_4-5','pACBB_4-5','pACBB_4-5'],
-        'DNA2 (0.75)': ['pACBB_vec-F1','pACBB_vec-F2','pACBB_T7-F1', 'pACBB_T7-F2','pACBB_MCS-F1'],
-        'DNA3 (0.75)': ['pACBB_vec-R1','pACBB_vec-R2','pACBB_T7-R1', 'pACBB_T7-R2','pACBB_MCS-R1'],
-        'Enzyme (12.5)': ['KODone','KODone','KODone','KODone','KODone'],
-        'DW (25)': ['DW','DW','DW','DW','DW']
-        }),
-    "Assembly": pd.DataFrame({
-        'Well': ['A9','B9','C9','D9','E9'],
-        'Name': ['vec1','vec2','vec3','vec4','vec5'],
-        'DNA1': ['S1','S1','S2','S1','S3'],
-        'DNA2': ['S2','S3','S3','S2',''],
-        'DNA3': ['S2','S3','S3','S2',''],
-        'Enzyme (10)': ['NEBuilder HiFi Master Mix','NEBuilder HiFi Master Mix','NEBuilder HiFi Master Mix','NEBuilder HiFi Master Mix','NEBuilder HiFi Master Mix'],
-        'DW (20)': ['DW','DW','DW','DW','DW']
-        }),
-    "Transformation": {}
-}
-
-MULTI_PIPETTE=False
 
 metadata = {
-    'protocolName': 'WJ_plate_replicate',
+    'protocolName': 'Cloning (PCR, Assembly, Transformation)',
     'author': 'Seong-Kun Bak <sanekun@kaist.ac.kr>',
     'apiLevel': '2.15',
     'robotType': "OT-2",
     'description': ''
 }
 
-# from opentrons import simulate
-# protocol=simulate.get_protocol_api('2.15')
+from opentrons import simulate
+protocol=simulate.get_protocol_api('2.15')
 
+#[Functions]
 def flow_rate(pipette, **kwargs):
     assert (item in ['aspirate', 'dispense', 'blow_out'] for item in kwargs.keys()), "Error Keywords in Flow Rate."
     for i in kwargs.keys:
@@ -87,16 +166,14 @@ def run(protocol: protocol_api.ProtocolContext):
     
     ## Pipette
     p20_tip = protocol.load_labware("opentrons_96_tiprack_20ul", 1)
-    if MULTI_PIPETTE:
-        p20 = protocol.load_instrument("p20_multi_gen2", "left", tip_racks=[p20_tip])
-    else:
-        p20 = protocol.load_instrument("p20_single_gen2", "left", tip_racks=[p20_tip])
+    p300_tip = protocol.load_labware("opentrons_96_tiprack_300ul", 2)
+    p20 = protocol.load_instrument("p20_single_gen2", "left", tip_racks=[p20_tip])
+    p300 = protocol.load_instrument("p300_single_gen2", "right", tip_racks=[p300_tip])
     
     ## Plates
-    
-    for i in range(len(PARAMETER["PLATE"])):
-        protocol.load_labware(PARAMETER["plate_type"], location=i)
-    PARAMETER["PLATE"].keys()
+    for i in range(len(PARAMETERS["Plates"])):
+        plate = PARAMETERS["Plates"][i]
+        plate["Deck"] = protocol.load_labware(plate["labware"], location=i+3)
     
     
     source_plate = protocol.load_labware("nest_96_wellplate_200ul_flat", location=3)

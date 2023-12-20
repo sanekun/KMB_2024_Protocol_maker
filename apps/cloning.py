@@ -131,26 +131,36 @@ def check_overlap_name(df1, df2):
     return list(df1_names) + list(df2_names)
 
 
-def Example():
+def Use_example():
     # Example Data set
-    PCR_df = pd.DataFrame({
-        'Well': ['A1', 'B1', 'C1', 'D1', 'F1'],
-        'Name': ['S1', 'S2', 'S3', 'S4', 'S5'],
-        'DNA1': ['pACBB_4-5', 'pACBB_4-5', 'pACBB_4-5', 'pACBB_4-5', 'pACBB_4-5'],
-        'DNA2': ['pACBB_vec-F1', 'pACBB_vec-F2', 'pACBB_T7-F1', 'pACBB_T7-F2', 'pET28_MCS-F1'],
-        'DNA3': ['pACBB_vec-R1', 'pACBB_vec-R2', 'pACBB_T7-R1', 'pACBB_T7-R2', 'pET28_MCS-R1'],
-        'Enzyme': ['KODone', 'KODone', 'KODone', 'KODone', 'KODone'],
-        'DW': ['DW', 'DW', 'DW', 'DW', 'DW']
-        }),
-    Assembly_df = pd.DataFrame({
-        'Well': ['A9', 'B9', 'C9', 'D9', 'E9'],
-        'Name': ['vec1', 'vec2', 'vec3', 'vec4', 'vec5'],
-        'DNA1': ['S1', 'S1', 'S2', 'S1', 'S3'],
-        'DNA2': ['S2', 'S3', 'S3', 'S2', None],
-        'DNA3': [None, None, None, 'S3', None],
-        'Enzyme (10)': ['NEBuilder HiFi Master Mix'] * 5,
-        'DW (20)': ['DW'] * 5
-        }),
+    # DNA table
+    st.session_state['DNA_plate_0_df'].loc['A', '1'] = 'Template1'
+    st.session_state['DNA_plate_0_df'].loc['B', '1'] = 'Primer1'
+    st.session_state['DNA_plate_0_df'].loc['C', '1'] = 'Primer2'
+
+    st.session_state['DNA_plate_0_df'].loc['A', '2'] = 'Template2'
+    st.session_state['DNA_plate_0_df'].loc['B', '2'] = 'Primer3'
+    st.session_state['DNA_plate_0_df'].loc['C', '2'] = 'Primer4'
+    
+    # PCR & Assembly table
+    st.session_state['PCR_plate_0_df'].loc[0, 'Name'] = 'Vector'
+    st.session_state['PCR_plate_0_df'].loc[0, 'DNA1'] = 'Template1'
+    st.session_state['PCR_plate_0_df'].loc[0, 'DNA2'] = 'Primer1'
+    st.session_state['PCR_plate_0_df'].loc[0, 'DNA3'] = 'Primer2'
+    st.session_state['PCR_plate_0_df'].loc[1, 'Name'] = 'Insert'
+    st.session_state['PCR_plate_0_df'].loc[1, 'DNA1'] = 'Template2'
+    st.session_state['PCR_plate_0_df'].loc[1, 'DNA2'] = 'Primer3'
+    st.session_state['PCR_plate_0_df'].loc[1, 'DNA3'] = 'Primer4'
+    
+    st.session_state['Assembly_plate_0_df'].loc[0, 'Name'] = 'Assembled_vector'
+    st.session_state['Assembly_plate_0_df'].loc[0, 'DNA1'] = 'Vector'
+    st.session_state['Assembly_plate_0_df'].loc[0, 'DNA2'] = 'Insert'
+    
+    # Reaction table
+    st.session_state['Reaction_plate_0_df'].loc['A', '1'] = 'Assembled_vector'
+    st.session_state['TF_plate_0_df'].loc['A', '1'] = 'Assembled_vector'
+    st.session_state['TF_plate_0_df'].loc['A', '2'] = 'Assembled_vector'
+    st.session_state['TF_plate_0_df'].loc['A', '3'] = 'Assembled_vector'
 
 st.set_page_config(page_title="Cloning",
                    layout="wide")
@@ -288,7 +298,7 @@ with st.expander("Manual", expanded=True):
             }
         })
 
-st.button('Use Example')
+st.button('Use Example', on_click=Use_example)
 st.markdown("---")
 
 ## DNA Plate
@@ -440,11 +450,13 @@ with st.expander("Advanced", expanded=False):
     st.markdown("### PCR volume")
     update_PCR_volume = st.data_editor(data=PCR_volume,
                    use_container_width=True,
-                   key='PCR_volume')
+                   key='PCR_volume',
+                   hide_index=True)
     st.markdown("### Assembly volume")
     update_Assembly_volume = st.data_editor(data=Assembly_volume,
                    use_container_width=True,
-                   key='Assembly_volume')
+                   key='Assembly_volume',
+                   hide_index=True)
 
 protocol = False
 if st.button("Make Protocol"):    
@@ -542,6 +554,7 @@ if st.button("Make Protocol"):
     with open('data/protocols/cloning/ot2_cloning.py', 'r') as f:
         protocol = f.read()
         protocol = protocol.replace("#[Remove]", "")
+        protocol.replace("null", "")
         new_protocol = protocol.replace('export_JSON', str(export_JSON))
     
 st.download_button(label="Download Protocol", data=new_protocol if protocol else "",
