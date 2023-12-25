@@ -4,3 +4,5 @@ ot2_ssh_key
 __pycache__/
 *.pyc
 certificate/
+.vscode/
+.streamlit/
