@@ -1,358 +1,152 @@
+PCR_plate_0_name Enzyme done Take off Enzyme from Deck
+Assembly_plate_0_name Enzyme done Take off Enzyme from Deck
+Assembly will end soon
 Protocol End
 Opening Thermocycler lid
 Logs from this command:
-DEBUG (command_executor): Executing 10553f9d-3f06-4a46-9db8-c93d28f6a588, home, axes=None skipIfMountPositionOk=None
-DEBUG (command_executor): Executing 499acaab-5c60-4f75-840d-dfdd7c35d18c, loadModule, model=<ModuleModel.THERMOCYCLER_MODULE_V1: 'thermocyclerModuleV1'> location=DeckSlotLocation(slotName=<DeckSlotName.SLOT_7: '7'>) moduleId=None
-INFO (publisher): command.THERMOCYCLER_OPEN: 
-DEBUG (command_executor): Executing 170bc390-4444-4181-8353-5106a84472e7, thermocycler/openLid, moduleId='2c7bd4c4-1a96-466c-ba1c-256d9d3c129b'
-Transferring 0.5 from A1 of NEST 96 Well Plate 200 µL Flat on slot 3 to A1 of NEST 96 Well Plate 200 µL Flat on slot 5
+WARNING (robot_configs): /home/kun/.opentrons/robot_settings.json not found. Loading defaults
+WARNING (deck_attitude): Deck calibration not found.
+WARNING (robot_configs): /home/kun/.opentrons/deck_calibration.json not found. Loading defaults
+Distributing 12.5 from A4 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 to A1 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7
+	Transferring 12.5 from A4 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 to A1 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7
+		Picking up tip from A1 of Opentrons OT-2 96 Tip Rack 300 µL on slot 2
+		Mixing 2 times with a volume of 50.0 ul
+			Aspirating 50.0 uL from A4 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 at 50.0 uL/sec
+			Dispensing 50.0 uL into A4 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 at 50.0 uL/sec
+			Aspirating 50.0 uL from A4 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 at 50.0 uL/sec
+			Dispensing 50.0 uL into A4 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 at 50.0 uL/sec
+		Aspirating 30.0 uL from A4 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 at 50.0 uL/sec
+		Touching tip
+		Dispensing 12.5 uL into A1 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7 at 50.0 uL/sec
+		Touching tip
+		Dispensing 12.5 uL into A2 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7 at 50.0 uL/sec
+		Touching tip
+		Blowing out at A4 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9
+		Returning tip
+			Dropping tip into A1 of Opentrons OT-2 96 Tip Rack 300 µL on slot 2
+Transferring 0.5 from A1 of NEST 96 Well Plate 200 µL Flat on slot 4 to A1 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7
 	Picking up tip from A1 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-	Logs from this command:
-	DEBUG (command_executor): Executing 680c621e-6ecb-405f-9874-dcfb711b4a72, loadLabware, location=DeckSlotLocation(slotName=<DeckSlotName.SLOT_1: '1'>) loadName='opentrons_96_tiprack_20ul' namespace='opentrons' version=1 labwareId=None displayName=None
-	DEBUG (command_executor): Executing 82ece8cd-03b9-4c27-97e0-4247a180f268, loadLabware, location=DeckSlotLocation(slotName=<DeckSlotName.SLOT_2: '2'>) loadName='opentrons_96_tiprack_300ul' namespace='opentrons' version=1 labwareId=None displayName=None
-	INFO (protocol_context): Loading p20_single_gen2 on left mount
-	DEBUG (command_executor): Executing 441c0279-afe9-4426-818b-d03928abfd9a, loadPipette, pipetteName=<PipetteNameType.P20_SINGLE_GEN2: 'p20_single_gen2'> mount=<MountType.LEFT: 'left'> pipetteId=None
-	INFO (protocol_context): Loading p300_single_gen2 on right mount
-	DEBUG (command_executor): Executing 51863edf-bb5d-4cbb-9dde-14843548e4c4, loadPipette, pipetteName=<PipetteNameType.P300_SINGLE_GEN2: 'p300_single_gen2'> mount=<MountType.RIGHT: 'right'> pipetteId=None
-	DEBUG (command_executor): Executing 1f90309d-c91f-4238-a2bb-9069cdec81a4, loadLabware, location=DeckSlotLocation(slotName=<DeckSlotName.SLOT_9: '9'>) loadName='opentrons_24_tuberack_nest_0.5ml_screwcap' namespace='opentrons' version=1 labwareId=None displayName=None
-	DEBUG (command_executor): Executing 1200095e-722d-49dd-a473-a1c35f5e9848, loadLabware, location=DeckSlotLocation(slotName=<DeckSlotName.SLOT_3: '3'>) loadName='nest_96_wellplate_200ul_flat' namespace='opentrons' version=2 labwareId=None displayName=None
-	DEBUG (command_executor): Executing 1c667d0d-ac6d-441a-9160-d1c5fe415be3, loadLabware, location=DeckSlotLocation(slotName=<DeckSlotName.SLOT_4: '4'>) loadName='nest_96_wellplate_200ul_flat' namespace='opentrons' version=2 labwareId=None displayName=None
-	DEBUG (command_executor): Executing 389c2014-9f99-453b-af81-bfedd533d422, loadLabware, location=ModuleLocation(moduleId='2c7bd4c4-1a96-466c-ba1c-256d9d3c129b') loadName='nest_96_wellplate_200ul_flat' namespace='opentrons' version=2 labwareId=None displayName=None
-	DEBUG (command_executor): Executing 013b5fd1-9b16-425e-9e30-a956777fcfaa, loadLabware, location=DeckSlotLocation(slotName=<DeckSlotName.SLOT_5: '5'>) loadName='nest_96_wellplate_200ul_flat' namespace='opentrons' version=2 labwareId=None displayName=None
-	DEBUG (command_executor): Executing 2e99e8d5-4156-4ce3-9e73-66e9c2046360, loadLabware, location=DeckSlotLocation(slotName=<DeckSlotName.SLOT_6: '6'>) loadName='nest_96_wellplate_200ul_flat' namespace='opentrons' version=2 labwareId=None displayName=None
-	INFO (publisher): command.TRANSFER: instrument: P20 Single-Channel GEN2 on left mount, locations: [A1 of NEST 96 Well Plate 200 µL Flat on slot 3, A1 of NEST 96 Well Plate 200 µL Flat on slot 5], volume: 0.5, source: A1 of NEST 96 Well Plate 200 µL Flat on slot 3, dest: A1 of NEST 96 Well Plate 200 µL Flat on slot 5
-	DEBUG (instrument_context): Transfer 0.5 from A1 of NEST 96 Well Plate 200 µL Flat on slot 3 to A1 of NEST 96 Well Plate 200 µL Flat on slot 5
-	INFO (publisher): command.PICK_UP_TIP: instrument: P20 Single-Channel GEN2 on left mount, location: A1 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-	DEBUG (command_executor): Executing 16cd44f2-fe73-403f-8e2b-b7010eabb1d9, pickUpTip, labwareId='8dae1b7b-cd11-403e-9e65-a96129d7aee2' wellName='A1' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=0.0)) pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11'
-	Aspirating 0.5 uL from A1 of NEST 96 Well Plate 200 µL Flat on slot 3 at 5.0 uL/sec
-	Logs from this command:
-	DEBUG (instrument_context): aspirate 0.5 from A1 of NEST 96 Well Plate 200 µL Flat on slot 3 at 1.0
-	INFO (publisher): command.ASPIRATE: instrument: P20 Single-Channel GEN2 on left mount, volume: 0.5, location: Location(point=Point(x=279.28, y=74.18, z=4.5), labware=A1 of NEST 96 Well Plate 200 µL Flat on slot 3), rate: 1.0
-	DEBUG (command_executor): Executing 798c5ae9-5276-4203-ad50-c2c5eed0c445, aspirate, labwareId='ae9ec056-86e3-4e53-be08-e4daa8d6ab4c' wellName='A1' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=-9.8)) flowRate=5.0 volume=0.5 pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11'
-	Dispensing 0.5 uL into A1 of NEST 96 Well Plate 200 µL Flat on slot 5 at 5.0 uL/sec
-	Logs from this command:
-	DEBUG (instrument_context): dispense 0.5 from A1 of NEST 96 Well Plate 200 µL Flat on slot 5 at 1.0
-	INFO (publisher): command.DISPENSE: instrument: P20 Single-Channel GEN2 on left mount, volume: 0.5, location: Location(point=Point(x=146.78, y=164.68, z=4.5), labware=A1 of NEST 96 Well Plate 200 µL Flat on slot 5), rate: 1.0
-	DEBUG (command_executor): Executing 2d20a433-5c0b-4f20-9d58-4a2b6b961660, dispense, labwareId='28d9e536-0453-477e-8d36-c6da1f7ec662' wellName='A1' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=-9.8)) flowRate=5.0 volume=0.5 pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11' pushOut=None
+	Aspirating 0.5 uL from A1 of NEST 96 Well Plate 200 µL Flat on slot 4 at 5.0 uL/sec
+	Dispensing 0.5 uL into A1 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7 at 5.0 uL/sec
 	Returning tip
 		Dropping tip into A1 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-		Logs from this command:
-		INFO (publisher): command.RETURN_TIP: 
-		INFO (publisher): command.DROP_TIP: instrument: P20 Single-Channel GEN2 on left mount, location: A1 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-		DEBUG (command_executor): Executing cce2a010-5928-4a4b-9c88-e8d7ff10df32, dropTip, pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11' labwareId='8dae1b7b-cd11-403e-9e65-a96129d7aee2' wellName='A1' wellLocation=DropTipWellLocation(origin=<DropTipWellOrigin.DEFAULT: 'default'>, offset=WellOffset(x=0, y=0, z=0)) homeAfter=None alternateDropLocation=False
-Transferring 0.75 from B1 of NEST 96 Well Plate 200 µL Flat on slot 3 to A1 of NEST 96 Well Plate 200 µL Flat on slot 5
+Transferring 0.75 from B1 of NEST 96 Well Plate 200 µL Flat on slot 4 to A1 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7
 	Picking up tip from B1 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-	Logs from this command:
-	INFO (publisher): command.TRANSFER: instrument: P20 Single-Channel GEN2 on left mount, locations: [B1 of NEST 96 Well Plate 200 µL Flat on slot 3, A1 of NEST 96 Well Plate 200 µL Flat on slot 5], volume: 0.75, source: B1 of NEST 96 Well Plate 200 µL Flat on slot 3, dest: A1 of NEST 96 Well Plate 200 µL Flat on slot 5
-	DEBUG (instrument_context): Transfer 0.75 from B1 of NEST 96 Well Plate 200 µL Flat on slot 3 to A1 of NEST 96 Well Plate 200 µL Flat on slot 5
-	INFO (publisher): command.PICK_UP_TIP: instrument: P20 Single-Channel GEN2 on left mount, location: B1 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-	DEBUG (command_executor): Executing 430f3a66-3938-49c6-bd1d-e98ab96c7aba, pickUpTip, labwareId='8dae1b7b-cd11-403e-9e65-a96129d7aee2' wellName='B1' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=0.0)) pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11'
-	Aspirating 0.75 uL from B1 of NEST 96 Well Plate 200 µL Flat on slot 3 at 5.0 uL/sec
-	Logs from this command:
-	DEBUG (instrument_context): aspirate 0.75 from B1 of NEST 96 Well Plate 200 µL Flat on slot 3 at 1.0
-	INFO (publisher): command.ASPIRATE: instrument: P20 Single-Channel GEN2 on left mount, volume: 0.75, location: Location(point=Point(x=279.28, y=65.18, z=4.5), labware=B1 of NEST 96 Well Plate 200 µL Flat on slot 3), rate: 1.0
-	DEBUG (command_executor): Executing a35d054f-fc1f-4be0-b95e-00e7353d5ab7, aspirate, labwareId='ae9ec056-86e3-4e53-be08-e4daa8d6ab4c' wellName='B1' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=-9.8)) flowRate=5.0 volume=0.75 pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11'
-	Dispensing 0.75 uL into A1 of NEST 96 Well Plate 200 µL Flat on slot 5 at 5.0 uL/sec
-	Logs from this command:
-	DEBUG (instrument_context): dispense 0.75 from A1 of NEST 96 Well Plate 200 µL Flat on slot 5 at 1.0
-	INFO (publisher): command.DISPENSE: instrument: P20 Single-Channel GEN2 on left mount, volume: 0.75, location: Location(point=Point(x=146.78, y=164.68, z=4.5), labware=A1 of NEST 96 Well Plate 200 µL Flat on slot 5), rate: 1.0
-	DEBUG (command_executor): Executing 641bfec3-1dcc-4d76-8f78-e41c20ca6552, dispense, labwareId='28d9e536-0453-477e-8d36-c6da1f7ec662' wellName='A1' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=-9.8)) flowRate=5.0 volume=0.75 pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11' pushOut=None
+	Aspirating 0.75 uL from B1 of NEST 96 Well Plate 200 µL Flat on slot 4 at 5.0 uL/sec
+	Dispensing 0.75 uL into A1 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7 at 5.0 uL/sec
 	Returning tip
 		Dropping tip into B1 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-		Logs from this command:
-		INFO (publisher): command.RETURN_TIP: 
-		INFO (publisher): command.DROP_TIP: instrument: P20 Single-Channel GEN2 on left mount, location: B1 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-		DEBUG (command_executor): Executing 6ede3065-eedd-4ee9-918d-171a17fa614b, dropTip, pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11' labwareId='8dae1b7b-cd11-403e-9e65-a96129d7aee2' wellName='B1' wellLocation=DropTipWellLocation(origin=<DropTipWellOrigin.DEFAULT: 'default'>, offset=WellOffset(x=0, y=0, z=0)) homeAfter=None alternateDropLocation=False
-Transferring 0.75 from C1 of NEST 96 Well Plate 200 µL Flat on slot 3 to A1 of NEST 96 Well Plate 200 µL Flat on slot 5
+Transferring 0.75 from C1 of NEST 96 Well Plate 200 µL Flat on slot 4 to A1 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7
 	Picking up tip from C1 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-	Logs from this command:
-	INFO (publisher): command.TRANSFER: instrument: P20 Single-Channel GEN2 on left mount, locations: [C1 of NEST 96 Well Plate 200 µL Flat on slot 3, A1 of NEST 96 Well Plate 200 µL Flat on slot 5], volume: 0.75, source: C1 of NEST 96 Well Plate 200 µL Flat on slot 3, dest: A1 of NEST 96 Well Plate 200 µL Flat on slot 5
-	DEBUG (instrument_context): Transfer 0.75 from C1 of NEST 96 Well Plate 200 µL Flat on slot 3 to A1 of NEST 96 Well Plate 200 µL Flat on slot 5
-	INFO (publisher): command.PICK_UP_TIP: instrument: P20 Single-Channel GEN2 on left mount, location: C1 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-	DEBUG (command_executor): Executing 9d1ab65c-41b1-41d1-963b-8f2718e380b0, pickUpTip, labwareId='8dae1b7b-cd11-403e-9e65-a96129d7aee2' wellName='C1' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=0.0)) pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11'
-	Aspirating 0.75 uL from C1 of NEST 96 Well Plate 200 µL Flat on slot 3 at 5.0 uL/sec
-	Logs from this command:
-	DEBUG (instrument_context): aspirate 0.75 from C1 of NEST 96 Well Plate 200 µL Flat on slot 3 at 1.0
-	INFO (publisher): command.ASPIRATE: instrument: P20 Single-Channel GEN2 on left mount, volume: 0.75, location: Location(point=Point(x=279.28, y=56.18, z=4.5), labware=C1 of NEST 96 Well Plate 200 µL Flat on slot 3), rate: 1.0
-	DEBUG (command_executor): Executing 536cdde9-7c36-4f4f-9f0b-36ac510821cb, aspirate, labwareId='ae9ec056-86e3-4e53-be08-e4daa8d6ab4c' wellName='C1' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=-9.8)) flowRate=5.0 volume=0.75 pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11'
-	Dispensing 0.75 uL into A1 of NEST 96 Well Plate 200 µL Flat on slot 5 at 5.0 uL/sec
-	Logs from this command:
-	DEBUG (instrument_context): dispense 0.75 from A1 of NEST 96 Well Plate 200 µL Flat on slot 5 at 1.0
-	INFO (publisher): command.DISPENSE: instrument: P20 Single-Channel GEN2 on left mount, volume: 0.75, location: Location(point=Point(x=146.78, y=164.68, z=4.5), labware=A1 of NEST 96 Well Plate 200 µL Flat on slot 5), rate: 1.0
-	DEBUG (command_executor): Executing 919a40f5-0c85-4ff2-9fe5-e0e4f381681d, dispense, labwareId='28d9e536-0453-477e-8d36-c6da1f7ec662' wellName='A1' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=-9.8)) flowRate=5.0 volume=0.75 pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11' pushOut=None
+	Aspirating 0.75 uL from C1 of NEST 96 Well Plate 200 µL Flat on slot 4 at 5.0 uL/sec
+	Dispensing 0.75 uL into A1 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7 at 5.0 uL/sec
 	Returning tip
 		Dropping tip into C1 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-		Logs from this command:
-		INFO (publisher): command.RETURN_TIP: 
-		INFO (publisher): command.DROP_TIP: instrument: P20 Single-Channel GEN2 on left mount, location: C1 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-		DEBUG (command_executor): Executing 83e21cc4-9670-469c-9d86-8e382b5ed8f8, dropTip, pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11' labwareId='8dae1b7b-cd11-403e-9e65-a96129d7aee2' wellName='C1' wellLocation=DropTipWellLocation(origin=<DropTipWellOrigin.DEFAULT: 'default'>, offset=WellOffset(x=0, y=0, z=0)) homeAfter=None alternateDropLocation=False
-Transferring 25.0 from A1 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 to A1 of NEST 96 Well Plate 200 µL Flat on slot 5
+Transferring 10.5 from A2 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 to A1 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7
 	Picking up tip from D1 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-	Logs from this command:
-	INFO (publisher): command.TRANSFER: instrument: P20 Single-Channel GEN2 on left mount, locations: [A1 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9, A1 of NEST 96 Well Plate 200 µL Flat on slot 5], volume: 25.0, source: A1 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9, dest: A1 of NEST 96 Well Plate 200 µL Flat on slot 5
-	DEBUG (instrument_context): Transfer 25.0 from A1 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 to A1 of NEST 96 Well Plate 200 µL Flat on slot 5
-	INFO (publisher): command.PICK_UP_TIP: instrument: P20 Single-Channel GEN2 on left mount, location: D1 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-	DEBUG (command_executor): Executing 26257492-3610-46c2-bd4e-4f11ddf2851b, pickUpTip, labwareId='8dae1b7b-cd11-403e-9e65-a96129d7aee2' wellName='D1' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=0.0)) pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11'
-	Aspirating 12.5 uL from A1 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 at 5.0 uL/sec
-	Logs from this command:
-	DEBUG (instrument_context): aspirate 12.5 from A1 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 at 1.0
-	INFO (publisher): command.ASPIRATE: instrument: P20 Single-Channel GEN2 on left mount, volume: 12.5, location: Location(point=Point(x=283.21, y=256.43, z=61.0), labware=A1 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9), rate: 1.0
-	DEBUG (command_executor): Executing 3632b2b3-4b2e-413f-be7b-658145d18faf, aspirate, labwareId='6f20122d-8db6-4a1b-bd86-f6425fdd268b' wellName='A1' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=-24.200000000000003)) flowRate=5.0 volume=12.5 pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11'
-	Dispensing 12.5 uL into A1 of NEST 96 Well Plate 200 µL Flat on slot 5 at 5.0 uL/sec
-	Logs from this command:
-	DEBUG (instrument_context): dispense 12.5 from A1 of NEST 96 Well Plate 200 µL Flat on slot 5 at 1.0
-	INFO (publisher): command.DISPENSE: instrument: P20 Single-Channel GEN2 on left mount, volume: 12.5, location: Location(point=Point(x=146.78, y=164.68, z=4.5), labware=A1 of NEST 96 Well Plate 200 µL Flat on slot 5), rate: 1.0
-	DEBUG (command_executor): Executing 4bfc4a64-d292-470a-88d5-1bd2ea219ce0, dispense, labwareId='28d9e536-0453-477e-8d36-c6da1f7ec662' wellName='A1' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=-9.8)) flowRate=5.0 volume=12.5 pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11' pushOut=None
+	Aspirating 10.5 uL from A2 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 at 5.0 uL/sec
+	Dispensing 10.5 uL into A1 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7 at 5.0 uL/sec
 	Returning tip
 		Dropping tip into D1 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-		Logs from this command:
-		INFO (publisher): command.RETURN_TIP: 
-		INFO (publisher): command.DROP_TIP: instrument: P20 Single-Channel GEN2 on left mount, location: D1 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-		DEBUG (command_executor): Executing c6357fb7-9a73-4c67-add5-92d790ac8fb0, dropTip, pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11' labwareId='8dae1b7b-cd11-403e-9e65-a96129d7aee2' wellName='D1' wellLocation=DropTipWellLocation(origin=<DropTipWellOrigin.DEFAULT: 'default'>, offset=WellOffset(x=0, y=0, z=0)) homeAfter=None alternateDropLocation=False
+Transferring 0.5 from A2 of NEST 96 Well Plate 200 µL Flat on slot 4 to A2 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7
 	Picking up tip from E1 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-	Logs from this command:
-	INFO (publisher): command.PICK_UP_TIP: instrument: P20 Single-Channel GEN2 on left mount, location: E1 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-	DEBUG (command_executor): Executing d15a0892-8d30-4813-b31a-3b5678116c28, pickUpTip, labwareId='8dae1b7b-cd11-403e-9e65-a96129d7aee2' wellName='E1' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=0.0)) pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11'
-	Aspirating 12.5 uL from A1 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 at 5.0 uL/sec
-	Logs from this command:
-	DEBUG (instrument_context): aspirate 12.5 from A1 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 at 1.0
-	INFO (publisher): command.ASPIRATE: instrument: P20 Single-Channel GEN2 on left mount, volume: 12.5, location: Location(point=Point(x=283.21, y=256.43, z=61.0), labware=A1 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9), rate: 1.0
-	DEBUG (command_executor): Executing 45b5c570-c505-40ba-9f74-3e6d0729de40, aspirate, labwareId='6f20122d-8db6-4a1b-bd86-f6425fdd268b' wellName='A1' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=-24.200000000000003)) flowRate=5.0 volume=12.5 pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11'
-	Dispensing 12.5 uL into A1 of NEST 96 Well Plate 200 µL Flat on slot 5 at 5.0 uL/sec
-	Logs from this command:
-	DEBUG (instrument_context): dispense 12.5 from A1 of NEST 96 Well Plate 200 µL Flat on slot 5 at 1.0
-	INFO (publisher): command.DISPENSE: instrument: P20 Single-Channel GEN2 on left mount, volume: 12.5, location: Location(point=Point(x=146.78, y=164.68, z=4.5), labware=A1 of NEST 96 Well Plate 200 µL Flat on slot 5), rate: 1.0
-	DEBUG (command_executor): Executing 0a9c0539-67f7-4718-8766-35050f344d66, dispense, labwareId='28d9e536-0453-477e-8d36-c6da1f7ec662' wellName='A1' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=-9.8)) flowRate=5.0 volume=12.5 pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11' pushOut=None
+	Aspirating 0.5 uL from A2 of NEST 96 Well Plate 200 µL Flat on slot 4 at 5.0 uL/sec
+	Dispensing 0.5 uL into A2 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7 at 5.0 uL/sec
 	Returning tip
 		Dropping tip into E1 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-		Logs from this command:
-		INFO (publisher): command.RETURN_TIP: 
-		INFO (publisher): command.DROP_TIP: instrument: P20 Single-Channel GEN2 on left mount, location: E1 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-		DEBUG (command_executor): Executing 9e26e1ac-6849-48d5-94a0-1a5dd649dc27, dropTip, pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11' labwareId='8dae1b7b-cd11-403e-9e65-a96129d7aee2' wellName='E1' wellLocation=DropTipWellLocation(origin=<DropTipWellOrigin.DEFAULT: 'default'>, offset=WellOffset(x=0, y=0, z=0)) homeAfter=None alternateDropLocation=False
-Transferring 0.5 from A2 of NEST 96 Well Plate 200 µL Flat on slot 3 to A2 of NEST 96 Well Plate 200 µL Flat on slot 5
+Transferring 0.75 from B2 of NEST 96 Well Plate 200 µL Flat on slot 4 to A2 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7
 	Picking up tip from F1 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-	Logs from this command:
-	INFO (publisher): command.TRANSFER: instrument: P20 Single-Channel GEN2 on left mount, locations: [A2 of NEST 96 Well Plate 200 µL Flat on slot 3, A2 of NEST 96 Well Plate 200 µL Flat on slot 5], volume: 0.5, source: A2 of NEST 96 Well Plate 200 µL Flat on slot 3, dest: A2 of NEST 96 Well Plate 200 µL Flat on slot 5
-	DEBUG (instrument_context): Transfer 0.5 from A2 of NEST 96 Well Plate 200 µL Flat on slot 3 to A2 of NEST 96 Well Plate 200 µL Flat on slot 5
-	INFO (publisher): command.PICK_UP_TIP: instrument: P20 Single-Channel GEN2 on left mount, location: F1 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-	DEBUG (command_executor): Executing eece9959-f978-4be9-8a58-f5c786c846ab, pickUpTip, labwareId='8dae1b7b-cd11-403e-9e65-a96129d7aee2' wellName='F1' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=0.0)) pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11'
-	Aspirating 0.5 uL from A2 of NEST 96 Well Plate 200 µL Flat on slot 3 at 5.0 uL/sec
-	Logs from this command:
-	DEBUG (instrument_context): aspirate 0.5 from A2 of NEST 96 Well Plate 200 µL Flat on slot 3 at 1.0
-	INFO (publisher): command.ASPIRATE: instrument: P20 Single-Channel GEN2 on left mount, volume: 0.5, location: Location(point=Point(x=288.28, y=74.18, z=4.5), labware=A2 of NEST 96 Well Plate 200 µL Flat on slot 3), rate: 1.0
-	DEBUG (command_executor): Executing 9c51b72d-e180-41f1-aa64-dafb46b8fd3d, aspirate, labwareId='ae9ec056-86e3-4e53-be08-e4daa8d6ab4c' wellName='A2' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=-9.8)) flowRate=5.0 volume=0.5 pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11'
-	Dispensing 0.5 uL into A2 of NEST 96 Well Plate 200 µL Flat on slot 5 at 5.0 uL/sec
-	Logs from this command:
-	DEBUG (instrument_context): dispense 0.5 from A2 of NEST 96 Well Plate 200 µL Flat on slot 5 at 1.0
-	INFO (publisher): command.DISPENSE: instrument: P20 Single-Channel GEN2 on left mount, volume: 0.5, location: Location(point=Point(x=155.78, y=164.68, z=4.5), labware=A2 of NEST 96 Well Plate 200 µL Flat on slot 5), rate: 1.0
-	DEBUG (command_executor): Executing 127df750-681e-47c2-8946-c5b20a27f135, dispense, labwareId='28d9e536-0453-477e-8d36-c6da1f7ec662' wellName='A2' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=-9.8)) flowRate=5.0 volume=0.5 pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11' pushOut=None
+	Aspirating 0.75 uL from B2 of NEST 96 Well Plate 200 µL Flat on slot 4 at 5.0 uL/sec
+	Dispensing 0.75 uL into A2 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7 at 5.0 uL/sec
 	Returning tip
 		Dropping tip into F1 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-		Logs from this command:
-		INFO (publisher): command.RETURN_TIP: 
-		INFO (publisher): command.DROP_TIP: instrument: P20 Single-Channel GEN2 on left mount, location: F1 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-		DEBUG (command_executor): Executing c03ed5b1-150a-45a9-9bbf-61ae0bd5aa1c, dropTip, pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11' labwareId='8dae1b7b-cd11-403e-9e65-a96129d7aee2' wellName='F1' wellLocation=DropTipWellLocation(origin=<DropTipWellOrigin.DEFAULT: 'default'>, offset=WellOffset(x=0, y=0, z=0)) homeAfter=None alternateDropLocation=False
-Transferring 0.75 from B2 of NEST 96 Well Plate 200 µL Flat on slot 3 to A2 of NEST 96 Well Plate 200 µL Flat on slot 5
+Transferring 0.75 from C2 of NEST 96 Well Plate 200 µL Flat on slot 4 to A2 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7
 	Picking up tip from G1 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-	Logs from this command:
-	INFO (publisher): command.TRANSFER: instrument: P20 Single-Channel GEN2 on left mount, locations: [B2 of NEST 96 Well Plate 200 µL Flat on slot 3, A2 of NEST 96 Well Plate 200 µL Flat on slot 5], volume: 0.75, source: B2 of NEST 96 Well Plate 200 µL Flat on slot 3, dest: A2 of NEST 96 Well Plate 200 µL Flat on slot 5
-	DEBUG (instrument_context): Transfer 0.75 from B2 of NEST 96 Well Plate 200 µL Flat on slot 3 to A2 of NEST 96 Well Plate 200 µL Flat on slot 5
-	INFO (publisher): command.PICK_UP_TIP: instrument: P20 Single-Channel GEN2 on left mount, location: G1 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-	DEBUG (command_executor): Executing 6e52e2cf-eb58-4e78-8c37-3388245dec93, pickUpTip, labwareId='8dae1b7b-cd11-403e-9e65-a96129d7aee2' wellName='G1' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=0.0)) pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11'
-	Aspirating 0.75 uL from B2 of NEST 96 Well Plate 200 µL Flat on slot 3 at 5.0 uL/sec
-	Logs from this command:
-	DEBUG (instrument_context): aspirate 0.75 from B2 of NEST 96 Well Plate 200 µL Flat on slot 3 at 1.0
-	INFO (publisher): command.ASPIRATE: instrument: P20 Single-Channel GEN2 on left mount, volume: 0.75, location: Location(point=Point(x=288.28, y=65.18, z=4.5), labware=B2 of NEST 96 Well Plate 200 µL Flat on slot 3), rate: 1.0
-	DEBUG (command_executor): Executing 1fe2b180-e88e-4f3f-90f1-6e0d8ba06eba, aspirate, labwareId='ae9ec056-86e3-4e53-be08-e4daa8d6ab4c' wellName='B2' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=-9.8)) flowRate=5.0 volume=0.75 pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11'
-	Dispensing 0.75 uL into A2 of NEST 96 Well Plate 200 µL Flat on slot 5 at 5.0 uL/sec
-	Logs from this command:
-	DEBUG (instrument_context): dispense 0.75 from A2 of NEST 96 Well Plate 200 µL Flat on slot 5 at 1.0
-	INFO (publisher): command.DISPENSE: instrument: P20 Single-Channel GEN2 on left mount, volume: 0.75, location: Location(point=Point(x=155.78, y=164.68, z=4.5), labware=A2 of NEST 96 Well Plate 200 µL Flat on slot 5), rate: 1.0
-	DEBUG (command_executor): Executing 7685d277-c44f-44fe-abe2-b5abb122e7bf, dispense, labwareId='28d9e536-0453-477e-8d36-c6da1f7ec662' wellName='A2' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=-9.8)) flowRate=5.0 volume=0.75 pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11' pushOut=None
+	Aspirating 0.75 uL from C2 of NEST 96 Well Plate 200 µL Flat on slot 4 at 5.0 uL/sec
+	Dispensing 0.75 uL into A2 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7 at 5.0 uL/sec
 	Returning tip
 		Dropping tip into G1 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-		Logs from this command:
-		INFO (publisher): command.RETURN_TIP: 
-		INFO (publisher): command.DROP_TIP: instrument: P20 Single-Channel GEN2 on left mount, location: G1 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-		DEBUG (command_executor): Executing d55d9ecf-c0cd-44e6-804f-c3fd5b1e1cf7, dropTip, pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11' labwareId='8dae1b7b-cd11-403e-9e65-a96129d7aee2' wellName='G1' wellLocation=DropTipWellLocation(origin=<DropTipWellOrigin.DEFAULT: 'default'>, offset=WellOffset(x=0, y=0, z=0)) homeAfter=None alternateDropLocation=False
-Transferring 0.75 from C2 of NEST 96 Well Plate 200 µL Flat on slot 3 to A2 of NEST 96 Well Plate 200 µL Flat on slot 5
+Transferring 10.5 from A2 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 to A2 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7
 	Picking up tip from H1 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-	Logs from this command:
-	INFO (publisher): command.TRANSFER: instrument: P20 Single-Channel GEN2 on left mount, locations: [C2 of NEST 96 Well Plate 200 µL Flat on slot 3, A2 of NEST 96 Well Plate 200 µL Flat on slot 5], volume: 0.75, source: C2 of NEST 96 Well Plate 200 µL Flat on slot 3, dest: A2 of NEST 96 Well Plate 200 µL Flat on slot 5
-	DEBUG (instrument_context): Transfer 0.75 from C2 of NEST 96 Well Plate 200 µL Flat on slot 3 to A2 of NEST 96 Well Plate 200 µL Flat on slot 5
-	INFO (publisher): command.PICK_UP_TIP: instrument: P20 Single-Channel GEN2 on left mount, location: H1 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-	DEBUG (command_executor): Executing 8a68d896-5ef8-4209-b714-abba6dde64de, pickUpTip, labwareId='8dae1b7b-cd11-403e-9e65-a96129d7aee2' wellName='H1' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=0.0)) pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11'
-	Aspirating 0.75 uL from C2 of NEST 96 Well Plate 200 µL Flat on slot 3 at 5.0 uL/sec
-	Logs from this command:
-	DEBUG (instrument_context): aspirate 0.75 from C2 of NEST 96 Well Plate 200 µL Flat on slot 3 at 1.0
-	INFO (publisher): command.ASPIRATE: instrument: P20 Single-Channel GEN2 on left mount, volume: 0.75, location: Location(point=Point(x=288.28, y=56.18, z=4.5), labware=C2 of NEST 96 Well Plate 200 µL Flat on slot 3), rate: 1.0
-	DEBUG (command_executor): Executing 71ecd5a5-6ca4-47a4-8010-e5ef611a563a, aspirate, labwareId='ae9ec056-86e3-4e53-be08-e4daa8d6ab4c' wellName='C2' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=-9.8)) flowRate=5.0 volume=0.75 pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11'
-	Dispensing 0.75 uL into A2 of NEST 96 Well Plate 200 µL Flat on slot 5 at 5.0 uL/sec
-	Logs from this command:
-	DEBUG (instrument_context): dispense 0.75 from A2 of NEST 96 Well Plate 200 µL Flat on slot 5 at 1.0
-	INFO (publisher): command.DISPENSE: instrument: P20 Single-Channel GEN2 on left mount, volume: 0.75, location: Location(point=Point(x=155.78, y=164.68, z=4.5), labware=A2 of NEST 96 Well Plate 200 µL Flat on slot 5), rate: 1.0
-	DEBUG (command_executor): Executing c04e2b3b-e1e1-4b55-8f8c-8c8b4c786fd2, dispense, labwareId='28d9e536-0453-477e-8d36-c6da1f7ec662' wellName='A2' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=-9.8)) flowRate=5.0 volume=0.75 pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11' pushOut=None
+	Aspirating 10.5 uL from A2 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 at 5.0 uL/sec
+	Dispensing 10.5 uL into A2 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7 at 5.0 uL/sec
 	Returning tip
 		Dropping tip into H1 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-		Logs from this command:
-		INFO (publisher): command.RETURN_TIP: 
-		INFO (publisher): command.DROP_TIP: instrument: P20 Single-Channel GEN2 on left mount, location: H1 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-		DEBUG (command_executor): Executing ec76fea0-34bc-46b6-a78d-1b1d47c54c4f, dropTip, pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11' labwareId='8dae1b7b-cd11-403e-9e65-a96129d7aee2' wellName='H1' wellLocation=DropTipWellLocation(origin=<DropTipWellOrigin.DEFAULT: 'default'>, offset=WellOffset(x=0, y=0, z=0)) homeAfter=None alternateDropLocation=False
-Transferring 25.0 from A1 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 to A2 of NEST 96 Well Plate 200 µL Flat on slot 5
+Closing Thermocycler lid
+Setting Thermocycler lid temperature to 100.0 °C
+Thermocycler starting 30 repetitions of cycle composed of the following steps: [{'temperature': 98, 'hold_time_seconds': 10}, {'temperature': 55, 'hold_time_seconds': 5}, {'temperature': 68, 'hold_time_seconds': 30}]
+Setting Thermocycler well block temperature to 8.0 °C with a hold time of 5.0 minutes and 0 seconds
+Deactivating Thermocycler
+Opening Thermocycler lid
+Distributing 10.0 from A1 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 to A4 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7
+	Transferring 10.0 from A1 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 to A4 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7
+		Picking up tip from B1 of Opentrons OT-2 96 Tip Rack 300 µL on slot 2
+		Mixing 2 times with a volume of 50.0 ul
+			Aspirating 50.0 uL from A1 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 at 50.0 uL/sec
+			Dispensing 50.0 uL into A1 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 at 50.0 uL/sec
+			Aspirating 50.0 uL from A1 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 at 50.0 uL/sec
+			Dispensing 50.0 uL into A1 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 at 50.0 uL/sec
+		Aspirating 15.0 uL from A1 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 at 50.0 uL/sec
+		Touching tip
+		Dispensing 10.0 uL into A4 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7 at 50.0 uL/sec
+		Touching tip
+		Blowing out at A1 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9
+		Returning tip
+			Dropping tip into B1 of Opentrons OT-2 96 Tip Rack 300 µL on slot 2
+Transferring 1.0 from A1 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7 to A4 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7
 	Picking up tip from A2 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-	Logs from this command:
-	INFO (publisher): command.TRANSFER: instrument: P20 Single-Channel GEN2 on left mount, locations: [A1 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9, A2 of NEST 96 Well Plate 200 µL Flat on slot 5], volume: 25.0, source: A1 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9, dest: A2 of NEST 96 Well Plate 200 µL Flat on slot 5
-	DEBUG (instrument_context): Transfer 25.0 from A1 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 to A2 of NEST 96 Well Plate 200 µL Flat on slot 5
-	INFO (publisher): command.PICK_UP_TIP: instrument: P20 Single-Channel GEN2 on left mount, location: A2 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-	DEBUG (command_executor): Executing 3252b812-bf8d-4c4b-9efe-fbd7561af4a2, pickUpTip, labwareId='8dae1b7b-cd11-403e-9e65-a96129d7aee2' wellName='A2' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=0.0)) pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11'
-	Aspirating 12.5 uL from A1 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 at 5.0 uL/sec
-	Logs from this command:
-	DEBUG (instrument_context): aspirate 12.5 from A1 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 at 1.0
-	INFO (publisher): command.ASPIRATE: instrument: P20 Single-Channel GEN2 on left mount, volume: 12.5, location: Location(point=Point(x=283.21, y=256.43, z=61.0), labware=A1 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9), rate: 1.0
-	DEBUG (command_executor): Executing 3c5a38d2-e8b0-4061-9ca4-52b0606c4e2d, aspirate, labwareId='6f20122d-8db6-4a1b-bd86-f6425fdd268b' wellName='A1' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=-24.200000000000003)) flowRate=5.0 volume=12.5 pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11'
-	Dispensing 12.5 uL into A2 of NEST 96 Well Plate 200 µL Flat on slot 5 at 5.0 uL/sec
-	Logs from this command:
-	DEBUG (instrument_context): dispense 12.5 from A2 of NEST 96 Well Plate 200 µL Flat on slot 5 at 1.0
-	INFO (publisher): command.DISPENSE: instrument: P20 Single-Channel GEN2 on left mount, volume: 12.5, location: Location(point=Point(x=155.78, y=164.68, z=4.5), labware=A2 of NEST 96 Well Plate 200 µL Flat on slot 5), rate: 1.0
-	DEBUG (command_executor): Executing 7650f58c-dfff-444f-bad5-89a7e80d8625, dispense, labwareId='28d9e536-0453-477e-8d36-c6da1f7ec662' wellName='A2' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=-9.8)) flowRate=5.0 volume=12.5 pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11' pushOut=None
+	Aspirating 1.0 uL from A1 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7 at 5.0 uL/sec
+	Dispensing 1.0 uL into A4 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7 at 5.0 uL/sec
 	Returning tip
 		Dropping tip into A2 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-		Logs from this command:
-		INFO (publisher): command.RETURN_TIP: 
-		INFO (publisher): command.DROP_TIP: instrument: P20 Single-Channel GEN2 on left mount, location: A2 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-		DEBUG (command_executor): Executing 9fa0da27-000e-4f0c-af1c-f52f17b2e539, dropTip, pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11' labwareId='8dae1b7b-cd11-403e-9e65-a96129d7aee2' wellName='A2' wellLocation=DropTipWellLocation(origin=<DropTipWellOrigin.DEFAULT: 'default'>, offset=WellOffset(x=0, y=0, z=0)) homeAfter=None alternateDropLocation=False
+Transferring 1.0 from A2 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7 to A4 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7
 	Picking up tip from B2 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-	Logs from this command:
-	INFO (publisher): command.PICK_UP_TIP: instrument: P20 Single-Channel GEN2 on left mount, location: B2 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-	DEBUG (command_executor): Executing e17f31d4-a9e8-4c70-be4b-918b041a8315, pickUpTip, labwareId='8dae1b7b-cd11-403e-9e65-a96129d7aee2' wellName='B2' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=0.0)) pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11'
-	Aspirating 12.5 uL from A1 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 at 5.0 uL/sec
-	Logs from this command:
-	DEBUG (instrument_context): aspirate 12.5 from A1 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 at 1.0
-	INFO (publisher): command.ASPIRATE: instrument: P20 Single-Channel GEN2 on left mount, volume: 12.5, location: Location(point=Point(x=283.21, y=256.43, z=61.0), labware=A1 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9), rate: 1.0
-	DEBUG (command_executor): Executing 2149da1b-fbf9-4bd8-a9c5-863ad6ef2535, aspirate, labwareId='6f20122d-8db6-4a1b-bd86-f6425fdd268b' wellName='A1' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=-24.200000000000003)) flowRate=5.0 volume=12.5 pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11'
-	Dispensing 12.5 uL into A2 of NEST 96 Well Plate 200 µL Flat on slot 5 at 5.0 uL/sec
-	Logs from this command:
-	DEBUG (instrument_context): dispense 12.5 from A2 of NEST 96 Well Plate 200 µL Flat on slot 5 at 1.0
-	INFO (publisher): command.DISPENSE: instrument: P20 Single-Channel GEN2 on left mount, volume: 12.5, location: Location(point=Point(x=155.78, y=164.68, z=4.5), labware=A2 of NEST 96 Well Plate 200 µL Flat on slot 5), rate: 1.0
-	DEBUG (command_executor): Executing 859cde76-2990-4c96-b3f2-6948ddd2ad20, dispense, labwareId='28d9e536-0453-477e-8d36-c6da1f7ec662' wellName='A2' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=-9.8)) flowRate=5.0 volume=12.5 pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11' pushOut=None
+	Aspirating 1.0 uL from A2 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7 at 5.0 uL/sec
+	Dispensing 1.0 uL into A4 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7 at 5.0 uL/sec
 	Returning tip
 		Dropping tip into B2 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-		Logs from this command:
-		INFO (publisher): command.RETURN_TIP: 
-		INFO (publisher): command.DROP_TIP: instrument: P20 Single-Channel GEN2 on left mount, location: B2 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-		DEBUG (command_executor): Executing 2987f2de-e59d-49d2-8428-8d9ac7b7333e, dropTip, pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11' labwareId='8dae1b7b-cd11-403e-9e65-a96129d7aee2' wellName='B2' wellLocation=DropTipWellLocation(origin=<DropTipWellOrigin.DEFAULT: 'default'>, offset=WellOffset(x=0, y=0, z=0)) homeAfter=None alternateDropLocation=False
-Closing Thermocycler lid
-Logs from this command:
-INFO (publisher): command.THERMOCYCLER_CLOSE: 
-DEBUG (command_executor): Executing 2a97a6b1-d4c1-40d2-b75f-60f223e67af2, thermocycler/closeLid, moduleId='2c7bd4c4-1a96-466c-ba1c-256d9d3c129b'
-Setting Thermocycler lid temperature to 100.0 °C
-Logs from this command:
-INFO (publisher): command.THERMOCYCLER_SET_LID_TEMP: 
-DEBUG (command_executor): Executing 3f5f0c36-b3b6-4df0-a287-ca7cdca71fb8, thermocycler/setTargetLidTemperature, moduleId='2c7bd4c4-1a96-466c-ba1c-256d9d3c129b' celsius=100.0
-DEBUG (command_executor): Executing 9dc77267-71b5-479d-af3b-ca363061ae01, thermocycler/waitForLidTemperature, moduleId='2c7bd4c4-1a96-466c-ba1c-256d9d3c129b'
-Thermocycler starting 30 repetitions of cycle composed of the following steps: [{'temperature': 98, 'hold_time_seconds': 10}, {'temperature': 55, 'hold_time_minutes': 5}, {'temperature': 68, 'hold_time_seconds': 30}]
-Logs from this command:
-INFO (publisher): command.THERMOCYCLER_EXECUTE_PROFILE: steps: [{'temperature': 98, 'hold_time_seconds': 10}, {'temperature': 55, 'hold_time_minutes': 5}, {'temperature': 68, 'hold_time_seconds': 30}]
-DEBUG (command_executor): Executing 8ace6ead-c9c1-40e0-93f0-73799fd961f9, thermocycler/runProfile, moduleId='2c7bd4c4-1a96-466c-ba1c-256d9d3c129b' profile=[RunProfileStepParams(celsius=98.0, holdSeconds=10.0), RunProfileStepParams(celsius=55.0, holdSeconds=300.0), RunProfileStepParams(celsius=68.0, holdSeconds=30.0), RunProfileStepParams(celsius=98.0, holdSeconds=10.0), RunProfileStepParams(celsius=55.0, holdSeconds=300.0), RunProfileStepParams(celsius=68.0, holdSeconds=30.0), RunProfileStepParams(celsius=98.0, holdSeconds=10.0), RunProfileStepParams(celsius=55.0, holdSeconds=300.0), RunProfileStepParams(celsius=68.0, holdSeconds=30.0), RunProfileStepParams(celsius=98.0, holdSeconds=10.0), RunProfileStepParams(celsius=55.0, holdSeconds=300.0), RunProfileStepParams(celsius=68.0, holdSeconds=30.0), RunProfileStepParams(celsius=98.0, holdSeconds=10.0), RunProfileStepParams(celsius=55.0, holdSeconds=300.0), RunProfileStepParams(celsius=68.0, holdSeconds=30.0), RunProfileStepParams(celsius=98.0, holdSeconds=10.0), RunProfileStepParams(celsius=55.0, holdSeconds=300.0), RunProfileStepParams(celsius=68.0, holdSeconds=30.0), RunProfileStepParams(celsius=98.0, holdSeconds=10.0), RunProfileStepParams(celsius=55.0, holdSeconds=300.0), RunProfileStepParams(celsius=68.0, holdSeconds=30.0), RunProfileStepParams(celsius=98.0, holdSeconds=10.0), RunProfileStepParams(celsius=55.0, holdSeconds=300.0), RunProfileStepParams(celsius=68.0, holdSeconds=30.0), RunProfileStepParams(celsius=98.0, holdSeconds=10.0), RunProfileStepParams(celsius=55.0, holdSeconds=300.0), RunProfileStepParams(celsius=68.0, holdSeconds=30.0), RunProfileStepParams(celsius=98.0, holdSeconds=10.0), RunProfileStepParams(celsius=55.0, holdSeconds=300.0), RunProfileStepParams(celsius=68.0, holdSeconds=30.0), RunProfileStepParams(celsius=98.0, holdSeconds=10.0), RunProfileStepParams(celsius=55.0, holdSeconds=300.0), RunProfileStepParams(celsius=68.0, holdSeconds=30.0), RunProfileStepParams(celsius=98.0, holdSeconds=10.0), RunProfileStepParams(celsius=55.0, holdSeconds=300.0), RunProfileStepParams(celsius=68.0, holdSeconds=30.0), RunProfileStepParams(celsius=98.0, holdSeconds=10.0), RunProfileStepParams(celsius=55.0, holdSeconds=300.0), RunProfileStepParams(celsius=68.0, holdSeconds=30.0), RunProfileStepParams(celsius=98.0, holdSeconds=10.0), RunProfileStepParams(celsius=55.0, holdSeconds=300.0), RunProfileStepParams(celsius=68.0, holdSeconds=30.0), RunProfileStepParams(celsius=98.0, holdSeconds=10.0), RunProfileStepParams(celsius=55.0, holdSeconds=300.0), RunProfileStepParams(celsius=68.0, holdSeconds=30.0), RunProfileStepParams(celsius=98.0, holdSeconds=10.0), RunProfileStepParams(celsius=55.0, holdSeconds=300.0), RunProfileStepParams(celsius=68.0, holdSeconds=30.0), RunProfileStepParams(celsius=98.0, holdSeconds=10.0), RunProfileStepParams(celsius=55.0, holdSeconds=300.0), RunProfileStepParams(celsius=68.0, holdSeconds=30.0), RunProfileStepParams(celsius=98.0, holdSeconds=10.0), RunProfileStepParams(celsius=55.0, holdSeconds=300.0), RunProfileStepParams(celsius=68.0, holdSeconds=30.0), RunProfileStepParams(celsius=98.0, holdSeconds=10.0), RunProfileStepParams(celsius=55.0, holdSeconds=300.0), RunProfileStepParams(celsius=68.0, holdSeconds=30.0), RunProfileStepParams(celsius=98.0, holdSeconds=10.0), RunProfileStepParams(celsius=55.0, holdSeconds=300.0), RunProfileStepParams(celsius=68.0, holdSeconds=30.0), RunProfileStepParams(celsius=98.0, holdSeconds=10.0), RunProfileStepParams(celsius=55.0, holdSeconds=300.0), RunProfileStepParams(celsius=68.0, holdSeconds=30.0), RunProfileStepParams(celsius=98.0, holdSeconds=10.0), RunProfileStepParams(celsius=55.0, holdSeconds=300.0), RunProfileStepParams(celsius=68.0, holdSeconds=30.0), RunProfileStepParams(celsius=98.0, holdSeconds=10.0), RunProfileStepParams(celsius=55.0, holdSeconds=300.0), RunProfileStepParams(celsius=68.0, holdSeconds=30.0), RunProfileStepParams(celsius=98.0, holdSeconds=10.0), RunProfileStepParams(celsius=55.0, holdSeconds=300.0), RunProfileStepParams(celsius=68.0, holdSeconds=30.0), RunProfileStepParams(celsius=98.0, holdSeconds=10.0), RunProfileStepParams(celsius=55.0, holdSeconds=300.0), RunProfileStepParams(celsius=68.0, holdSeconds=30.0), RunProfileStepParams(celsius=98.0, holdSeconds=10.0), RunProfileStepParams(celsius=55.0, holdSeconds=300.0), RunProfileStepParams(celsius=68.0, holdSeconds=30.0), RunProfileStepParams(celsius=98.0, holdSeconds=10.0), RunProfileStepParams(celsius=55.0, holdSeconds=300.0), RunProfileStepParams(celsius=68.0, holdSeconds=30.0), RunProfileStepParams(celsius=98.0, holdSeconds=10.0), RunProfileStepParams(celsius=55.0, holdSeconds=300.0), RunProfileStepParams(celsius=68.0, holdSeconds=30.0), RunProfileStepParams(celsius=98.0, holdSeconds=10.0), RunProfileStepParams(celsius=55.0, holdSeconds=300.0), RunProfileStepParams(celsius=68.0, holdSeconds=30.0), RunProfileStepParams(celsius=98.0, holdSeconds=10.0), RunProfileStepParams(celsius=55.0, holdSeconds=300.0), RunProfileStepParams(celsius=68.0, holdSeconds=30.0)] blockMaxVolumeUl=25.0
-Setting Thermocycler well block temperature to 8.0 °C with a hold time of 5.0 minutes and 0 seconds
-Logs from this command:
-INFO (publisher): command.THERMOCYCLER_SET_BLOCK_TEMP: temperature: 8, hold_time: 300
-DEBUG (command_executor): Executing 0902fc95-9dc8-4164-ad77-e5b6817c8870, thermocycler/setTargetBlockTemperature, moduleId='2c7bd4c4-1a96-466c-ba1c-256d9d3c129b' celsius=8.0 blockMaxVolumeUl=25.0 holdTimeSeconds=300.0
-DEBUG (command_executor): Executing 13e71310-da88-4c2f-8f55-9b791c6725e3, thermocycler/waitForBlockTemperature, moduleId='2c7bd4c4-1a96-466c-ba1c-256d9d3c129b'
-Deactivating Thermocycler
-Logs from this command:
-INFO (publisher): command.THERMOCYCLER_DEACTIVATE: 
-DEBUG (command_executor): Executing 212a20c0-ca51-47a8-9608-c4b0b9ef1cf2, thermocycler/deactivateBlock, moduleId='2c7bd4c4-1a96-466c-ba1c-256d9d3c129b'
-DEBUG (command_executor): Executing 54497266-1300-4d54-8e79-5ff07bff75f7, thermocycler/deactivateLid, moduleId='2c7bd4c4-1a96-466c-ba1c-256d9d3c129b'
-Opening Thermocycler lid
-Logs from this command:
-INFO (publisher): command.THERMOCYCLER_OPEN: 
-DEBUG (command_executor): Executing 63590f20-37ca-438e-8278-b2477b7264ef, thermocycler/openLid, moduleId='2c7bd4c4-1a96-466c-ba1c-256d9d3c129b'
-Transferring 1.0 from A1 of NEST 96 Well Plate 200 µL Flat on slot 5 to A4 of NEST 96 Well Plate 200 µL Flat on slot 5
+Transferring 8.0 from A2 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 to A4 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7
 	Picking up tip from C2 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-	Logs from this command:
-	INFO (publisher): command.TRANSFER: instrument: P20 Single-Channel GEN2 on left mount, locations: [A1 of NEST 96 Well Plate 200 µL Flat on slot 5, A4 of NEST 96 Well Plate 200 µL Flat on slot 5], volume: 1.0, source: A1 of NEST 96 Well Plate 200 µL Flat on slot 5, dest: A4 of NEST 96 Well Plate 200 µL Flat on slot 5
-	DEBUG (instrument_context): Transfer 1.0 from A1 of NEST 96 Well Plate 200 µL Flat on slot 5 to A4 of NEST 96 Well Plate 200 µL Flat on slot 5
-	INFO (publisher): command.PICK_UP_TIP: instrument: P20 Single-Channel GEN2 on left mount, location: C2 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-	DEBUG (command_executor): Executing 2dea856b-bfae-4d27-9387-1679f65299ec, pickUpTip, labwareId='8dae1b7b-cd11-403e-9e65-a96129d7aee2' wellName='C2' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=0.0)) pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11'
-	Aspirating 1.0 uL from A1 of NEST 96 Well Plate 200 µL Flat on slot 5 at 5.0 uL/sec
-	Logs from this command:
-	DEBUG (instrument_context): aspirate 1.0 from A1 of NEST 96 Well Plate 200 µL Flat on slot 5 at 1.0
-	INFO (publisher): command.ASPIRATE: instrument: P20 Single-Channel GEN2 on left mount, volume: 1.0, location: Location(point=Point(x=146.78, y=164.68, z=4.5), labware=A1 of NEST 96 Well Plate 200 µL Flat on slot 5), rate: 1.0
-	DEBUG (command_executor): Executing 890983b4-65a5-4ffa-88b5-68432e7595fb, aspirate, labwareId='28d9e536-0453-477e-8d36-c6da1f7ec662' wellName='A1' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=-9.8)) flowRate=5.0 volume=1.0 pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11'
-	Dispensing 1.0 uL into A4 of NEST 96 Well Plate 200 µL Flat on slot 5 at 5.0 uL/sec
-	Logs from this command:
-	DEBUG (instrument_context): dispense 1.0 from A4 of NEST 96 Well Plate 200 µL Flat on slot 5 at 1.0
-	INFO (publisher): command.DISPENSE: instrument: P20 Single-Channel GEN2 on left mount, volume: 1.0, location: Location(point=Point(x=173.78, y=164.68, z=4.5), labware=A4 of NEST 96 Well Plate 200 µL Flat on slot 5), rate: 1.0
-	DEBUG (command_executor): Executing 92d2b6d6-609e-4c8b-9d34-86e759012a6c, dispense, labwareId='28d9e536-0453-477e-8d36-c6da1f7ec662' wellName='A4' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=-9.8)) flowRate=5.0 volume=1.0 pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11' pushOut=None
+	Aspirating 8.0 uL from A2 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 at 5.0 uL/sec
+	Dispensing 8.0 uL into A4 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7 at 5.0 uL/sec
 	Returning tip
 		Dropping tip into C2 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-		Logs from this command:
-		INFO (publisher): command.RETURN_TIP: 
-		INFO (publisher): command.DROP_TIP: instrument: P20 Single-Channel GEN2 on left mount, location: C2 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-		DEBUG (command_executor): Executing 2086f576-ba25-4bf3-8db1-bb60fed8ef67, dropTip, pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11' labwareId='8dae1b7b-cd11-403e-9e65-a96129d7aee2' wellName='C2' wellLocation=DropTipWellLocation(origin=<DropTipWellOrigin.DEFAULT: 'default'>, offset=WellOffset(x=0, y=0, z=0)) homeAfter=None alternateDropLocation=False
-Transferring 1.0 from A2 of NEST 96 Well Plate 200 µL Flat on slot 5 to A4 of NEST 96 Well Plate 200 µL Flat on slot 5
-	Picking up tip from D2 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-	Logs from this command:
-	INFO (publisher): command.TRANSFER: instrument: P20 Single-Channel GEN2 on left mount, locations: [A2 of NEST 96 Well Plate 200 µL Flat on slot 5, A4 of NEST 96 Well Plate 200 µL Flat on slot 5], volume: 1.0, source: A2 of NEST 96 Well Plate 200 µL Flat on slot 5, dest: A4 of NEST 96 Well Plate 200 µL Flat on slot 5
-	DEBUG (instrument_context): Transfer 1.0 from A2 of NEST 96 Well Plate 200 µL Flat on slot 5 to A4 of NEST 96 Well Plate 200 µL Flat on slot 5
-	INFO (publisher): command.PICK_UP_TIP: instrument: P20 Single-Channel GEN2 on left mount, location: D2 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-	DEBUG (command_executor): Executing 56a345e5-b5f1-4730-97b2-e2565a2b73d6, pickUpTip, labwareId='8dae1b7b-cd11-403e-9e65-a96129d7aee2' wellName='D2' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=0.0)) pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11'
-	Aspirating 1.0 uL from A2 of NEST 96 Well Plate 200 µL Flat on slot 5 at 5.0 uL/sec
-	Logs from this command:
-	DEBUG (instrument_context): aspirate 1.0 from A2 of NEST 96 Well Plate 200 µL Flat on slot 5 at 1.0
-	INFO (publisher): command.ASPIRATE: instrument: P20 Single-Channel GEN2 on left mount, volume: 1.0, location: Location(point=Point(x=155.78, y=164.68, z=4.5), labware=A2 of NEST 96 Well Plate 200 µL Flat on slot 5), rate: 1.0
-	DEBUG (command_executor): Executing 76902e69-a12c-47e6-b05e-3951c9f0c71c, aspirate, labwareId='28d9e536-0453-477e-8d36-c6da1f7ec662' wellName='A2' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=-9.8)) flowRate=5.0 volume=1.0 pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11'
-	Dispensing 1.0 uL into A4 of NEST 96 Well Plate 200 µL Flat on slot 5 at 5.0 uL/sec
-	Logs from this command:
-	DEBUG (instrument_context): dispense 1.0 from A4 of NEST 96 Well Plate 200 µL Flat on slot 5 at 1.0
-	INFO (publisher): command.DISPENSE: instrument: P20 Single-Channel GEN2 on left mount, volume: 1.0, location: Location(point=Point(x=173.78, y=164.68, z=4.5), labware=A4 of NEST 96 Well Plate 200 µL Flat on slot 5), rate: 1.0
-	DEBUG (command_executor): Executing 6cfb255e-05d1-401e-9f80-8511c28d3582, dispense, labwareId='28d9e536-0453-477e-8d36-c6da1f7ec662' wellName='A4' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=-9.8)) flowRate=5.0 volume=1.0 pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11' pushOut=None
-	Returning tip
-		Dropping tip into D2 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-		Logs from this command:
-		INFO (publisher): command.RETURN_TIP: 
-		INFO (publisher): command.DROP_TIP: instrument: P20 Single-Channel GEN2 on left mount, location: D2 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-		DEBUG (command_executor): Executing 2bd80418-e2fc-4fd9-a47f-e4688b136846, dropTip, pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11' labwareId='8dae1b7b-cd11-403e-9e65-a96129d7aee2' wellName='D2' wellLocation=DropTipWellLocation(origin=<DropTipWellOrigin.DEFAULT: 'default'>, offset=WellOffset(x=0, y=0, z=0)) homeAfter=None alternateDropLocation=False
-Transferring 20.0 from A1 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 to A4 of NEST 96 Well Plate 200 µL Flat on slot 5
-	Picking up tip from E2 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-	Logs from this command:
-	INFO (publisher): command.TRANSFER: instrument: P20 Single-Channel GEN2 on left mount, locations: [A1 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9, A4 of NEST 96 Well Plate 200 µL Flat on slot 5], volume: 20.0, source: A1 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9, dest: A4 of NEST 96 Well Plate 200 µL Flat on slot 5
-	DEBUG (instrument_context): Transfer 20.0 from A1 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 to A4 of NEST 96 Well Plate 200 µL Flat on slot 5
-	INFO (publisher): command.PICK_UP_TIP: instrument: P20 Single-Channel GEN2 on left mount, location: E2 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-	DEBUG (command_executor): Executing 1fa38540-024a-43df-8bbb-9d0c3ebfcfc9, pickUpTip, labwareId='8dae1b7b-cd11-403e-9e65-a96129d7aee2' wellName='E2' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=0.0)) pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11'
-	Aspirating 20.0 uL from A1 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 at 5.0 uL/sec
-	Logs from this command:
-	DEBUG (instrument_context): aspirate 20 from A1 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 at 1.0
-	INFO (publisher): command.ASPIRATE: instrument: P20 Single-Channel GEN2 on left mount, volume: 20, location: Location(point=Point(x=283.21, y=256.43, z=61.0), labware=A1 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9), rate: 1.0
-	DEBUG (command_executor): Executing 23d9d2e6-e9c0-478d-82e9-bbbfa843ae48, aspirate, labwareId='6f20122d-8db6-4a1b-bd86-f6425fdd268b' wellName='A1' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=-24.200000000000003)) flowRate=5.0 volume=20.0 pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11'
-	Dispensing 20.0 uL into A4 of NEST 96 Well Plate 200 µL Flat on slot 5 at 5.0 uL/sec
-	Logs from this command:
-	DEBUG (instrument_context): dispense 20 from A4 of NEST 96 Well Plate 200 µL Flat on slot 5 at 1.0
-	INFO (publisher): command.DISPENSE: instrument: P20 Single-Channel GEN2 on left mount, volume: 20, location: Location(point=Point(x=173.78, y=164.68, z=4.5), labware=A4 of NEST 96 Well Plate 200 µL Flat on slot 5), rate: 1.0
-	DEBUG (command_executor): Executing c1dd2b8f-ec2f-4dbb-a6ea-b3fbbb352207, dispense, labwareId='28d9e536-0453-477e-8d36-c6da1f7ec662' wellName='A4' wellLocation=WellLocation(origin=<WellOrigin.TOP: 'top'>, offset=WellOffset(x=0.0, y=0.0, z=-9.8)) flowRate=5.0 volume=20.0 pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11' pushOut=None
-	Returning tip
-		Dropping tip into E2 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-		Logs from this command:
-		INFO (publisher): command.RETURN_TIP: 
-		INFO (publisher): command.DROP_TIP: instrument: P20 Single-Channel GEN2 on left mount, location: E2 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
-		DEBUG (command_executor): Executing 0631407b-24fb-416b-89e8-b19680bf12a7, dropTip, pipetteId='38bfc2ed-9162-4a83-8100-a23f35ebaa11' labwareId='8dae1b7b-cd11-403e-9e65-a96129d7aee2' wellName='E2' wellLocation=DropTipWellLocation(origin=<DropTipWellOrigin.DEFAULT: 'default'>, offset=WellOffset(x=0, y=0, z=0)) homeAfter=None alternateDropLocation=False
 Closing Thermocycler lid
-Logs from this command:
-INFO (publisher): command.THERMOCYCLER_CLOSE: 
-DEBUG (command_executor): Executing b4996226-9fec-4ae2-86d9-d47291f63c5e, thermocycler/closeLid, moduleId='2c7bd4c4-1a96-466c-ba1c-256d9d3c129b'
 Setting Thermocycler lid temperature to 100.0 °C
-Logs from this command:
-INFO (publisher): command.THERMOCYCLER_SET_LID_TEMP: 
-DEBUG (command_executor): Executing 14655d93-1194-4ca5-838c-aa06e59f28af, thermocycler/setTargetLidTemperature, moduleId='2c7bd4c4-1a96-466c-ba1c-256d9d3c129b' celsius=100.0
-DEBUG (command_executor): Executing aae3e8fc-77bc-4ef4-830c-d78f5a99ce58, thermocycler/waitForLidTemperature, moduleId='2c7bd4c4-1a96-466c-ba1c-256d9d3c129b'
 Setting Thermocycler well block temperature to 50.0 °C with a hold time of 40.0 minutes and 0 seconds
-Logs from this command:
-INFO (publisher): command.THERMOCYCLER_SET_BLOCK_TEMP: temperature: 50, hold_time: 2400
-DEBUG (command_executor): Executing 6dc97ae1-89ec-40a0-b156-cc9cb23e9e93, thermocycler/setTargetBlockTemperature, moduleId='2c7bd4c4-1a96-466c-ba1c-256d9d3c129b' celsius=50.0 blockMaxVolumeUl=20.0 holdTimeSeconds=2400.0
-DEBUG (command_executor): Executing aa74a73e-3d86-4fbd-a9e8-a7308faded39, thermocycler/waitForBlockTemperature, moduleId='2c7bd4c4-1a96-466c-ba1c-256d9d3c129b'
 Setting Thermocycler well block temperature to 8.0 °C with a hold time of 5.0 minutes and 0 seconds
-Logs from this command:
-INFO (publisher): command.THERMOCYCLER_SET_BLOCK_TEMP: temperature: 8, hold_time: 300
-DEBUG (command_executor): Executing 9f15c095-2602-48f2-b529-621b7582d4a2, thermocycler/setTargetBlockTemperature, moduleId='2c7bd4c4-1a96-466c-ba1c-256d9d3c129b' celsius=8.0 blockMaxVolumeUl=25.0 holdTimeSeconds=300.0
-DEBUG (command_executor): Executing 422760aa-e6e1-4567-9eb6-5575727bb63f, thermocycler/waitForBlockTemperature, moduleId='2c7bd4c4-1a96-466c-ba1c-256d9d3c129b'
+Deactivating Thermocycler
+Opening Thermocycler lid
+Distributing 25.0 from A3 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 to A4 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7
+	Transferring 25.0 from A3 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 to A4 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7
+		Picking up tip from C1 of Opentrons OT-2 96 Tip Rack 300 µL on slot 2
+		Mixing 2 times with a volume of 50.0 ul
+			Aspirating 50.0 uL from A3 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 at 20.0 uL/sec
+			Dispensing 50.0 uL into A3 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 at 10.0 uL/sec
+			Aspirating 50.0 uL from A3 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 at 20.0 uL/sec
+			Dispensing 50.0 uL into A3 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 at 10.0 uL/sec
+		Aspirating 30.0 uL from A3 of Opentrons 24 Tube Rack with NEST 0.5 mL Screwcap on slot 9 at 20.0 uL/sec
+		Touching tip
+		Dispensing 25.0 uL into A4 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7 at 10.0 uL/sec
+		Touching tip
+		Blowing out at A1 of Opentrons Fixed Trash on slot 12
+		Returning tip
+			Dropping tip into C1 of Opentrons OT-2 96 Tip Rack 300 µL on slot 2
+Closing Thermocycler lid
+Thermocycler starting 1 repetitions of cycle composed of the following steps: [{'temperature': 42, 'hold_time_seconds': 90}, {'temperature': 8, 'hold_time_seconds': 90}, {'temperature': 37, 'hold_time_minutes': 15}]
+Deactivating Thermocycler
+Opening Thermocycler lid
+Distributing 4.0 from A4 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7 to A1 of NEST 96 Well Plate 200 µL Flat on slot 6
+	Transferring 4.0 from A4 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7 to A1 of NEST 96 Well Plate 200 µL Flat on slot 6
+		Picking up tip from D2 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1
+		Aspirating 13.0 uL from A4 of NEST 96 Well Plate 200 µL Flat on Thermocycler Module GEN1 on slot 7 at 5.0 uL/sec
+		Touching tip
+		Dispensing 4.0 uL into A1 of NEST 96 Well Plate 200 µL Flat on slot 6 at 5.0 uL/sec
+		Touching tip
+		Dispensing 4.0 uL into A2 of NEST 96 Well Plate 200 µL Flat on slot 6 at 5.0 uL/sec
+		Touching tip
+		Dispensing 4.0 uL into A3 of NEST 96 Well Plate 200 µL Flat on slot 6 at 5.0 uL/sec
+		Touching tip
+		Blowing out at A1 of Opentrons Fixed Trash on slot 12
+		Returning tip
+			Dropping tip into D2 of Opentrons OT-2 96 Tip Rack 20 µL on slot 1

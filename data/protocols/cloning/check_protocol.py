@@ -17,3 +17,20 @@ def enzyme_position(enzyme_list):
     for enzyme, well in zip(enzyme_list, well_position):
         return_dict[enzyme] = well
     return return_dict
+
+def deck_position(plates):
+    position = [1,2,3,4,5,6,9]
+    
+    deck_dict = {}
+    deck_dict["Enzyme_tube"] = position.pop(0)
+    deck_dict["p20_tip"] = position.pop(0)
+    deck_dict["p300_tip"] = position.pop(0)
+    
+    for key in plates.keys():
+        if plates[key]["type"] == "Reaction":
+            deck_dict[key] = 7
+            continue
+        
+        deck_dict[key] = position.pop(0)
+        
+    return deck_dict

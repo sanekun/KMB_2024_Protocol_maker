@@ -5,7 +5,7 @@ import re
 from datetime import datetime
 
 sys.path.append("/home/kun/workspace/webservice/automated-protocol-ot2/data")
-from protocols.cloning.check_protocol import check_tips, enzyme_position
+from protocols.cloning.check_protocol import *
 
 # I wanna use ot2_cloning.py's function in this script.
 # But I don't want import imported module in ot2_cloning.py
@@ -206,7 +206,7 @@ def Use_example():
 
 
 st.set_page_config(page_title="Cloning", layout="wide")
-st.session_state["labwares"] = ["nest_96_wellplate_200ul_flat"]
+st.session_state["labwares"] = ["biorad_96_wellplate_200ul_pcr", "nest_96_wellplate_200ul_flat"]
 export_JSON = False
 
 # Main
@@ -216,7 +216,7 @@ with st.expander("Manual", expanded=True):
         st.markdown(
             """
             # How to use
-            ***This method is for `Cloning` and optimized in `OT-2`.***  
+            ***This method is for `Cloning` and optimized in `OT-2`.***
             (`PCR` - `Assembly` - `Transformation`)
             """
         )
@@ -240,7 +240,7 @@ with st.expander("Manual", expanded=True):
             2. Describe the Reaction using Sample Name write in `Sample Plate`
 
             3. Fill the `Reaction plate` in the order of the following table
-            
+
             4. Fill the `TF plate` in the order of the following table
                 - You can spot the same sample several times
 
@@ -248,15 +248,15 @@ with st.expander("Manual", expanded=True):
                 - If you add additional enzyme you fill the volume for it
                 - It can adjust volume and condition
                 - It's `advanced` options the protocol only optimized deafult condition.
-            
+
             6. Click `Make Protocol` button.
-                - Automatically check the error. 
+                - Automatically check the error.
                     - same sample name, empty sample name ...
                 - The Report will be displayed
                 - Transformed Plate on each sample is recorded
                 - Parameters used in this protocol
             7. Download and Transfer `protocol.py` file to OT-2
-            
+
             8. Run the protocol with appropriate samples
             """
         )
@@ -265,15 +265,15 @@ with st.expander("Manual", expanded=True):
         st.markdown(
             """
             # Flow
-            1. Check Number of plate and plate type can access to Device  
-            2. Check whole DNA used in Reaction be in DNA plate.  
-            3. Check whole Reacted Sample used in Transformation be in Reaction plate.  
-            4. Check and Notice Enzyme and DW using in this Protocol.  
-            5. Check Number of Reaction and How many tips need.  
-            6. Make Report and Protocol with upper information.    
+            1. Check Number of plate and plate type can access to Device
+            2. Check whole DNA used in Reaction be in DNA plate.
+            3. Check whole Reacted Sample used in Transformation be in Reaction plate.
+            4. Check and Notice Enzyme and DW using in this Protocol.
+            5. Check Number of Reaction and How many tips need.
+            6. Make Report and Protocol with upper information.
             ---
-            
-            # Output Information  
+
+            # Output Information
             `Plates` = {"name": {"data": {"sample_name": "well", ...}, "labware": "labware_name", "type": "plate_type"}}  
             `Reactions` = {"name": {"data": {"column_name": {"row_name": "sample_name", ...}, "type": "reaction_type"}}  
             `Reaction_volume` = {"reaction_type": {"column_name": {"row_name": "volume", ...}}}  
@@ -285,12 +285,12 @@ with st.expander("Manual", expanded=True):
                 "Plates": {
                     "DNA_plate_0_name": {
                         "data": {
-                            "Template1": "A1",
-                            "Primer1": "B1",
-                            "Primer2": "C1",
-                            "Template2": "A2",
-                            "Primer3": "B2",
-                            "Primer4": "C2",
+                            "A1": "Template1",
+                            "B1": "Primer1",
+                            "C1": "Primer2",
+                            "A2": "Template2",
+                            "B2": "Primer3",
+                            "C2": "Primer4",
                         },
                         "labware": "nest_96_wellplate_200ul_flat",
                         "type": "DNA",
@@ -302,15 +302,19 @@ with st.expander("Manual", expanded=True):
                     },
                     "Reaction_plate_0_name": {
                         "data": {
-                            "Vector": "A1",
-                            "Insert": "A2",
-                            "Assembled_vector": "A4",
+                            "A1": "Vector",
+                            "A2": "Insert",
+                            "A4": "Assembled_vector",
                         },
                         "labware": "nest_96_wellplate_200ul_flat",
                         "type": "Reaction",
                     },
                     "TF_plate_0_name": {
-                        "data": {"Assembled_vector": "A3"},
+                        "data": {
+                            "A1": "Assembled_vector",
+                            "A2": "Assembled_vector",
+                            "A3": "Assembled_vector",
+                        },
                         "labware": "nest_96_wellplate_200ul_flat",
                         "type": "TF",
                     },
@@ -338,33 +342,32 @@ with st.expander("Manual", expanded=True):
                         "type": "Assembly",
                     },
                 },
-                "Reaction_volume": 
-                    {
-                        "PCR": {
-                            "DNA1": "0.5",
-                            "DNA2": "0.75",
-                            "DNA3": "0.75",
-                            "Enzyme1": "12.5",
-                            "DW": "25",
-                        },
-                        "Assembly": {
-                            "DNA1": "1",
-                            "DNA2": "1",
-                            "Enzyme1": "10",
-                            "DW": "20",
-                        },
+                "Reaction_volume": {
+                    "PCR": {
+                        "DNA1": "0.5",
+                        "DNA2": "0.75",
+                        "DNA3": "0.75",
+                        "Enzyme1": "12.5",
+                        "DW": "10.5",
                     },
+                    "Assembly": {"DNA1": "1", "DNA2": "1", "Enzyme1": "10", "DW": "8"},
+                },
                 "Parameters": {
                     "Number of Plate": 4,
                     "Plate_type": ["DNA", "Reaction", "TF"],
                     "Reaction_type": ["PCR", "Assembly"],
-                    "Enzyme_position": {"AssemblyMix": "A1", "DW": "A2",
-                                        "PCRMix": "A3", "CPcell": "A4"},
+                    "Enzyme_position": {
+                        "CPcell": "A1",
+                        "DW": "A2",
+                        "PCRMix": "A3",
+                        "AssemblyMix": "A4",
+                    },
                     "number_of_tips": "",
                 },
-            },
-            expanded=False,
+            }
         )
+
+
 st.button("Use Example", on_click=Use_example)
 st.markdown("---")
 
@@ -620,14 +623,14 @@ with st.expander("Advanced", expanded=False):
         "0.75",
         "0.75",
         "12.5",
-        "25",
+        "10.5",
     ]
     # Thermocycler condition
 
     Assembly_volume = pd.DataFrame(
         columns=st.session_state["Assembly_plate_0_df"].columns
     ).drop(columns=["Name"])
-    Assembly_volume.loc[0, ["DNA1", "DNA2", "Enzyme1", "DW"]] = ["1", "1", "10", "20"]
+    Assembly_volume.loc[0, ["DNA1", "DNA2", "Enzyme1", "DW"]] = ["1", "1", "10", "8"]
 
     st.markdown("### PCR volume")
     update_PCR_volume = st.data_editor(
@@ -673,8 +676,8 @@ if st.button("Make Protocol"):
                     )
                     .dropna()
                     .reset_index()
-                    .set_index("Value")
-                ).to_dict()["well"],
+                    .set_index("well")
+                ).to_dict()["Value"],
                 "labware": st.session_state[f"{plate_type}_plate_{num}_labware"],
                 "type": plate_type,
             }
@@ -707,11 +710,11 @@ if st.button("Make Protocol"):
     DNA_names, Reaction_names, TF_names = [], [], []
     for plate_name, plate_info in export_JSON["Plates"].items():
         if plate_info["type"] == "DNA":
-            DNA_names += list(plate_info["data"].keys())
+            DNA_names += list(plate_info["data"].values())
         elif plate_info["type"] == "Reaction":
-            Reaction_names += list(plate_info["data"].keys())
+            Reaction_names += list(plate_info["data"].values())
         elif plate_info["type"] == "TF":
-            TF_names += list(plate_info["data"].keys())
+            TF_names += list(plate_info["data"].values())
 
     assert len(DNA_names) == len(set(DNA_names)), "DNA names are overlaped"
     assert len(Reaction_names) == len(
@@ -781,15 +784,16 @@ if st.button("Make Protocol"):
         "Enzyme_position": enzyme_position(
             enzyme_list=list(set(PCR_enzyme) | set(Assembly_enzyme) | {"DW", "CPcell"})
         ),
-        "number_of_tips": check_tips(),
+        "Deck_position": deck_position(export_JSON["Plates"]),
+        "number_of_tips": check_tips()
     }
 
     protocol = True
     with open("data/protocols/cloning/ot2_cloning.py", "r") as f:
         protocol = f.read()
         protocol = protocol.replace("#[Remove]", "")
-        protocol.replace("null", "")
-        new_protocol = protocol.replace("export_JSON", str(export_JSON))
+        protocol = protocol.replace("EXPORT_JSON", str(export_JSON))
+        new_protocol = protocol.replace("null", "")
 
 st.download_button(
     label="Download Protocol",
