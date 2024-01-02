@@ -12,8 +12,8 @@ metadata = {
 debug = False
 
 from opentrons import protocol_api
-from opentrons import simulate
-protocol = simulate.get_protocol_api("2.13")
+# from opentrons import simulate
+# protocol = simulate.get_protocol_api("2.13")
 
 import pandas as pd
 import re
@@ -88,7 +88,7 @@ def transfer_materials(key, p20, p300, mix_last=False):
             src = find_materials_well(enzyme_name, "Enzyme")
             vol = float(volume_dict["Enzyme1"])
             # z 3cm
-            dest = [find_materials_well(name, "DNA").bottom(z=3) for name in tmp["Name"].values]
+            dest = [find_materials_well(name, "DNA").bottom(z=7) for name in tmp["Name"].values]
 
             flow_rate(p300, aspirate=20, dispense=20, blow_out=20)
             p300.distribute(
@@ -108,8 +108,12 @@ def transfer_materials(key, p20, p300, mix_last=False):
             if sample_type == "Name":
                 dest = find_materials_well(sample_name, "DNA")
                 continue
-            if sample_name == "":
+            if sample_name == "" or "nan":
                 continue
+
+            src = find_materials_well(sample_name, re.sub(r"[0-9]+", "", sample_type))
+            vol = float(volume_dict[sample_type])
+
             # Check DNA or Enzyme
             if re.sub(r"[0-9]+", "", sample_type) == "Enzyme":
                 flow_rate(p20, aspirate=1, dispense=1, blow_out=1)
@@ -118,19 +122,16 @@ def transfer_materials(key, p20, p300, mix_last=False):
                 flow_rate(p20, aspirate=1, dispense=1, blow_out=1)
                 touch_tip = False
 
-            src = find_materials_well(sample_name, re.sub(r"[0-9]+", "", sample_type))
-            vol = float(volume_dict[sample_type])
-
             p20.transfer(
-                vol, src, dest, new_tip="always", 
-                touch_tip=touch_tip, 
-                blow_out=True, blowout_location="destination well",
+                vol, src, dest, new_tip="always",
+                touch_tip=touch_tip,
+                blow_out=False, blowout_location="destination well",
                 trash=not debug
             )
         # Final Mix
         if mix_last:
             p20.pick_up_tip()
-            p20.mix(3, 10, dest)
+            p20.mix(2, 10, dest.bottom(z=3))
             p20.drop_tip()
 
 
@@ -193,11 +194,14 @@ def run(protocol: protocol_api.ProtocolContext):
         tc_mod.open_lid()
 
     # Second Reaction
-    protocol.pause(f"Place down {list(PARAMETERS['Reactions'].keys())[1]} enzyme")
     reaction = list(PARAMETERS["Reactions"].keys())[1]
     final_volume = sum([float(i) for i in PARAMETERS["Reaction_volume"]["PCR"].values()])
+
+    ## If not Empty Run protocol
     if [i for i in PARAMETERS["Reactions"][reaction]["data"]["Name"].values() if i != None]:
+        protocol.pause(f"Place down {list(PARAMETERS['Reactions'].keys())[1]} enzyme")
         print (f"RUN {reaction}")
+
         transfer_materials(list(PARAMETERS["Reactions"].keys())[1], p20=p20, p300=p300, mix_last=True)
         ## Thermocycler
         tc_mod.close_lid()
@@ -216,34 +220,63 @@ def run(protocol: protocol_api.ProtocolContext):
             block_max_volume=final_volume,
             ramp_rate=0.1,
         )
-        tc_mod.deactivate()
+        tc_mod.set_block_temperature(8)
+        tc_mod.deactivate_lid()
         tc_mod.open_lid()
 
     # Transformation
-    # Assembly DNA 위에 그냥 CP cell을 얹어야 할 것 같은데 ..?
-    # CP cell 분주하는 걸로..
-    protocol.pause("Place down TF-associated materials")
-    if PARAMETERS["Plates"]["TF_plate_0_name"]["data"]:
+    ## IF Tf plate not empty, run protocol
+    run_protocol=False
+    for key in PARAMETERS["Plates"].keys():
+        plate = PARAMETERS["Plates"][key]
+        if plate["type"] == "TF":
+            if plate["data"]:
+                run_protocol=True
+                break
+
+    if run_protocol:
+        tc_mod.set_block_temperature(8)
+        protocol.pause("Place down TF-associated materials")
         print (f"RUN TF")
         flow_rate(p300, aspirate=20, dispense=10, blow_out=100)
         src = find_materials_well("CPcell", "DW").bottom(z=3)
+
+        unique_sample = []
+        for key in PARAMETERS["Plates"].keys():
+            plate=PARAMETERS["Plates"][key]
+            if plate["type"] == "TF":
+                unique_sample += list(plate["data"].values())
+        unique_sample = list(set(unique_sample))
+        if "" in unique_sample:
+            unique_sample.remove("")
+
         dest = [
-            find_materials_well(name, "DNA")
-            for name in PARAMETERS["Reactions"]["Assembly_plate_0_name"]["data"][
-                "Name"
-            ].values()
+            find_materials_well(name, "DNA").bottom(z=3)
+            for name in unique_sample
         ]
+
         CP_cell_volume = 25
         p300.pick_up_tip()
-        p300.mix(3, 25, src)
+        p300.mix(2, 25, src)
         p300.drop_tip()
         p300.transfer(CP_cell_volume, src, dest,
-                        new_tip="always", touch_tip=True, disposal_volume=5,
-                        mix_after=(3, 20),
+                        new_tip="always", touch_tip=False, disposal_volume=5,
+                        mix_after=(2, 20),
                         blow_out=False, trash=not debug)
 
-        ## Thermocycler
         tc_mod.close_lid()
+        protocol.delay(minutes=7)
+
+        for i in PARAMETERS["Plates"].keys():
+            plate = PARAMETERS["Plates"][i]
+            if plate["type"] != "TF":
+                continue
+            else:
+                unique_sample = list(set(plate["data"].values()))
+                for sample in unique_sample:
+                    src = find_materials_well(sample, "DNA")
+
+        ## Thermocycler
         profile = [
             {"temperature": 42, "hold_time_seconds": 70},
             {"temperature": 8, "hold_time_seconds": 100},
@@ -255,11 +288,11 @@ def run(protocol: protocol_api.ProtocolContext):
         )
         tc_mod.open_lid()
         tc_mod.deactivate_block()
-        
+
         src = find_materials_well("LB", "DW").bottom(z=3)
-        p300.transfer(50, src, dest,
+        p300.transfer(35, src, dest,
                       new_tip="always", touch_tip=True, disposal_volume=5,
-                      trash=not debug)
+                      blow_out=False, trash=not debug)
 
         tc_mod.set_block_temperature(37, hold_time_minutes=15, block_max_volume=final_volume + CP_cell_volume + 50)
 
@@ -276,7 +309,10 @@ def run(protocol: protocol_api.ProtocolContext):
                     src = find_materials_well(sample, "DNA")
                     # value == sample
                     dest = [plate['Deck'][well].bottom(z=4) for well, value in plate["data"].items() if value == sample]
-                    p20.distribute(spotting_volume, src, dest, new_tip="once", touch_tip=False, trash=not debug)
+                    p20.pick_up_tip()
+                    p20.mix(2, 20, src)
+                    p20.distribute(spotting_volume, src, dest, new_tip="never", mix_before=(2, 20), touch_tip=False, trash=not debug)
+                    p20.drop_tip()
         tc_mod.deactivate()
 
     print(f"Protocol End: {time.strftime('%Y-%m-%d %H:%M:%S')}")

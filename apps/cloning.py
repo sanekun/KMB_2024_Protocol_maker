@@ -630,7 +630,7 @@ with st.expander("Advanced", expanded=False):
     Assembly_volume = pd.DataFrame(
         columns=st.session_state["Assembly_plate_0_df"].columns
     ).drop(columns=["Name"])
-    Assembly_volume.loc[0, ["DNA1", "DNA2", "Enzyme1", "DW"]] = ["1", "1", "10", "8"]
+    Assembly_volume.loc[0, ["DNA1", "DNA2", "Enzyme1", "DW"]] = ["1.5", "1.5", "5", "2"]
 
     st.markdown("### PCR volume")
     update_PCR_volume = st.data_editor(
@@ -669,7 +669,7 @@ if st.button("Make Protocol"):
                 )
             # Json append
             # With Long form
-            export_JSON["Plates"][f"{plate_type}_plate_{num}_name"] = {
+            export_JSON["Plates"][st.session_state[f"{plate_type}_plate_{num}_name"]] = {
                 "data": (
                     plate_transformation(
                         st.session_state[f"{plate_type}_plate_{num}_df"], "long"
@@ -716,6 +716,11 @@ if st.button("Make Protocol"):
         elif plate_info["type"] == "TF":
             TF_names += list(plate_info["data"].values())
 
+    # Remove "nan"
+    DNA_names = [i for i in DNA_names if i != "nan"]
+    Reaction_names = [i for i in Reaction_names if i != "nan"]
+    TF_names = [i for i in TF_names if i != "nan"]
+
     assert len(DNA_names) == len(set(DNA_names)), "DNA names are overlaped"
     assert len(Reaction_names) == len(
         set(Reaction_names)
@@ -723,7 +728,7 @@ if st.button("Make Protocol"):
     for i in TF_names:
         if i == "" or i == "nan":
             continue
-        assert i in Reaction_names, f"{i} is not in Reaction Name"
+        assert i in Reaction_names or i in DNA_names, f"{i} is not in Reaction Name"
     del TF_names, Reaction_names
 
     # All DNAs in PCR and Assembly
