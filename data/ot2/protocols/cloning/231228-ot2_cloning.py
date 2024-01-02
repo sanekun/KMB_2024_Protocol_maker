@@ -1,7 +1,7 @@
 # 23-10-20 Simulated by kun.
 
 # [PARAMETERS]
-PARAMETERS = {'Plates': {'DNA_plate_0_name': {'data': {'A1': 'Template1', 'B1': 'Primer1', 'C1': 'Primer2', 'A2': 'Template2', 'B2': 'Primer3', 'C2': 'Primer4'}, 'labware': 'biorad_96_wellplate_200ul_pcr', 'type': 'DNA'}, 'DNA_plate_1_name': {'data': {}, 'labware': 'biorad_96_wellplate_200ul_pcr', 'type': 'DNA'}, 'Reaction_plate_0_name': {'data': {'A1': 'Vector', 'A2': 'Insert', 'A4': 'Assembled_vector'}, 'labware': 'biorad_96_wellplate_200ul_pcr', 'type': 'Reaction'}, 'TF_plate_0_name': {'data': {'A1': 'Assembled_vector', 'A2': 'Assembled_vector', 'A3': 'Assembled_vector'}, 'labware': 'biorad_96_wellplate_200ul_pcr', 'type': 'TF'}}, 'Reactions': {'PCR_plate_0_name': {'data': {'Name': {0: 'Vector', 1: 'Insert'}, 'DNA1': {0: 'Template1', 1: 'Template2'}, 'DNA2': {0: 'Primer1', 1: 'Primer3'}, 'DNA3': {0: 'Primer2', 1: 'Primer4'}, 'Enzyme1': {0: 'PCRMix', 1: 'PCRMix'}, 'DW': {0: 'DW', 1: 'DW'}}, 'type': 'PCR'}, 'Assembly_plate_0_name': {'data': {'Name': {0: 'Assembled_vector'}, 'DNA1': {0: 'Vector'}, 'DNA2': {0: 'Insert'}, 'Enzyme1': {0: 'AssemblyMix'}, 'DW': {0: 'DW'}}, 'type': 'Assembly'}}, 'Reaction_volume': {'PCR': {'DNA1': '0.5', 'DNA2': '0.75', 'DNA3': '0.75', 'Enzyme1': '12.5', 'DW': '10.5'}, 'Assembly': {'DNA1': '1', 'DNA2': '1', 'Enzyme1': '10', 'DW': '8'}}, 'Parameters': {'Number of Plate': 4, 'Plate_type': ['DNA', 'Reaction', 'TF'], 'Reaction_type': ['PCR', 'Assembly'], 'Enzyme_position': {'AssemblyMix': 'A1', 'DW': 'A2', 'PCRMix': 'A3', 'CPcell': 'A4'}, 'Deck_position': {'Enzyme_tube': 1, 'p20_tip': 2, 'p300_tip': 3, 'DNA_plate_0_name': 4, 'DNA_plate_1_name': 5, 'Reaction_plate_0_name': 7, 'TF_plate_0_name': 6}, 'number_of_tips': None}}
+PARAMETERS = {'Plates': {'DNA_plate_0_name': {'data': {'A1': 'Template1', 'B1': 'Primer1', 'C1': 'Primer2', 'A2': 'Template2', 'B2': 'Primer3', 'C2': 'Primer4'}, 'labware': 'biorad_96_wellplate_200ul_pcr', 'type': 'DNA'}, 'Reaction_plate_0_name': {'data': {'A1': 'Vector', 'A2': 'Insert', 'A4': 'Assembled_vector'}, 'labware': 'biorad_96_wellplate_200ul_pcr', 'type': 'Reaction'}, 'TF_plate_0_name': {'data': {'A1': 'Assembled_vector', 'A2': 'Assembled_vector', 'A3': 'Assembled_vector'}, 'labware': 'biorad_96_wellplate_200ul_pcr', 'type': 'TF'}}, 'Reactions': {'PCR_plate_0_name': {'data': {'Name': {0: 'Vector', 1: 'Insert'}, 'DNA1': {0: 'Template1', 1: 'Template2'}, 'DNA2': {0: 'Primer1', 1: 'Primer3'}, 'DNA3': {0: 'Primer2', 1: 'Primer4'}, 'Enzyme1': {0: 'PCRMix', 1: 'PCRMix'}, 'DW': {0: 'DW', 1: 'DW'}}, 'type': 'PCR'}, 'Assembly_plate_0_name': {'data': {'Name': {0: 'Assembled_vector'}, 'DNA1': {0: 'Vector'}, 'DNA2': {0: 'Insert'}, 'Enzyme1': {0: 'AssemblyMix'}, 'DW': {0: 'DW'}}, 'type': 'Assembly'}}, 'Reaction_volume': {'PCR': {'DNA1': '0.5', 'DNA2': '0.75', 'DNA3': '0.75', 'Enzyme1': '12.5', 'DW': '10.5'}, 'Assembly': {'DNA1': '1', 'DNA2': '1', 'Enzyme1': '10', 'DW': '8'}}, 'Parameters': {'Number of Plate': 3, 'Plate_type': ['DNA', 'Reaction', 'TF'], 'Reaction_type': ['PCR', 'Assembly'], 'Enzyme_position': {'PCRMix': 'A1', 'AssemblyMix': 'A2', 'DW': 'A3', 'CPcell': 'A4', 'LB': 'B1'}, 'Deck_position': {'Enzyme_tube': 1, 'p20_tip': 2, 'p300_tip': 3, 'DNA_plate_0_name': 4, 'Reaction_plate_0_name': 7, 'TF_plate_0_name': 5}, 'number_of_tips': None}}
 metadata = {
     "protocolName": "Cloning (PCR, Assembly, Transformation)",
     "author": "Seong-Kun Bak <sanekun@kaist.ac.kr>",
@@ -17,7 +17,7 @@ from opentrons import simulate
 protocol = simulate.get_protocol_api("2.13")
 import pandas as pd
 import re
-import json
+import time
 
 
 # [Functions]
@@ -72,7 +72,7 @@ def transfer_materials(key, p20, p300):
             vol = float(volume_dict["DW"])
             dest = [find_materials_well(name, "DNA") for name in tmp["Name"].values]
 
-            flow_rate(p300, aspirate=50, dispense=50, blow_out=50)
+            flow_rate(p300, aspirate=50, dispense=50, blow_out=20)
             p300.distribute(
                 vol, src, dest,
                 new_tip="once", touch_tip=True,
@@ -80,16 +80,17 @@ def transfer_materials(key, p20, p300):
                 blow_out=True, blowout_location="source well",
                 trash=not debug
             )
-    
+
     for enzyme_name in df["Enzyme1"].unique():
         tmp = df[df["Enzyme1"] == enzyme_name]
         # tmp exists
         if len(tmp):
             src = find_materials_well(enzyme_name, "Enzyme")
             vol = float(volume_dict["Enzyme1"])
-            dest = [find_materials_well(name, "DNA") for name in tmp["Name"].values]
+            # z 3cm
+            dest = [find_materials_well(name, "DNA").bottom(z=3) for name in tmp["Name"].values]
 
-            flow_rate(p300, aspirate=50, dispense=50, blow_out=50)
+            flow_rate(p300, aspirate=20, dispense=20, blow_out=20)
             p300.distribute(
                 vol, src, dest,
                 new_tip="once", touch_tip=True,
@@ -111,10 +112,10 @@ def transfer_materials(key, p20, p300):
                 continue
             # Check DNA or Enzyme
             if re.sub(r"[0-9]+", "", sample_type) == "Enzyme":
-                flow_rate(p20, aspirate=5, dispense=5, blow_out=5)
+                flow_rate(p20, aspirate=3, dispense=3, blow_out=3)
                 touch_tip = True
             else:  # DNA & DW
-                flow_rate(p20, aspirate=5, dispense=5, blow_out=5)
+                flow_rate(p20, aspirate=3, dispense=3, blow_out=3)
                 touch_tip = False
 
             src = find_materials_well(sample_name, re.sub(r"[0-9]+", "", sample_type))
@@ -123,9 +124,14 @@ def transfer_materials(key, p20, p300):
             p20.transfer(
                 vol, src, dest, new_tip="always", touch_tip=touch_tip, trash=not debug
             )
+        # Final Mix
+        p20.pick_up_tip()
+        p20.mix(3, 10, dest)
+        p20.drop_tip()
 
 
 def run(protocol: protocol_api.ProtocolContext):
+    print(f"Protocol Run: {time.strftime('%Y-%m-%d %H:%M:%S')}")
     # Deck Setting
     ## Modules
     tc_mod = protocol.load_module(module_name="thermocyclerModuleV1")
@@ -151,12 +157,13 @@ def run(protocol: protocol_api.ProtocolContext):
             PARAMETERS["Plates"][key]["Deck"] = tc_mod.load_labware(
                 PARAMETERS["Plates"][key]["labware"])
             continue
-        
+
         PARAMETERS["Plates"][key]["Deck"] = protocol.load_labware(
             PARAMETERS["Plates"][key]["labware"], location=location)
 
     # RUN first Reaction
     reaction = list(PARAMETERS["Reactions"].keys())[0]
+    final_volume = sum([float(i) for i in PARAMETERS["Reaction_volume"]["PCR"].values()])
     if [i for i in PARAMETERS["Reactions"][reaction]["data"]["Name"].values() if i != None]:
         print (f"RUN {reaction}")
         transfer_materials(key=reaction, p20=p20, p300=p300)
@@ -171,18 +178,19 @@ def run(protocol: protocol_api.ProtocolContext):
         tc_mod.execute_profile(
             steps=profile,
             repetitions=30,
-            block_max_volume=float(PARAMETERS["Reaction_volume"]["PCR"]["DW"]),
+            block_max_volume=final_volume
         )
         tc_mod.set_block_temperature(
             temperature=8,
             hold_time_minutes=5,
-            block_max_volume=float(PARAMETERS["Reaction_volume"]["PCR"]["DW"]),
+            block_max_volume=final_volume
         )
         tc_mod.deactivate()
         tc_mod.open_lid()
 
     # Second Reaction
     reaction = list(PARAMETERS["Reactions"].keys())[1]
+    final_volume = sum([float(i) for i in PARAMETERS["Reaction_volume"]["PCR"].values()])
     if [i for i in PARAMETERS["Reactions"][reaction]["data"]["Name"].values() if i != None]:
         print (f"RUN {reaction}")
         transfer_materials(list(PARAMETERS["Reactions"].keys())[1], p20=p20, p300=p300)
@@ -192,7 +200,7 @@ def run(protocol: protocol_api.ProtocolContext):
         tc_mod.set_block_temperature(
             temperature=50,
             hold_time_minutes=40,
-            block_max_volume=float(PARAMETERS["Reaction_volume"]["Assembly"]["DW"]),
+            block_max_volume=final_volume,
         )
 
         print("Assembly will end soon")
@@ -200,7 +208,7 @@ def run(protocol: protocol_api.ProtocolContext):
         tc_mod.set_block_temperature(
             temperature=8,
             hold_time_minutes=5,
-            block_max_volume=float(PARAMETERS["Reaction_volume"]["PCR"]["DW"]),
+            block_max_volume=final_volume,
             ramp_rate=0.1,
         )
         tc_mod.deactivate()
@@ -220,9 +228,9 @@ def run(protocol: protocol_api.ProtocolContext):
                 "Name"
             ].values()
         ]
-        vol = 25
-        p300.distribute(vol, src, dest,
-                        new_tip="once", touch_tip=True, disposal_volume=5,
+        CP_cell_volume = 25
+        p300.transfer(CP_cell_volume, src, dest,
+                        new_tip="always", touch_tip=True, disposal_volume=5,
                         blow_out=False, mix_before=(2, 50), trash=not debug)
 
         ## Thermocycler
@@ -230,19 +238,23 @@ def run(protocol: protocol_api.ProtocolContext):
         profile = [
             {"temperature": 42, "hold_time_seconds": 90},
             {"temperature": 8, "hold_time_seconds": 90},
-            {"temperature": 37, "hold_time_minutes": 15},
         ]
         tc_mod.execute_profile(
             steps=profile,
             repetitions=1,
-            block_max_volume=float(PARAMETERS["Reaction_volume"]["Assembly"]["DW"]) + vol,
+            block_max_volume=final_volume + CP_cell_volume
         )
-
-        tc_mod.deactivate()
         tc_mod.open_lid()
+        tc_mod.set_block_temperature(37)
+
+        src = find_materials_well("LB", "DW")
+        p300.transfer(50, src, dest,
+                      new_tip="always", touch_tip=True, disposal_volume=5,
+                      trash=not debug)
+        tc_mod.set_block_temperature(37, hold_time_minutes=15, block_max_volume=final_volume + CP_cell_volume + 50)
 
         # Spotting
-        vol = 4
+        spotting_volume = 4
         flow_rate(p20, aspirate=5, dispense=5, blow_out=5)
         for i in PARAMETERS["Plates"].keys():
             plate = PARAMETERS["Plates"][i]
@@ -253,7 +265,8 @@ def run(protocol: protocol_api.ProtocolContext):
                 for sample in unique_sample:
                     src = find_materials_well(sample, "DNA")
                     # value == sample
-                    dest = [plate['Deck'][well] for well, value in plate["data"].items() if value == sample]
-                    p20.distribute(vol, src, dest, new_tip="once", touch_tip=True, trash=not debug)
+                    dest = [plate['Deck'][well].top() for well, value in plate["data"].items() if value == sample]
+                    p20.distribute(spotting_volume, src, dest, new_tip="once", touch_tip=True, trash=not debug)
+        tc_mod.deactivate()
 
-    print("Protocol End")
+    print(f"Protocol End: {time.strftime('%Y-%m-%d %H:%M:%S')}")

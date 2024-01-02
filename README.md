@@ -11,8 +11,8 @@ Contact about Protocols : <sanekun@kribb.ac.kr>
 
 * Every Protocol have own Setup Process and Web Programs refer to each README.md    
 
-[v] Nanopore: Ligation Sequencing Kit  
-[v] Cloning: PCR - Assembly - Transformation  
+- [x] Nanopore: Ligation Sequencing Kit  
+- [x] Cloning: PCR - Assembly - Transformation  
 
 ## Protocol Development flow  
 1. Deck positioning, Reaction, Transformation 등 기본적인 골격을 함수 단위로 유지
@@ -22,7 +22,7 @@ Contact about Protocols : <sanekun@kribb.ac.kr>
 
 # Web Application
 
-[v] Cloning  
+- [x] Cloning  
 
 ## Web Development flow
 1. 외부에서 입력이 필요한 Parameter 선정 ex) Plate 위치, 이름 ...  

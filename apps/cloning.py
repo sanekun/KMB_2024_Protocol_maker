@@ -4,8 +4,8 @@ import pandas as pd
 import re
 from datetime import datetime
 
-sys.path.append("/home/kun/workspace/webservice/automated-protocol-ot2/data")
-from protocols.cloning.check_protocol import *
+sys.path.append("/home/kun/workspace/webservice/automated-protocol/data")
+from ot2.protocols.cloning.check_protocol import *
 
 # I wanna use ot2_cloning.py's function in this script.
 # But I don't want import imported module in ot2_cloning.py
@@ -274,10 +274,10 @@ with st.expander("Manual", expanded=True):
             ---
 
             # Output Information
-            `Plates` = {"name": {"data": {"sample_name": "well", ...}, "labware": "labware_name", "type": "plate_type"}}  
-            `Reactions` = {"name": {"data": {"column_name": {"row_name": "sample_name", ...}, "type": "reaction_type"}}  
-            `Reaction_volume` = {"reaction_type": {"column_name": {"row_name": "volume", ...}}}  
-            `Parameters` = {"Number of Plate", "Plate_type" = ['DNA', 'Reaction', 'TF'], Reaction_type` = ['PCR', 'Assembly'], "Enzyme_position": {"Enzyme_name": "well"}, "number_of_tips"}  
+            `Plates` = {"name": {"data": {"sample_name": "well", ...}, "labware": "labware_name", "type": "plate_type"}}
+            `Reactions` = {"name": {"data": {"column_name": {"row_name": "sample_name", ...}, "type": "reaction_type"}}
+            `Reaction_volume` = {"reaction_type": {"column_name": {"row_name": "volume", ...}}}
+            `Parameters` = {"Number of Plate", "Plate_type" = ['DNA', 'Reaction', 'TF'], Reaction_type` = ['PCR', 'Assembly'], "Enzyme_position": {"Enzyme_name": "well"}, "number_of_tips"}
             """
         )
         st.json(
@@ -380,7 +380,7 @@ with st.expander("DNA Plate", expanded=True):
         f"Number of {plate_type}_plate",
         min_value=1,
         step=1,
-        value=2,
+        value=1,
         key=f"num_of_{plate_type}_plate",
     )
     plates = st.tabs([f"{plate_type}_Plate_{i+1}" for i in range(number_of_plate)])
@@ -721,6 +721,8 @@ if st.button("Make Protocol"):
         set(Reaction_names)
     ), "Reaction names are overlaped"
     for i in TF_names:
+        if i == "" or i == "nan":
+            continue
         assert i in Reaction_names, f"{i} is not in Reaction Name"
     del TF_names, Reaction_names
 
@@ -743,11 +745,11 @@ if st.button("Make Protocol"):
     Assembly_DNA = [i for j in Assembly_DNA for i in j]
 
     for i in list(set(PCR_DNA)):
-        if i == None:
+        if i == None or i == "nan":
             continue
         assert i in DNA_names, f"{i} is not in DNA plate"
     for i in list(set(Assembly_DNA)):
-        if i == None:
+        if i == None or i == "nan":
             continue
         if i in st.session_state["PCR_plate_0_df"]["Name"].dropna().unique():
             pass
@@ -782,14 +784,14 @@ if st.button("Make Protocol"):
         "Plate_type": plate_types,
         "Reaction_type": reaction_types,
         "Enzyme_position": enzyme_position(
-            enzyme_list=list(set(PCR_enzyme) | set(Assembly_enzyme) | {"DW", "CPcell"})
+            enzyme_list=list(set(PCR_enzyme) | set(Assembly_enzyme))
         ),
         "Deck_position": deck_position(export_JSON["Plates"]),
         "number_of_tips": check_tips()
     }
 
     protocol = True
-    with open("data/protocols/cloning/ot2_cloning.py", "r") as f:
+    with open("data/ot2/protocols/cloning/ot2_cloning.py", "r") as f:
         protocol = f.read()
         protocol = protocol.replace("#[Remove]", "")
         protocol = protocol.replace("EXPORT_JSON", str(export_JSON))

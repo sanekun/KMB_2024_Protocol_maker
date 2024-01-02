@@ -12,6 +12,7 @@ def check_tips():
 # Enzyme position
 def enzyme_position(enzyme_list):
     # 24-well position
+    enzyme_list = enzyme_list + ["DW", "CPcell", "LB"]
     well_position = ["A1", "A2", "A3", "A4", "B1", "B2", "B3", "B4","C1", "C2", "C3", "C4", "D1", "D2", "D3", "D4"]
     return_dict = {}
     for enzyme, well in zip(enzyme_list, well_position):
