@@ -1,11 +1,14 @@
 # Automated-protocol for synthetic biology
+목적과 필요성 음
+`Janus`, `Zephyr`, `OT-2` 등 서로 다른 Input을 받는 장비들이 동일한 연구노트 기반의 Input을 받아 프로토콜을 수행할 수 있도록 도와줄 Protocol Maker 필요  
+또, 자주 사용되는 프로토콜의 Web 기반 UI를 제공 하여 다른 사용자들의 참여를 유도함.  
+
+The Protocols are using in KRIBB Synthetic biology Research Center[(SBL)](https://oak.kribb.re.kr/handle/201005/19496/tab-browse?sort_by=2&order=DESC)  
+Contact about Protocols : <sanekun@kribb.ac.kr>
 
 ## Machine
 
 OT2 liquid-handler[(OT2)](https://opentrons.com/ot-2/)  
-
-The Protocols are using in KRIBB Synthetic biology Research Center[(SBL)](https://oak.kribb.re.kr/handle/201005/19496/tab-browse?sort_by=2&order=DESC)  
-Contact about Protocols : <sanekun@kribb.ac.kr>
 
 # Protocols  
 
