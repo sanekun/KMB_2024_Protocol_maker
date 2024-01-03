@@ -59,7 +59,7 @@ def plate_initialization(i, plate_type: str, table_type="empty"):
 
 def plate_transformation(df, data_form):
     # Change data form to [long or wide]
-    assert data_form in ["wide", "long"], "data_form Error"
+    assert data_form in ["wide", "long"], "Plate_transformation: data_form Error"
     if data_form == "long":
         new_df = (
             df.reset_index()
@@ -620,17 +620,17 @@ with st.expander("Advanced", expanded=False):
     )
     PCR_volume.loc[0, ["DNA1", "DNA2", "DNA3", "Enzyme1", "DW"]] = [
         "0.5",
-        "0.75",
-        "0.75",
+        "0.5",
+        "0.5",
         "12.5",
-        "10.5",
+        "21",
     ]
     # Thermocycler condition
 
     Assembly_volume = pd.DataFrame(
         columns=st.session_state["Assembly_plate_0_df"].columns
     ).drop(columns=["Name"])
-    Assembly_volume.loc[0, ["DNA1", "DNA2", "Enzyme1", "DW"]] = ["1.5", "1.5", "5", "2"]
+    Assembly_volume.loc[0, ["DNA1", "DNA2", "Enzyme1", "DW"]] = ["1.5", "1.5", "4", "8"]
 
     st.markdown("### PCR volume")
     update_PCR_volume = st.data_editor(
@@ -726,9 +726,9 @@ if st.button("Make Protocol"):
         set(Reaction_names)
     ), "Reaction names are overlaped"
     for i in TF_names:
-        if i == "" or i == "nan":
+        if pd.isna(i):
             continue
-        assert i in Reaction_names or i in DNA_names, f"{i} is not in Reaction Name"
+        assert i in Reaction_names or i in DNA_names, f"Check TF names: {i} is not in Reaction Name"
     del TF_names, Reaction_names
 
     # All DNAs in PCR and Assembly
@@ -750,16 +750,17 @@ if st.button("Make Protocol"):
     Assembly_DNA = [i for j in Assembly_DNA for i in j]
 
     for i in list(set(PCR_DNA)):
-        if i == None or i == "nan":
+        if pd.isna(i):
             continue
-        assert i in DNA_names, f"{i} is not in DNA plate"
+        assert i in DNA_names, f"Check PCR table: {i} is not in DNA plate"
     for i in list(set(Assembly_DNA)):
-        if i == None or i == "nan":
+        if pd.isna(i):
             continue
         if i in st.session_state["PCR_plate_0_df"]["Name"].dropna().unique():
             pass
         else:
-            assert i in DNA_names, f"{i} is not in DNA plate"
+            st.markdown(f"{type(i)}")
+            assert i in DNA_names, f"Check Assembly table: {i} is not in DNA plate"
     del PCR_DNA_columns, Assembly_DNA_columns, PCR_DNA, Assembly_DNA, DNA_names
 
     # All Enzymes in PCR and Assembly
@@ -798,8 +799,9 @@ if st.button("Make Protocol"):
     protocol = True
     with open("data/ot2/protocols/cloning/ot2_cloning.py", "r") as f:
         protocol = f.read()
-        protocol = protocol.replace("#[Remove]", "")
-        protocol = protocol.replace("EXPORT_JSON", str(export_JSON))
+        protocol = protocol.replace("{{EXPORT_JSON}}", str(export_JSON))
+        protocol = protocol.replace("{{PRESENT_TIME}}", datetime.now().strftime('%Y-%m-%d'))
+        protocol = protocol.replace("nan", "")
         new_protocol = protocol.replace("null", "")
 
 st.download_button(
