@@ -198,8 +198,8 @@ def Use_example():
 
     # Reaction table
     st.session_state["Reaction_plate_0_df"].loc["A", "1"] = "Vector"
-    st.session_state["Reaction_plate_0_df"].loc["A", "2"] = "Insert"
-    st.session_state["Reaction_plate_0_df"].loc["A", "4"] = "Assembled_vector"
+    st.session_state["Reaction_plate_0_df"].loc["B", "1"] = "Insert"
+    st.session_state["Reaction_plate_0_df"].loc["A", "3"] = "Assembled_vector"
     st.session_state["TF_plate_0_df"].loc["A", "1"] = "Assembled_vector"
     st.session_state["TF_plate_0_df"].loc["A", "2"] = "Assembled_vector"
     st.session_state["TF_plate_0_df"].loc["A", "3"] = "Assembled_vector"
@@ -541,13 +541,16 @@ with st.expander("Reaction Plate", expanded=True):
                     else "wide",
                 },
             )
+            # Wide form
             if not st.session_state[f"{plate_type}_plate_{i}_toggle"]:
                 st.data_editor(
                     data=st.session_state[f"{plate_type}_plate_{i}_df"],
                     use_container_width=True,
                     key=f"{plate_type}_plate_{i}_wide",
+                    disabled=["2", "4", "6", "8", "10", "12"]
                 )
             else:
+            # Long form
                 st.data_editor(
                     data=plate_transformation(
                         st.session_state[f"{plate_type}_plate_{i}_df"], data_form="long"
@@ -555,6 +558,7 @@ with st.expander("Reaction Plate", expanded=True):
                     use_container_width=True,
                     key=f"{plate_type}_plate_{i}_long",
                 )
+        st.success('짝수 Column은 정제 이유로 사용 불가합니다.')
 
 ## Transformation
 st.markdown("## Transformation")
@@ -643,6 +647,17 @@ with st.expander("Advanced", expanded=False):
         key="Assembly_volume",
         hide_index=True,
     )
+    st.checkbox('Stop between Reactions', value=True, 
+                key='stop_between_reactions',
+                help='If you want to stop between reactions for take enzymes, check this box')
+    
+    advanced_column = st.columns([5,2,5])
+    with advanced_column[0]:
+        with st.container(border=True):
+            st.number_input("PCR extension time (seconds)", min_value=1, step=1, value=15,
+                            key='PCR_extension_time')
+            st.number_input("TF Recovery time (minutes)", min_value=0, step=1, value=20,
+                            key='TF_recovery_time')
 
 protocol = False
 if st.button("Make Protocol"):
@@ -691,7 +706,7 @@ if st.button("Make Protocol"):
         )
 
         export_JSON["Reactions"][f"{reaction_type}_plate_{0}_name"] = {
-            "data": st.session_state[f"{reaction_type}_plate_{0}_df"].to_dict(),
+            "data": st.session_state[f"{reaction_type}_plate_{0}_df"].astype(str).to_dict(),
             "type": reaction_type,
         }
 
@@ -726,7 +741,7 @@ if st.button("Make Protocol"):
         set(Reaction_names)
     ), "Reaction names are overlaped"
     for i in TF_names:
-        if pd.isna(i):
+        if pd.isna(i) or i == "None" or i == "":
             continue
         assert i in Reaction_names or i in DNA_names, f"Check TF names: {i} is not in Reaction Name"
     del TF_names, Reaction_names
@@ -750,11 +765,11 @@ if st.button("Make Protocol"):
     Assembly_DNA = [i for j in Assembly_DNA for i in j]
 
     for i in list(set(PCR_DNA)):
-        if pd.isna(i):
+        if pd.isna(i) or i == "None" or i == "":
             continue
         assert i in DNA_names, f"Check PCR table: {i} is not in DNA plate"
     for i in list(set(Assembly_DNA)):
-        if pd.isna(i):
+        if pd.isna(i) or i == "None" or i == "":
             continue
         if i in st.session_state["PCR_plate_0_df"]["Name"].dropna().unique():
             pass
@@ -789,6 +804,9 @@ if st.button("Make Protocol"):
         ),
         "Plate_type": plate_types,
         "Reaction_type": reaction_types,
+        "Stop_between_reactions": st.session_state['stop_between_reactions'],
+        "PCR_extension_time": st.session_state['PCR_extension_time'],
+        "TF_recovery_time": st.session_state['TF_recovery_time'],
         "Enzyme_position": enzyme_position(
             enzyme_list=list(set(PCR_enzyme) | set(Assembly_enzyme))
         ),
@@ -801,8 +819,9 @@ if st.button("Make Protocol"):
         protocol = f.read()
         protocol = protocol.replace("{{EXPORT_JSON}}", str(export_JSON))
         protocol = protocol.replace("{{PRESENT_TIME}}", datetime.now().strftime('%Y-%m-%d'))
-        protocol = protocol.replace("nan", "")
-        new_protocol = protocol.replace("null", "")
+        protocol = protocol.replace("nan", '')
+        new_protocol = protocol.replace("null", '')
+        new_protocol=protocol
 
 st.download_button(
     label="Download Protocol",

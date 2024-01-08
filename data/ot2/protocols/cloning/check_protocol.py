@@ -7,6 +7,7 @@ def get_values(*names):
 
 # Check needed tips
 def check_tips():
+    return 96
     pass
 
 # Enzyme position

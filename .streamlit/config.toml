@@ -1,8 +1,8 @@
 [server]
 runOnSave = true
 headless = true
-#sslCertFile = "/mnt/beta/share/kun_workspace/settings/certificate/server.crt"
-#sslKeyFile = "/mnt/beta/share/kun_workspace/settings/certificate/server.key"
+sslCertFile = "/mnt/beta/share/kun_workspace/settings/certificate/server.crt"
+sslKeyFile = "/mnt/beta/share/kun_workspace/settings/certificate/server.key"
 port = 5002
 
 [browser]

@@ -49,6 +49,7 @@ If name of sample is empty, the sample will be skipped
 Pipette Type  
 Thermocycler Condition  
 Enzyme deck position  
+Deck position
 
 ### 동적 변수
 
@@ -62,12 +63,14 @@ Plate Data (Long - Wide form 전환)
 Reaction table  
 DNA, Enzyme 수  
 
-**Transformation**
+**Transformation**  
 Transformation Table (Spotting 여러번 가능)  
 
 **Advanced**  
 Reaction Volume  
-Run or not each steps
+Stop between steps  
+PCR extension time  
+Transformation recovery time
 
 ## Output Information
 
