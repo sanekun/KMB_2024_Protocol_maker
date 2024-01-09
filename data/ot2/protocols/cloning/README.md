@@ -1,11 +1,11 @@
 # How to use
 **This method is for `Cloning` and optimized in `OT-2`. (`PCR` - `Assembly` - `Transformation`)**   
 
-> Success
+> Success  
 The Maximum number of plates is 4  
 Reaction Plate must be single and place on thermocycler.  
 
-> Warnning
+> Warnning  
 The Name in each table is necessary!  
 If name of sample is overlaped, protocol makes error.  
 If name of sample is empty, the sample will be skipped  

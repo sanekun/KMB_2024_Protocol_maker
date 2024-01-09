@@ -37,11 +37,12 @@ class MultiApp:
         })
 
     def run(self):
-
-        st.sidebar.title("OT2 Protocols for Synthetic Biology")
-        st.sidebar.subheader("by Seong-Kun Bak *tjdrns227@gmail.com*")
+        st.sidebar.title("Protocol Maker")
+        st.sidebar.subheader("by Seong-Kun Bak *sanekun@kribb.re.kr*")
         st.sidebar.markdown("---")
+        st.sidebar.selectbox("Messenger", ['None', 'Kun'], key='messenger')
         st.sidebar.text("")
+        st.sidebar.markdown("---")
 
         app = st.sidebar.radio(
             'Protocols',

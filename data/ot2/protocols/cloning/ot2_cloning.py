@@ -6,6 +6,8 @@ from opentrons import protocol_api
 import pandas as pd
 import re
 import time
+import json
+import requests
 
 metadata = {
     "protocolName": "{{PRESENT_TIME}} Cloning (PCR, Assembly, Transformation)",
@@ -20,27 +22,31 @@ PARAMETERS = {{EXPORT_JSON}}
 debug = False
 
 # [Functions]
-# def discord_message(message):
-#     url = "https://discord.com/api/webhooks/1169608986891390996/wLti5ulSOXBtGelwiYO4SJi1jQSJ9tEQ8uC8sVXVlWXih3XWwkoLDr6cJBEm2iPY9b0t"
+def discord_message(message, user=PARAMETERS["Parameters"]["Messenger"]):
+    if user == "None":
+        return None
+    
+    # Send message to discord chaneel
+    url = "https://discord.com/api/webhooks/1169608986891390996/wLti5ulSOXBtGelwiYO4SJi1jQSJ9tEQ8uC8sVXVlWXih3XWwkoLDr6cJBEm2iPY9b0t"
 
-#     headers = {"Content-Type": "application/json"}
-#     data = {"content": message}
-#     response = requests.post(url, headers=headers, data=json.dumps(data))
-
-#     print("Response Code:", response.status_code)
-#     print("Send Message")
-
+    headers = {"Content-Type": "application/json"}
+    data = {"content": message}
+    response = requests.post(url, headers=headers, data=json.dumps(data), verify=False)
 
 def flow_rate(pipette, **kwargs):
+    # Change flow rate of pipette
+    
     assert (
         item in ["aspirate", "dispense", "blow_out"] for item in kwargs.keys()
     ), "Error Keywords in Flow Rate."
     for i in kwargs.keys():
         setattr(pipette.flow_rate, i, kwargs[i])
 
-def find_materials_well(material, type: ["DNA", "Enzyme"], PARAMETERS=PARAMETERS,
-                        right_well=False):
-    # If DNA
+def find_materials_well(material, type: ["DNA", "Enzyme"], 
+                        PARAMETERS=PARAMETERS, right_well=False):
+    # Convert material name to well
+    # right_well means well of right side of plate (for abstraction)
+    
     if type == "DNA":
         for i in PARAMETERS["Plates"].keys():
             plate = PARAMETERS["Plates"][i]
@@ -53,25 +59,28 @@ def find_materials_well(material, type: ["DNA", "Enzyme"], PARAMETERS=PARAMETERS
                             return wells[list(wells)[pos+8]]
                         else:
                             return wells[well]
-    # If Enzyme
     if type == "Enzyme":
         return PARAMETERS["Parameters"]["Enzyme_position"][material]
-    # If DW
     if type == "DW":
         return PARAMETERS["Parameters"]["Enzyme_position"][material]
 
 
 def transfer_materials(key, p20, p300, mix_last=(0,0)):
+    # Transfer materials by type of materials
+    
     reaction = PARAMETERS["Reactions"][key]
     volume_dict = PARAMETERS["Reaction_volume"][reaction["type"]]
-    # transform dict to row iterable
+    
+    # transform dict to dataframe (row iterable)
     df = pd.DataFrame(reaction["data"])
 
     # Only First Material transfer to all wells at once (Enzyme1 or DW)
     for dw in df["DW"].unique():
         tmp = df[df["DW"] == dw]
-        # tmp exists
+        # If Data doens't exist, this step will be skipped
         if len(tmp):
+            if pd.isna(dw) or dw == "":
+                continue
             src = find_materials_well(dw, "DW")
             vol = float(volume_dict["DW"])
             dest = [find_materials_well(name, "DNA") for name in tmp["Name"].values]
@@ -84,14 +93,15 @@ def transfer_materials(key, p20, p300, mix_last=(0,0)):
                 blow_out=False,
                 trash=not debug
             )
-
+            
     for enzyme_name in df["Enzyme1"].unique():
         tmp = df[df["Enzyme1"] == enzyme_name]
-        # tmp exists
+        # If Data doens't exist, this step will be skipped
         if len(tmp):
+            if pd.isna(enzyme_name) or enzyme_name == "":
+                continue
             src = find_materials_well(enzyme_name, "Enzyme")
             vol = float(volume_dict["Enzyme1"])
-            # z 3cm
             dest = [find_materials_well(name, "DNA").bottom(z=1) for name in tmp["Name"].values]
 
             flow_rate(p300, aspirate=20, dispense=20, blow_out=20)
@@ -102,17 +112,16 @@ def transfer_materials(key, p20, p300, mix_last=(0,0)):
                 blow_out=True, blowout_location="source well",
                 trash=not debug
             )
-
-    print(f"{key} Enzyme done Take off Enzyme from Deck")
-
+    # Other Materials
     df.drop(columns=["Enzyme1", "DW"], inplace=True)
     columns = df.columns
     for action in df.values:
         for sample_type, sample_name in zip(columns, action):
+            # Empty well will be skipped
             if sample_type == "Name":
                 dest = find_materials_well(sample_name, "DNA")
                 continue
-            if pd.isna(sample_name) or sample_name == "None" or sample_name == "":
+            if pd.isna(sample_name) or sample_name == "":
                 continue
 
             src = find_materials_well(sample_name, re.sub(r"[0-9]+", "", sample_type))
@@ -132,7 +141,8 @@ def transfer_materials(key, p20, p300, mix_last=(0,0)):
                 blow_out=False, blowout_location="destination well",
                 trash=not debug
             )
-        # Final Mix
+        
+        # Mix Product
         if sum(mix_last):
             flow_rate(p20, aspirate=5, dispense=10, blow_out=10)
             p20.pick_up_tip()
@@ -141,9 +151,9 @@ def transfer_materials(key, p20, p300, mix_last=(0,0)):
                 p20.dispense(mix_last[1], dest.bottom(z=3))
             p20.drop_tip()
 
-
 def run(protocol: protocol_api.ProtocolContext):
-    print(f"Protocol Run: {time.strftime('%Y-%m-%d %H:%M:%S')}")
+    discord_message(f"Protocol Start: {time.strftime('%Y-%m-%d %H:%M:%S')}")
+    
     # Deck Setting
     ## Modules
     tc_mod = protocol.load_module(module_name="thermocyclerModuleV1")
@@ -177,10 +187,10 @@ def run(protocol: protocol_api.ProtocolContext):
     # PCR
     reaction = list(PARAMETERS["Reactions"].keys())[0]
     final_volume = sum([float(i) for i in PARAMETERS["Reaction_volume"]["PCR"].values()])
-    Run_PCR = [i for i in PARAMETERS["Reactions"][reaction]["data"]["Name"].values() if i != None]
+    Run_PCR = [i for i in PARAMETERS["Reactions"][reaction]["data"]["Name"].values() if i]
 
     if Run_PCR:
-        print (f"RUN {reaction}")
+        discord_message(f"PCR Start")
         transfer_materials(key=reaction, p20=p20, p300=p300, mix_last=(2, 15))
         ## Thermocycler
         tc_mod.close_lid()
@@ -205,24 +215,26 @@ def run(protocol: protocol_api.ProtocolContext):
             hold_time_seconds=60,
             block_max_volume=final_volume
         )
+        discord_message(f"PCR will be end 5 minutes later, Take in Enzyme for next step")
         tc_mod.set_block_temperature(
             temperature=8,
             hold_time_minutes=5,
             block_max_volume=final_volume
         )
-        tc_mod.deactivate()
+        tc_mod.deactivate_lid()
+        tc_mod.set_block_temperature(8)
         tc_mod.open_lid()
 
     # Second Reaction
     reaction = list(PARAMETERS["Reactions"].keys())[1]
     final_volume = sum([float(i) for i in PARAMETERS["Reaction_volume"]["PCR"].values()])
-    Run_Assembly = [i for i in PARAMETERS["Reactions"][reaction]["data"]["Name"].values() if i != None]
+    Run_Assembly = [i for i in PARAMETERS["Reactions"][reaction]["data"]["Name"].values() if i]
 
     ## If not Empty Run protocol
     if Run_Assembly:
         if PARAMETERS["Parameters"]["Stop_between_reactions"]:
             protocol.pause(f"Place down {list(PARAMETERS['Reactions'].keys())[1]} enzyme")
-        print (f"RUN {reaction}")
+        discord_message(f"Assembly Start")
 
         transfer_materials(list(PARAMETERS["Reactions"].keys())[1], p20=p20, p300=p300, mix_last=(2, 10))
         ## Thermocycler
@@ -234,16 +246,15 @@ def run(protocol: protocol_api.ProtocolContext):
             block_max_volume=final_volume,
         )
 
-        print("Assembly will end soon")
-
+        discord_message(f"Assembly will be end 10 minutes later, Take in CP cell for next step")
         tc_mod.set_block_temperature(
             temperature=8,
             hold_time_minutes=5,
             block_max_volume=final_volume,
             ramp_rate=0.1,
         )
-        tc_mod.set_block_temperature(8)
         tc_mod.deactivate_lid()
+        tc_mod.set_block_temperature(8)
         tc_mod.open_lid()
 
     # Transformation
@@ -257,10 +268,10 @@ def run(protocol: protocol_api.ProtocolContext):
                 break
 
     if Run_TF:
-        tc_mod.set_block_temperature(8)
+        discord_message(f"Transformation Start")
         if PARAMETERS["Parameters"]["Stop_between_reactions"]:
             protocol.pause("Place down TF-associated materials")
-        print (f"RUN TF")
+            
         flow_rate(p300, aspirate=20, dispense=20, blow_out=100)
         src = find_materials_well("CPcell", "DW")
 
@@ -339,11 +350,13 @@ def run(protocol: protocol_api.ProtocolContext):
                 for sample in unique_sample:
                     src = find_materials_well(sample, "DNA", right_well=True)
                     # value == sample
-                    dest = [plate['Deck'][well].bottom(z=4.2) for well, value in plate["data"].items() if value == sample]
+                    dest = [plate['Deck'][well].bottom(z=4.4) for well, value in plate["data"].items() if value == sample]
                     p20.pick_up_tip()
-                    p20.mix(2, 20, src)
+                    for _ in range(2):
+                        p20.aspirate(20, src)
+                        p20.dispense(20, src.bottom(z=4))
                     p20.distribute(spotting_volume, src, dest, new_tip="never", touch_tip=False, trash=not debug)
                     p20.drop_tip()
         tc_mod.deactivate()
 
-    print(f"Protocol End: {time.strftime('%Y-%m-%d %H:%M:%S')}")
+    discord_message(f"Protocol End: {time.strftime('%Y-%m-%d %H:%M:%S')}")
