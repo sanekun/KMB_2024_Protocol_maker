@@ -632,7 +632,6 @@ def main():
             if i in st.session_state["PCR_plate_0_df"]["Name"].dropna().unique():
                 pass
             else:
-                st.markdown(f"{type(i)}")
                 assert i in DNA_names, f"Check Assembly table: {i} is not in DNA plate"
         del PCR_DNA_columns, Assembly_DNA_columns, PCR_DNA, Assembly_DNA, DNA_names
 

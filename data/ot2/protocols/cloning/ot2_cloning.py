@@ -151,6 +151,32 @@ def transfer_materials(key, p20, p300, mix_last=(0,0)):
                 p20.dispense(mix_last[1], dest.bottom(z=3))
             p20.drop_tip()
 
+
+def spotting_dispense(pipette, src, dest: list, spotting_volume=4):
+    # Dispense liquid at the top of well
+    # and then, move down pipette to specific height.
+    
+    if not pipette.has_tip:
+        pipette.pick_up_tip()
+    
+    whole_vol = spotting_volume * len(dest) + spotting_volume-1
+    cnt = 0
+    while (whole_vol > spotting_volume):
+        if pipette.max_volume < whole_vol:
+            pipette.aspirate(pipette.max_volume-1, src)
+        else:
+            pipette.aspirate(whole_vol, src)
+        
+        while (pipette.current_volume > spotting_volume):
+            pipette.dispense(spotting_volume, dest[cnt].bottom(z=4.4))
+            pipette.move_to(dest[cnt].bottom(z=3))
+            cnt += 1
+            whole_vol -= spotting_volume
+        
+        pipette.blow_out(pipette.trash_container.wells()[0])
+        pipette.air_gap(1)
+
+
 def run(protocol: protocol_api.ProtocolContext):
     discord_message(f"Protocol Start: {time.strftime('%Y-%m-%d %H:%M:%S')}")
     
@@ -349,13 +375,15 @@ def run(protocol: protocol_api.ProtocolContext):
                     unique_sample.remove("")
                 for sample in unique_sample:
                     src = find_materials_well(sample, "DNA", right_well=True)
-                    # value == sample
-                    dest = [plate['Deck'][well].bottom(z=4.4) for well, value in plate["data"].items() if value == sample]
+                    dest = [plate['Deck'][well] for well, value in plate["data"].items() if value == sample]
                     p20.pick_up_tip()
+                    # Mix Sample
                     for _ in range(2):
                         p20.aspirate(20, src)
                         p20.dispense(20, src.bottom(z=4))
-                    p20.distribute(spotting_volume, src, dest, new_tip="never", touch_tip=False, trash=not debug)
+                    # Dispense Sample
+                    spotting_dispense(p20, src, dest, spotting_volume)
+                    # p20.distribute(spotting_volume, src, dest, new_tip="never", touch_tip=False, trash=not debug)
                     p20.drop_tip()
         tc_mod.deactivate()
 
