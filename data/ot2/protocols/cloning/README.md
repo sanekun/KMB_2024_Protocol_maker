@@ -97,6 +97,7 @@ Transformation recovery time
         "Deck_position": [Dict] Deck position
     },
     "Parameters": {
+        "protocol": [str] "OT-2 Cloning",
         "Plate type": [Dict] Plate Order,
         "Reaction type": [Dict] Reaction Order,
         "number of tips": [int] Total Tips used in this protocol

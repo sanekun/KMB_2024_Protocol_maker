@@ -227,12 +227,13 @@ def main():
             )
 
     st.button("Use Example", on_click=Use_example)
+    # st.file_uploader("Load previous result", key="load", on_click)
     st.markdown("---")
 
     ## DNA Plate
     st.markdown("# Main")
-    st.markdown("## DNA")
-    with st.expander("DNA Plate", expanded=True):
+    st.markdown("## Source Plate")
+    with st.expander("Source plate", expanded=True):
         plate_type = "DNA"
         number_of_plate = st.number_input(
             f"Number of {plate_type}_plate",
@@ -657,6 +658,7 @@ def main():
 
         # Protocol 별 검사 (Tip 수, Plate 수, Volume 최대 등)
         export_JSON["Parameters"] = {
+            "protocol": "OT-2 cloning",
             "Plate_type": plate_types,
             "Reaction_type": reaction_types,
             "Messenger": st.session_state['messenger'],

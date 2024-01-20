@@ -159,11 +159,12 @@ def spotting_dispense(pipette, src, dest: list, spotting_volume=4):
     if not pipette.has_tip:
         pipette.pick_up_tip()
     
-    whole_vol = spotting_volume * len(dest) + spotting_volume-1
+    disposal_vol = 1
+    whole_vol = spotting_volume * len(dest) + disposal_vol
     cnt = 0
     while (whole_vol > spotting_volume):
         if pipette.max_volume < whole_vol:
-            pipette.aspirate(pipette.max_volume-1, src)
+            pipette.aspirate(pipette.max_volume, src)
         else:
             pipette.aspirate(whole_vol, src)
         
@@ -174,7 +175,6 @@ def spotting_dispense(pipette, src, dest: list, spotting_volume=4):
             whole_vol -= spotting_volume
         
         pipette.blow_out(pipette.trash_container.wells()[0])
-        pipette.air_gap(1)
 
 
 def run(protocol: protocol_api.ProtocolContext):
