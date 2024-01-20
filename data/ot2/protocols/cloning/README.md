@@ -92,11 +92,13 @@ Transformation recovery time
     "Reaction_volume": {
         "Reaction type": [Dict] Volumes in Reaction
     },
+    "Deck": {
+        "Enzyme_position": [Dict] Enzyme well position,
+        "Deck_position": [Dict] Deck position
+    },
     "Parameters": {
-        "Number of Plates": [int] Number of Plate,
         "Plate type": [Dict] Plate Order,
         "Reaction type": [Dict] Reaction Order,
-        "Enzyme_position": [Dict] Enzyme well position,
         "number of tips": [int] Total Tips used in this protocol
     }
 }

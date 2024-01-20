@@ -60,9 +60,9 @@ def find_materials_well(material, type: ["DNA", "Enzyme"],
                         else:
                             return wells[well]
     if type == "Enzyme":
-        return PARAMETERS["Parameters"]["Enzyme_position"][material]
+        return PARAMETERS["Deck"]["Enzyme_position"][material]
     if type == "DW":
-        return PARAMETERS["Parameters"]["Enzyme_position"][material]
+        return PARAMETERS["Deck"]["Enzyme_position"][material]
 
 
 def transfer_materials(key, p20, p300, mix_last=(0,0)):
@@ -193,14 +193,14 @@ def run(protocol: protocol_api.ProtocolContext):
     p300 = protocol.load_instrument("p300_single_gen2", "right", tip_racks=[p300_tip])
 
     ## Enzymes
-    for key in PARAMETERS["Parameters"]["Enzyme_position"].keys():
-        PARAMETERS["Parameters"]["Enzyme_position"][key] = Enzyme_deck.wells_by_name()[
-            PARAMETERS["Parameters"]["Enzyme_position"][key]
+    for key in PARAMETERS["Deck"]["Enzyme_position"].keys():
+        PARAMETERS["Deck"]["Enzyme_position"][key] = Enzyme_deck.wells_by_name()[
+            PARAMETERS["Deck"]["Enzyme_position"][key]
         ]
 
     ## Plates
     for key in PARAMETERS["Plates"].keys():
-        location = PARAMETERS["Parameters"]["Deck_position"][key]
+        location = PARAMETERS["Deck"]["Deck_position"][key]
         if str(location) == "7":
             PARAMETERS["Plates"][key]["Deck"] = tc_mod.load_labware(
                 PARAMETERS["Plates"][key]["labware"])
@@ -233,7 +233,7 @@ def run(protocol: protocol_api.ProtocolContext):
         ]
         tc_mod.execute_profile(
             steps=profile,
-            repetitions=30,
+            repetitions=25,
             block_max_volume=final_volume
         )
         tc_mod.set_block_temperature(
@@ -268,7 +268,7 @@ def run(protocol: protocol_api.ProtocolContext):
         tc_mod.set_lid_temperature(100)
         tc_mod.set_block_temperature(
             temperature=50,
-            hold_time_minutes=40,
+            hold_time_minutes=30,
             block_max_volume=final_volume,
         )
 

@@ -523,6 +523,7 @@ def main():
             "Plates": {},
             "Reactions": {},
             "Reaction_volume": {},
+            "Deck": {},
             "Parameters": {},
         }
         plate_types = ["DNA", "Reaction", "TF"]
@@ -656,20 +657,20 @@ def main():
 
         # Protocol 별 검사 (Tip 수, Plate 수, Volume 최대 등)
         export_JSON["Parameters"] = {
-            "Messenger": st.session_state['messenger'],
-            "Number of Plate": sum(
-                [st.session_state[f"num_of_{i}_plate"] for i in plate_types]
-            ),
             "Plate_type": plate_types,
             "Reaction_type": reaction_types,
+            "Messenger": st.session_state['messenger'],
             "Stop_between_reactions": st.session_state['stop_between_reactions'],
             "PCR_extension_time": st.session_state['PCR_extension_time'],
             "TF_recovery_time": st.session_state['TF_recovery_time'],
+            "number_of_tips": check_tips()
+            }
+        
+        export_JSON["Deck"] = {
             "Enzyme_position": enzyme_position(
                 enzyme_list=list(set(PCR_enzyme) | set(Assembly_enzyme))
             ),
             "Deck_position": deck_position(export_JSON["Plates"]),
-            "number_of_tips": check_tips()
         }
 
         protocol = True
