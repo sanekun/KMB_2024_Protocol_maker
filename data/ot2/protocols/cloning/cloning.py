@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import re
+from io import StringIO
+import json
 from datetime import datetime
 from data.ot2.protocols.cloning.check_protocol import *
 
@@ -208,6 +210,22 @@ def Use_example():
     st.session_state["TF_plate_0_df"].loc["A", "2"] = "Assembled_vector"
     st.session_state["TF_plate_0_df"].loc["A", "3"] = "Assembled_vector"
 
+def upload_file():
+    # Convert to string
+    data = StringIO(st.session_state['load'].getvalue().decode("utf-8")).readlines()
+    idx = data.index("# [PARAMETERS]\n")
+    params = data[idx+1]
+    params = params.replace("PARAMETERS = ", "")
+    params = eval(params)
+    
+    if params['Parameters']['protocol'] != "OT-2 cloning":
+        st.error("This is not OT-2 cloning protocol")
+        return None
+    
+    # Fill the blank
+    # dna_plates = [i for i in params["Plates"] if i["type"] == "DNA"]
+    # st.session_state["num_of_DNA_plate"] = len(dna_plates)
+
 def main():
     st.session_state["labwares"] = ["biorad_96_wellplate_200ul_pcr", "nest_96_wellplate_200ul_flat"]
     export_JSON = False
@@ -227,7 +245,7 @@ def main():
             )
 
     st.button("Use Example", on_click=Use_example)
-    # st.file_uploader("Load previous result", key="load", on_click)
+    st.file_uploader("Load previous result", type=['py'],key="load", on_change=upload_file, disabled=True)
     st.markdown("---")
 
     ## DNA Plate
