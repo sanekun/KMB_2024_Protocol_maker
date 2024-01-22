@@ -165,11 +165,11 @@ def read_README(path):
     README = []
     with open(path, "r") as f:
         txt=f.readlines()
-    
+
     txt.index("# Developer only\n")
     README.append("".join(txt[:txt.index("# Developer only\n")]))
     README.append("".join(txt[txt.index("# Developer only\n"):]))
-    
+
     return README
 
 def Use_example():
@@ -217,11 +217,11 @@ def upload_file():
     params = data[idx+1]
     params = params.replace("PARAMETERS = ", "")
     params = eval(params)
-    
+
     if params['Parameters']['protocol'] != "OT-2 cloning":
         st.error("This is not OT-2 cloning protocol")
         return None
-    
+
     # Fill the blank
     # dna_plates = [i for i in params["Plates"] if i["type"] == "DNA"]
     # st.session_state["num_of_DNA_plate"] = len(dna_plates)
@@ -235,14 +235,16 @@ def main():
     with st.expander("Manual", expanded=True):
         manual_tabs = st.tabs(["README", "Developer only"])
         with manual_tabs[0]:
-            st.markdown(
-                README[0]
-            )
-        
+            with st.container(height=450):
+                st.markdown(
+                    README[0]
+                )
+
         with manual_tabs[1]:
-            st.markdown(
-                README[1]
-            )
+            with st.container(height=450):
+                st.markdown(
+                    README[1]
+                )
 
     st.button("Use Example", on_click=Use_example)
     st.file_uploader("Load previous result", type=['py'],key="load", on_change=upload_file, disabled=True)
@@ -524,10 +526,10 @@ def main():
             key="Assembly_volume",
             hide_index=True,
         )
-        st.checkbox('Stop between Reactions', value=True, 
+        st.checkbox('Stop between Reactions', value=True,
                     key='stop_between_reactions',
                     help='If you want to stop between reactions for take enzymes, check this box')
-        
+
         advanced_column = st.columns([5,2,5])
         with advanced_column[0]:
             with st.container(border=True):
@@ -685,7 +687,7 @@ def main():
             "TF_recovery_time": st.session_state['TF_recovery_time'],
             "number_of_tips": check_tips()
             }
-        
+
         export_JSON["Deck"] = {
             "Enzyme_position": enzyme_position(
                 enzyme_list=list(set(PCR_enzyme) | set(Assembly_enzyme))
@@ -711,7 +713,8 @@ def main():
     )
     if export_JSON:
         with st.expander("Report", expanded=True):
-            st.json(export_JSON)
+            with st.container(height=450):
+                st.json(export_JSON)
 
 if __name__ == "__main__":
     st.set_page_config(page_title="Cloning", layout="wide")
