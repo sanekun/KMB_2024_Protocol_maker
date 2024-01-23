@@ -210,7 +210,8 @@ def Use_example():
     st.session_state["TF_plate_0_df"].loc["A", "2"] = "Assembled_vector"
     st.session_state["TF_plate_0_df"].loc["A", "3"] = "Assembled_vector"
 
-def upload_file():
+
+def load_previous_protocol():
     # Convert to string
     data = StringIO(st.session_state['load'].getvalue().decode("utf-8")).readlines()
     idx = data.index("# [PARAMETERS]\n")
@@ -221,6 +222,32 @@ def upload_file():
     if params['Parameters']['protocol'] != "OT-2 cloning":
         st.error("This is not OT-2 cloning protocol")
         return None
+    
+    # Fill parameters
+    st.session_state['messenger'] = params['Parameters']['Messenger']
+    st.session_state['stop_between_reactions'] = params['Parameters']['Stop_between_reactions']
+    st.session_state['PCR_extension_time'] = params['Parameters']['PCR_extension_time']
+    st.session_state['TF_recovery_time'] = params['Parameters']['TF_recovery_time']
+    
+    # Source plate
+    for plate_name, plate_info in params["Plates"].items():
+        if plate_info["type"] == "DNA":
+            plate_type = "DNA"
+        elif plate_info["type"] == "Reaction":
+            plate_type = "Reaction"
+        elif plate_info["type"] == "TF":
+            plate_type = "TF"
+        else:
+            continue
+
+        # Fill the blank
+        st.session_state[f"{plate_type}_plate_{st.session_state[f'num_of_{plate_type}_plate']}"] = plate_info["data"]
+        st.session_state[f"{plate_type}_plate_{st.session_state[f'num_of_{plate_type}_plate']}_name"] = plate_name
+        st.session_state[f"{plate_type}_plate_{st.session_state[f'num_of_{plate_type}_plate']}_labware"] = plate_info["labware"]
+        st.session_state[f"{plate_type}_plate_{st.session_state[f'num_of_{plate_type}_plate']}_toggle"] = True
+        st.session_state[f"{plate_type}_plate_{st.session_state[f'num_of_{plate_type}_plate']}_df"] = plate_transformation(pd.DataFrame(plate_info["data"]), "long")
+
+        st.session_state[f"num_of_{plate_type}_plate"] += 1
 
     # Fill the blank
     # dna_plates = [i for i in params["Plates"] if i["type"] == "DNA"]
@@ -247,7 +274,7 @@ def main():
                 )
 
     st.button("Use Example", on_click=Use_example)
-    st.file_uploader("Load previous result", type=['py'],key="load", on_change=upload_file, disabled=True)
+    st.file_uploader("## Load previous result", type=['py'],key="load", on_change=upload_file, disabled=True)
     st.markdown("---")
 
     ## DNA Plate

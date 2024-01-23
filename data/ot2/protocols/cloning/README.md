@@ -104,6 +104,56 @@ Transformation recovery time
     }
 }
 ```
+
+## session_state
+
+``` json
+"Plate": { # type: DNA, Reaction, TF
+    "num_of_DNA_plate": [int] Number of DNA plate,
+    "plate" : {
+        f"{plate_type}_plate_{i}_df": [pd.DataFrame] Plate data, # long form
+        f"{plate_type}_plate_{i}_name": [str] Plate name,
+        f"{plate_type}_plate_{i}_labware": [str] Plate labware,
+        f"{plate_type}_plate_{i}_toggle": [bool] Dataframe toggle,
+        f"{plate_type}_plate_{i}_uploader": [str] Plate uploader,
+    }
+},
+"Reaction": { # PCR, Assembly
+    "reaction" : {
+        f"{reaction_type}_plate_{i}_df": [pd.DataFrame] Plate data, # long form
+        f"{reaction_type}_plate_{i}_selecttype": [str] Add column type,
+        f"{reaction_type}_plate_{i}_addcolumn": [str] Add column type
+    }
+},
+
+}
+
+
+# st.session_state["Reaction_plate_0_df"]
+# st.session_state["Reaction_plate_0_name"]
+# st.session_state["Reaction_plate_0_labware"]
+# st.session_state["Reaction_plate_0_toggle"]
+# st.session_state["Reaction_plate_0_df"]
+# st.session_state["Reaction_plate_0_uploader"]
+# st.session_state["Reaction_plate_0_long"]
+# st.session_state["Reaction_plate_0_wide"]
+# st.session_state["num_of_Reaction_plate"]
+# st.session_state["TF_plate_0_df"]
+# st.session_state["TF_plate_0_name"]
+# st.session_state["TF_plate_0_labware"]
+# st.session_state["TF_plate_0_toggle"]
+# st.session_state["TF_plate_0_df"]
+# st.session_state["TF_plate_0_uploader"]
+# st.session_state["TF_plate_0_long"]
+# st.session_state["TF_plate_0_wide"]
+# st.session_state["num_of_TF_plate"]
+# st.session_state["labwares"]
+# st.session_state["load"]
+# st.session_state["messenger"]
+# st.session_state["stop_between_reactions"]
+# st.session_state["PCR_extension_time"]
+# st.session_state["TF_recovery_time"]
+```
 ## Check Protocol
 
 프로토콜 마다 
