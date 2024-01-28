@@ -325,7 +325,8 @@ def run(protocol: protocol_api.ProtocolContext):
         # Transfer CP cell to right well of assembly product
         p300.distribute(CP_cell_volume, src.bottom(z=3), dest,
                         new_tip="never", touch_tip=False, disposal_volume=10,
-                        blow_out=False, trash=not debug)
+                        blow_out=True, blowout_location="source well",
+                        trash=not debug)
         p300.drop_tip()
 
         # Transfer Assembly Mix to distributed CP cell
@@ -333,7 +334,7 @@ def run(protocol: protocol_api.ProtocolContext):
             find_materials_well(name, "DNA", right_well=False)
             for name in unique_sample
         ]
-        reaction_mix_vol = 5
+        reaction_mix_vol = 10
         p20.transfer(reaction_mix_vol, src, dest,
                       new_tip='always',
                       blow_out=False, trash=not debug)
@@ -343,8 +344,8 @@ def run(protocol: protocol_api.ProtocolContext):
 
         ## Thermocycler
         profile = [
-            {"temperature": 42, "hold_time_seconds": 60},
-            {"temperature": 8, "hold_time_seconds": 100},
+            {"temperature": 42, "hold_time_seconds": 90},
+            {"temperature": 8, "hold_time_seconds": 120},
         ]
         tc_mod.execute_profile(
             steps=profile,
@@ -355,16 +356,41 @@ def run(protocol: protocol_api.ProtocolContext):
         tc_mod.deactivate_block()
 
         src = find_materials_well("LB", "DW").bottom(z=3)
-        p300.transfer(40, src, dest,
-                      new_tip="always", touch_tip=False, disposal_volume=5,
-                      blow_out=False, trash=not debug)
+        
+        # Mix for recovery
+        for dest_well in dest:
+            p300.pick_up_tip()
+            p300.transfer(40, src, dest_well,
+                        new_tip="never", touch_tip=False, disposal_volume=5,
+                        blow_out=False, trash=not debug)
+            for _ in range(2):
+                p300.aspirate(40, dest_well)
+                p300.dispense(40, dest_well.bottom(z=5))
+            p300.drop_tip()
 
-        tc_mod.set_block_temperature(37, hold_time_minutes=int(PARAMETERS["Parameters"]["TF_recovery_time"]),
-                                     block_max_volume=reaction_mix_vol + CP_cell_volume + 40)
-
+        # Recovery
+        tc_mod.set_block_temperature(8)
+        
+        total_duration = int(PARAMETERS["Parameters"]["TF_recovery_time"]) * 60
+        start_time = time.time()
+        end_time = start_time + total_duration
+        interval = 5 * 60
+        
+        flow_rate(p300, aspirate=40, dispense=40, blow_out=40)
+        while time.time() < end_time - 120:
+            for dest_well in dest:
+                if time.time() < end_time - 60:
+                    break
+                p300.pick_up_tip()
+                for _ in range(2):
+                    p300.aspirate(40, dest_well)
+                    p300.dispense(40, dest_well.bottom(z=5))
+                p300.drop_tip()
+            time.sleep(interval - len(dest)*10)
+            
         # Spotting
         spotting_volume = 4
-        flow_rate(p20, aspirate=5, dispense=5, blow_out=5)
+        flow_rate(p20, aspirate=8, dispense=8, blow_out=8)
         for i in PARAMETERS["Plates"].keys():
             plate = PARAMETERS["Plates"][i]
             if plate["type"] != "TF":

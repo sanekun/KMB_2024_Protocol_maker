@@ -222,13 +222,13 @@ def load_previous_protocol():
     if params['Parameters']['protocol'] != "OT-2 cloning":
         st.error("This is not OT-2 cloning protocol")
         return None
-    
+
     # Fill parameters
     st.session_state['messenger'] = params['Parameters']['Messenger']
     st.session_state['stop_between_reactions'] = params['Parameters']['Stop_between_reactions']
     st.session_state['PCR_extension_time'] = params['Parameters']['PCR_extension_time']
     st.session_state['TF_recovery_time'] = params['Parameters']['TF_recovery_time']
-    
+
     # Source plate
     for plate_name, plate_info in params["Plates"].items():
         if plate_info["type"] == "DNA":
@@ -274,7 +274,7 @@ def main():
                 )
 
     st.button("Use Example", on_click=Use_example)
-    st.file_uploader("## Load previous result", type=['py'],key="load", on_change=upload_file, disabled=True)
+    st.file_uploader("## Load previous result", type=['py'],key="load", disabled=True)
     st.markdown("---")
 
     ## DNA Plate
