@@ -386,7 +386,9 @@ def run(protocol: protocol_api.ProtocolContext):
                     p300.aspirate(40, dest_well)
                     p300.dispense(40, dest_well.bottom(z=5))
                 p300.drop_tip()
-            time.sleep(interval - len(dest)*10)
+            
+            if not protocol.is_simulating(): # Avoid simulation error
+                time.sleep(interval - len(dest)*10)
             
         # Spotting
         spotting_volume = 4
