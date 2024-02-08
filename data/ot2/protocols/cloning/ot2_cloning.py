@@ -273,15 +273,22 @@ def run(protocol: protocol_api.ProtocolContext):
         )
 
         discord_message(f"Assembly will be end 10 minutes later, Take in CP cell for next step")
-        tc_mod.set_block_temperature(
-            temperature=8,
-            hold_time_minutes=5,
-            block_max_volume=final_volume,
-            ramp_rate=0.1,
-        )
-        tc_mod.deactivate_lid()
-        tc_mod.set_block_temperature(8)
-        tc_mod.open_lid()
+        # Ramp rate is 0.1 degree per second
+        current_tmp = 50
+        while True:
+            current_tmp -= 5
+            
+            if current_tmp <= 8:
+                tc_mod.deactivate_lid()
+                tc_mod.set_block_temperature(8)
+                tc_mod.open_lid()
+                break
+            
+            tc_mod.set_block_temperature(
+                temperature=current_tmp,
+                hold_time_seconds=45, # ramp_rate is almost 0.1 degree per second
+                block_max_volume=final_volume
+            )
 
     # Transformation
     ## IF Tf plate not empty, run protocol
@@ -343,52 +350,50 @@ def run(protocol: protocol_api.ProtocolContext):
         protocol.delay(minutes=7)
 
         ## Thermocycler
-        profile = [
-            {"temperature": 42, "hold_time_seconds": 90},
-            {"temperature": 8, "hold_time_seconds": 120},
-        ]
-        tc_mod.execute_profile(
-            steps=profile,
-            repetitions=1,
+        tc_mod.set_block_temperature(
+            temperature=42,
+            hold_time_seconds=90,
             block_max_volume=reaction_mix_vol + CP_cell_volume
         )
+        tc_mod.set_block_temperature(8)
         tc_mod.open_lid()
-        tc_mod.deactivate_block()
 
         src = find_materials_well("LB", "DW").bottom(z=3)
         
-        # Mix for recovery
-        for dest_well in dest:
-            p300.pick_up_tip()
-            p300.transfer(40, src, dest_well,
-                        new_tip="never", touch_tip=False, disposal_volume=5,
-                        blow_out=False, trash=not debug)
-            for _ in range(2):
-                p300.aspirate(40, dest_well)
-                p300.dispense(40, dest_well.bottom(z=5))
-            p300.drop_tip()
-
-        # Recovery
-        tc_mod.set_block_temperature(8)
+        # Add media for recovery
+        start_time = time.time()
+        p300.transfer(40, src, dest,
+                    new_tip="never", touch_tip=False, disposal_volume=5,
+                    blow_out=False, trash=not debug)
+        end_time = time.time()
         
+        # Duration time in 8 degree
+        rest_time = 120 - (end_time - start_time)
+        if rest_time > 0:
+            if rest_time < 30:
+                protocol.delay(seconds=30)
+                
+            protocol.delay(seconds=rest_time)
+
+        # Recovery        
         total_duration = int(PARAMETERS["Parameters"]["TF_recovery_time"]) * 60
         start_time = time.time()
         end_time = start_time + total_duration
         interval = 5 * 60
         
         flow_rate(p300, aspirate=40, dispense=40, blow_out=40)
-        while time.time() < end_time - 120:
-            for dest_well in dest:
-                if time.time() < end_time - 60:
-                    break
-                p300.pick_up_tip()
-                for _ in range(2):
-                    p300.aspirate(40, dest_well)
-                    p300.dispense(40, dest_well.bottom(z=5))
-                p300.drop_tip()
-            
-            if not protocol.is_simulating(): # Avoid simulation error
-                time.sleep(interval - len(dest)*10)
+        if not protocol.is_simulating(): # Avoid simulation error
+            while time.time() < end_time - 120:
+                for dest_well in dest:
+                    if time.time() < end_time - 60:
+                        break
+                    p300.pick_up_tip()
+                    for _ in range(2):
+                        p300.aspirate(40, dest_well)
+                        p300.dispense(40, dest_well.bottom(z=5))
+                    p300.drop_tip()
+                
+                protocol.delay(seconds=interval - len(dest)*10)
             
         # Spotting
         spotting_volume = 4
