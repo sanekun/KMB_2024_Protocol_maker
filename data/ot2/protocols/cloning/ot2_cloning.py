@@ -25,7 +25,7 @@ debug = False
 def discord_message(message, user=PARAMETERS["Parameters"]["Messenger"]):
     if user == "None":
         return None
-    
+
     # Send message to discord chaneel
     url = "https://discord.com/api/webhooks/1169608986891390996/wLti5ulSOXBtGelwiYO4SJi1jQSJ9tEQ8uC8sVXVlWXih3XWwkoLDr6cJBEm2iPY9b0t"
 
@@ -35,18 +35,18 @@ def discord_message(message, user=PARAMETERS["Parameters"]["Messenger"]):
 
 def flow_rate(pipette, **kwargs):
     # Change flow rate of pipette
-    
+
     assert (
         item in ["aspirate", "dispense", "blow_out"] for item in kwargs.keys()
     ), "Error Keywords in Flow Rate."
     for i in kwargs.keys():
         setattr(pipette.flow_rate, i, kwargs[i])
 
-def find_materials_well(material, type: ["DNA", "Enzyme"], 
+def find_materials_well(material, type: ["DNA", "Enzyme"],
                         PARAMETERS=PARAMETERS, right_well=False):
     # Convert material name to well
     # right_well means well of right side of plate (for abstraction)
-    
+
     if type == "DNA":
         for i in PARAMETERS["Plates"].keys():
             plate = PARAMETERS["Plates"][i]
@@ -67,10 +67,10 @@ def find_materials_well(material, type: ["DNA", "Enzyme"],
 
 def transfer_materials(key, p20, p300, mix_last=(0,0)):
     # Transfer materials by type of materials
-    
+
     reaction = PARAMETERS["Reactions"][key]
     volume_dict = PARAMETERS["Reaction_volume"][reaction["type"]]
-    
+
     # transform dict to dataframe (row iterable)
     df = pd.DataFrame(reaction["data"])
 
@@ -93,21 +93,21 @@ def transfer_materials(key, p20, p300, mix_last=(0,0)):
                 blow_out=False,
                 trash=not debug
             )
-            
+
     for enzyme_name in df["Enzyme1"].unique():
         tmp = df[df["Enzyme1"] == enzyme_name]
         # If Data doens't exist, this step will be skipped
         if len(tmp):
             if pd.isna(enzyme_name) or enzyme_name == "":
                 continue
-            src = find_materials_well(enzyme_name, "Enzyme")
+            src = find_materials_well(enzyme_name, "Enzyme").bottom(z=3)
             vol = float(volume_dict["Enzyme1"])
             dest = [find_materials_well(name, "DNA").bottom(z=1) for name in tmp["Name"].values]
 
             flow_rate(p300, aspirate=20, dispense=20, blow_out=20)
             p300.distribute(
                 vol, src, dest,
-                new_tip="once", touch_tip=True,
+                new_tip="once", touch_tip=False,
                 mix_before=(2, 50), disposal_volume=5,
                 blow_out=True, blowout_location="source well",
                 trash=not debug
@@ -130,7 +130,7 @@ def transfer_materials(key, p20, p300, mix_last=(0,0)):
             # Check DNA or Enzyme
             if re.sub(r"[0-9]+", "", sample_type) == "Enzyme":
                 flow_rate(p20, aspirate=1, dispense=1, blow_out=1)
-                touch_tip = True
+                touch_tip = False
             else:  # DNA & DW
                 flow_rate(p20, aspirate=1, dispense=1, blow_out=1)
                 touch_tip = False
@@ -141,7 +141,7 @@ def transfer_materials(key, p20, p300, mix_last=(0,0)):
                 blow_out=False, blowout_location="destination well",
                 trash=not debug
             )
-        
+
         # Mix Product
         if sum(mix_last):
             flow_rate(p20, aspirate=5, dispense=10, blow_out=10)
@@ -155,10 +155,10 @@ def transfer_materials(key, p20, p300, mix_last=(0,0)):
 def spotting_dispense(pipette, src, dest: list, spotting_volume=4):
     # Dispense liquid at the top of well
     # and then, move down pipette to specific height.
-    
+
     if not pipette.has_tip:
         pipette.pick_up_tip()
-    
+
     disposal_vol = 1
     whole_vol = spotting_volume * len(dest) + disposal_vol
     cnt = 0
@@ -167,19 +167,19 @@ def spotting_dispense(pipette, src, dest: list, spotting_volume=4):
             pipette.aspirate(pipette.max_volume, src)
         else:
             pipette.aspirate(whole_vol, src)
-        
+
         while (pipette.current_volume > spotting_volume):
             pipette.dispense(spotting_volume, dest[cnt].bottom(z=4.4))
             pipette.move_to(dest[cnt].bottom(z=3))
             cnt += 1
             whole_vol -= spotting_volume
-        
+
         pipette.blow_out(pipette.trash_container.wells()[0])
 
 
 def run(protocol: protocol_api.ProtocolContext):
     discord_message(f"Protocol Start: {time.strftime('%Y-%m-%d %H:%M:%S')}")
-    
+
     # Deck Setting
     ## Modules
     tc_mod = protocol.load_module(module_name="thermocyclerModuleV1")
@@ -266,6 +266,19 @@ def run(protocol: protocol_api.ProtocolContext):
         ## Thermocycler
         tc_mod.close_lid()
         tc_mod.set_lid_temperature(100)
+        
+        ### DpnI
+        tc_mod.set_block_temperature(
+            temperature=37,
+            hold_time_minutes=5,
+            block_max_volume=final_volume
+        )
+        ### denaturation
+        tc_mod.set_block_temperature(
+            temperature=65,
+            hold_time_seconds=20,
+            block_max_volume=final_volume
+        )
         tc_mod.set_block_temperature(
             temperature=50,
             hold_time_minutes=30,
@@ -277,13 +290,13 @@ def run(protocol: protocol_api.ProtocolContext):
         current_tmp = 50
         while True:
             current_tmp -= 5
-            
+
             if current_tmp <= 8:
                 tc_mod.deactivate_lid()
                 tc_mod.set_block_temperature(8)
                 tc_mod.open_lid()
                 break
-            
+
             tc_mod.set_block_temperature(
                 temperature=current_tmp,
                 hold_time_seconds=45, # ramp_rate is almost 0.1 degree per second
@@ -304,7 +317,7 @@ def run(protocol: protocol_api.ProtocolContext):
         discord_message(f"Transformation Start")
         if PARAMETERS["Parameters"]["Stop_between_reactions"]:
             protocol.pause("Place down TF-associated materials")
-            
+
         flow_rate(p300, aspirate=20, dispense=20, blow_out=100)
         src = find_materials_well("CPcell", "DW")
 
@@ -341,13 +354,13 @@ def run(protocol: protocol_api.ProtocolContext):
             find_materials_well(name, "DNA", right_well=False)
             for name in unique_sample
         ]
-        reaction_mix_vol = 10
+        reaction_mix_vol = 5
         p20.transfer(reaction_mix_vol, src, dest,
                       new_tip='always',
                       blow_out=False, trash=not debug)
 
         tc_mod.close_lid()
-        protocol.delay(minutes=7)
+        protocol.delay(minutes=10)
 
         ## Thermocycler
         tc_mod.set_block_temperature(
@@ -359,42 +372,56 @@ def run(protocol: protocol_api.ProtocolContext):
         tc_mod.open_lid()
 
         src = find_materials_well("LB", "DW").bottom(z=3)
-        
-        # Add media for recovery
-        start_time = time.time()
-        p300.transfer(40, src, dest,
-                    new_tip="never", touch_tip=False, disposal_volume=5,
-                    blow_out=False, trash=not debug)
-        end_time = time.time()
-        
-        # Duration time in 8 degree
-        rest_time = 120 - (end_time - start_time)
-        if rest_time > 0:
-            if rest_time < 30:
-                protocol.delay(seconds=30)
-                
-            protocol.delay(seconds=rest_time)
 
-        # Recovery        
-        total_duration = int(PARAMETERS["Parameters"]["TF_recovery_time"]) * 60
-        start_time = time.time()
-        end_time = start_time + total_duration
-        interval = 5 * 60
+        # Add media for recovery
+        #start_time = time.time()
+        p300.transfer(40, src, dest,
+                    new_tip="always", touch_tip=False, disposal_volume=5,
+                    blow_out=False, trash=not debug)
+        protocol.delay(seconds=30)
+        #end_time = time.time()
+
+        # Duration time in 8 degree
+        #rest_time = 120 - (end_time - start_time)
+        #if rest_time > 0:
+        #    if rest_time < 30:
+        #        protocol.delay(seconds=30)
+        #    else:
+        #        protocol.delay(seconds=rest_time)
+
+        # Recovery
+        tc_mod.set_block_temperature(temperature=37,
+                                     hold_time_minutes=int(int(PARAMETERS["Parameters"]["TF_recovery_time"])/2))
         
-        flow_rate(p300, aspirate=40, dispense=40, blow_out=40)
-        if not protocol.is_simulating(): # Avoid simulation error
-            while time.time() < end_time - 120:
-                for dest_well in dest:
-                    if time.time() < end_time - 60:
-                        break
-                    p300.pick_up_tip()
-                    for _ in range(2):
-                        p300.aspirate(40, dest_well)
-                        p300.dispense(40, dest_well.bottom(z=5))
-                    p300.drop_tip()
-                
-                protocol.delay(seconds=interval - len(dest)*10)
+        for dest_well in dest:
+            p300.pick_up_tip()
+            for _ in range(2):
+                p300.aspirate(40, dest_well)
+                p300.dispense(40, dest_well.bottom(z=5))
+            p300.drop_tip()
             
+        tc_mod.set_block_temperature(temperature=37,
+                                        hold_time_minutes=int(int(PARAMETERS["Parameters"]["TF_recovery_time"])/2))
+        
+        #total_duration = int(PARAMETERS["Parameters"]["TF_recovery_time"]) * 60
+        #start_time = time.time()
+        #end_time = start_time + total_duration
+        #interval = 5 * 60
+
+        #flow_rate(p300, aspirate=40, dispense=40, blow_out=40)
+        #if not protocol.is_simulating(): # Avoid simulation error
+        #    while time.time() < end_time - 120:
+        #        for dest_well in dest:
+        #            if time.time() < end_time - 60:
+        #                break
+        #            p300.pick_up_tip()
+        #            for _ in range(2):
+        #                p300.aspirate(40, dest_well)
+        #                p300.dispense(40, dest_well.bottom(z=5))
+        #            p300.drop_tip()
+
+        #        protocol.delay(seconds=interval - len(dest)*10)
+
         # Spotting
         spotting_volume = 4
         flow_rate(p20, aspirate=8, dispense=8, blow_out=8)
