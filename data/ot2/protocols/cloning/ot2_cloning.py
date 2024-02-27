@@ -48,8 +48,7 @@ def find_materials_well(material, type: ["DNA", "Enzyme"],
     # right_well means well of right side of plate (for abstraction)
 
     if type == "DNA":
-        for i in PARAMETERS["Plates"].keys():
-            plate = PARAMETERS["Plates"][i]
+        for plate in PARAMETERS["Plates"].values():
             if plate["type"] != "TF":
                 for well in plate["data"].keys():
                     if plate["data"][well] == material:
