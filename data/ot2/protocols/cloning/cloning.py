@@ -242,16 +242,15 @@ def load_previous_protocol():
             st.session_state[f"{target_type}_plate_{n}_toggle"] = False
             
             # Read plate data and Update to existed dataframe
-            
-            
-            #st.session_state[f"{target_type}_plate_{n}_df"] = empty_plate_df()
-            #tmp = pd.DataFrame.from_dict(plate["data"], orient="index", columns=['Value'])
-            #tmp.index.name = 'well'
-            #st.session_state[f"{target_type}_plate_{n}_df"].update(plate_transformation(tmp, 'wide'))
+            st.session_state[f"{target_type}_plate_{n}_df"] = empty_plate_df()
+            tmp = pd.DataFrame.from_dict(plate["data"], orient="index", columns=['Value'])
+            tmp.index.name = 'well'
+            tmp2 = plate_transformation(tmp, 'wide')
+            tmp2.columns = tmp2.columns.map(str)
+            st.session_state[f"{target_type}_plate_{n}_df"].update(tmp2)
+    
+    # Reaction Table
 
-    # Fill the blank
-    # dna_plates = [i for i in params["Plates"] if i["type"] == "DNA"]
-    # st.session_state["num_of_DNA_plate"] = len(dna_plates)
 
 def main():
     plate_types = ["source", "Reaction", "TF"]
