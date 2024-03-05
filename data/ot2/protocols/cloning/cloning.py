@@ -44,13 +44,12 @@ def plate_initialization(i, plate_type: str, table_type="empty"):
         if f"{plate_type}_plate_{i}_name" not in st.session_state:
             st.session_state[
                 f"{plate_type}_plate_{i}_name"
-            ] = f"{plate_type}_plate_{i+1}"
+            ] = f"{plate_type}_plate_{i}"
         if f"{plate_type}_plate_{i}_toggle" not in st.session_state:
             st.session_state[f"{plate_type}_plate_{i}_toggle"] = False
 
     if f"{plate_type}_plate_{i}_df" not in st.session_state:
         st.session_state[f"{plate_type}_plate_{i}_df"] = initial_tables[table_type]
-
 
 def plate_transformation(df, data_form):
     # Change data form to [long or wide]
@@ -175,13 +174,13 @@ def read_README(path):
 def Use_example():
     # Example Data set
     # DNA table
-    st.session_state["DNA_plate_0_df"].loc["A", "1"] = "Template1"
-    st.session_state["DNA_plate_0_df"].loc["B", "1"] = "Primer1"
-    st.session_state["DNA_plate_0_df"].loc["C", "1"] = "Primer2"
+    st.session_state["source_plate_0_df"].loc["A", "1"] = "Template1"
+    st.session_state["source_plate_0_df"].loc["B", "1"] = "Primer1"
+    st.session_state["source_plate_0_df"].loc["C", "1"] = "Primer2"
 
-    st.session_state["DNA_plate_0_df"].loc["A", "2"] = "Template2"
-    st.session_state["DNA_plate_0_df"].loc["B", "2"] = "Primer3"
-    st.session_state["DNA_plate_0_df"].loc["C", "2"] = "Primer4"
+    st.session_state["source_plate_0_df"].loc["A", "2"] = "Template2"
+    st.session_state["source_plate_0_df"].loc["B", "2"] = "Primer3"
+    st.session_state["source_plate_0_df"].loc["C", "2"] = "Primer4"
 
     # PCR & Assembly table
     st.session_state["PCR_plate_0_df"].loc[0, "Name"] = "Vector"
@@ -212,7 +211,10 @@ def Use_example():
 
 
 def load_previous_protocol():
-    # Convert to string
+    if st.session_state['load'] is None:
+        return None
+    
+    # Read and Convert to String
     data = StringIO(st.session_state['load'].getvalue().decode("utf-8")).readlines()
     idx = data.index("# [PARAMETERS]\n")
     params = data[idx+1]
@@ -224,39 +226,44 @@ def load_previous_protocol():
         return None
 
     # Fill parameters
-    st.session_state['messenger'] = params['Parameters']['Messenger']
+    # st.session_state['messenger'] = params['Parameters']['Messenger']
     st.session_state['stop_between_reactions'] = params['Parameters']['Stop_between_reactions']
     st.session_state['PCR_extension_time'] = params['Parameters']['PCR_extension_time']
     st.session_state['TF_recovery_time'] = params['Parameters']['TF_recovery_time']
 
     # Source plate
-    for plate_name, plate_info in params["Plates"].items():
-        if plate_info["type"] == "DNA":
-            plate_type = "DNA"
-        elif plate_info["type"] == "Reaction":
-            plate_type = "Reaction"
-        elif plate_info["type"] == "TF":
-            plate_type = "TF"
-        else:
-            continue
-
-        # Fill the blank
-        st.session_state[f"{plate_type}_plate_{st.session_state[f'num_of_{plate_type}_plate']}"] = plate_info["data"]
-        st.session_state[f"{plate_type}_plate_{st.session_state[f'num_of_{plate_type}_plate']}_name"] = plate_name
-        st.session_state[f"{plate_type}_plate_{st.session_state[f'num_of_{plate_type}_plate']}_labware"] = plate_info["labware"]
-        st.session_state[f"{plate_type}_plate_{st.session_state[f'num_of_{plate_type}_plate']}_toggle"] = True
-        st.session_state[f"{plate_type}_plate_{st.session_state[f'num_of_{plate_type}_plate']}_df"] = plate_transformation(pd.DataFrame(plate_info["data"]), "long")
-
-        st.session_state[f"num_of_{plate_type}_plate"] += 1
-
-    # Fill the blank
-    # dna_plates = [i for i in params["Plates"] if i["type"] == "DNA"]
-    # st.session_state["num_of_DNA_plate"] = len(dna_plates)
+    for target_type in params["Parameters"]["Plate_type"]:
+        target_plates = [plate for plate in params["Plates"].values() if plate["type"] == target_type]
+        st.session_state[f"num_of_{target_type}_plate"] = len(target_plates)
+        
+        for n, plate in enumerate(target_plates):
+            st.session_state[f"{target_type}_plate_{n}_name"] = plate["name"]
+            st.session_state[f"{target_type}_plate_{n}_labware"] = plate["labware"]
+            st.session_state[f"{target_type}_plate_{n}_toggle"] = False
+            
+            # Read plate data and Update to existed dataframe
+            st.session_state[f"{target_type}_plate_{n}_df"] = empty_plate_df()
+            tmp = pd.DataFrame.from_dict(plate["data"], orient="index", columns=['Value'])
+            tmp.index.name = 'well'
+            tmp2 = plate_transformation(tmp, 'wide')
+            tmp2.columns = tmp2.columns.map(str)
+            st.session_state[f"{target_type}_plate_{n}_df"].update(tmp2)
+    
+    # Reaction Table & Volumes
+    for reaction in params["Reactions"].values():
+        st.session_state[f"{reaction['type']}_plate_{0}_df"] = pd.DataFrame.from_dict(reaction['data'])
+        # st.session_state[f"{reaction['type']}_volume"] = pd.DataFrame.from_dict(params["Reaction_volume"][f"{reaction}"], orient='index').T
+        # Volume 입력 구조를 변경해야함.
 
 def main():
+    plate_types = ["source", "Reaction", "TF"]
+    for i in plate_types:
+        if f"num_of_{i}_plate" not in st.session_state:
+            st.session_state[f"num_of_{i}_plate"] = 1
+    
     st.session_state["labwares"] = ["biorad_96_wellplate_200ul_pcr", "nest_96_wellplate_200ul_flat"]
     export_JSON = False
-    README = read_README('/home/kun/workspace/webservice/automated-protocol/data/ot2/protocols/cloning/README.md')
+    README = read_README('data/ot2/protocols/cloning/README.md')
 
     # Main
     with st.expander("Manual", expanded=True):
@@ -274,29 +281,29 @@ def main():
                 )
 
     st.button("Use Example", on_click=Use_example)
-    st.file_uploader("## Load previous result", type=['py'],key="load", disabled=True)
+    st.file_uploader("## Load previous result", type=['py'],key="load", disabled=False, help="Load previous result to modify", on_change=load_previous_protocol)
     st.markdown("---")
 
     ## DNA Plate
     st.markdown("# Main")
     st.markdown("## Source Plate")
     with st.expander("Source plate", expanded=True):
-        plate_type = "DNA"
+        plate_type = "source"
         number_of_plate = st.number_input(
             f"Number of {plate_type}_plate",
             min_value=1,
             step=1,
-            value=1,
+            value=st.session_state[f"num_of_{plate_type}_plate"],
             key=f"num_of_{plate_type}_plate",
         )
-        plates = st.tabs([f"{plate_type}_Plate_{i+1}" for i in range(number_of_plate)])
+        plates = st.tabs([f"{plate_type}_Plate_{i}" for i in range(number_of_plate)])
 
         for i in range(len(plates)):
             plate_initialization(i, plate_type=plate_type, table_type="empty")
             with plates[i]:
                 st.text_input(
                     "Name",
-                    placeholder=f"{plate_type}_plate_{i+1}_name",
+                    placeholder=f"{plate_type}_plate_{i}_name",
                     key=f"{plate_type}_plate_{i}_name",
                 )
                 st.selectbox(
@@ -308,7 +315,7 @@ def main():
                 st.toggle(
                     "Long Form",
                     key=f"{plate_type}_plate_{i}_toggle",
-                    on_change=editor_update,
+                    on_change=editor_update, # Transformation을 여기에서 할걸
                     kwargs={
                         "editor_key": f"{plate_type}_plate_{i}_long"
                         if st.session_state[f"{plate_type}_plate_{i}_toggle"]
@@ -333,10 +340,7 @@ def main():
                         use_container_width=True,
                         key=f"{plate_type}_plate_{i}_long",
                     )
-                st.file_uploader(
-                    "Upload", key=f"{plate_type}_plate_{i}_uploader", disabled=True
-                )
-
+                9
     st.markdown("## Reaction")
     with st.expander("Reaction - PCR", expanded=True):
         i, reaction_type = 0, "PCR"
@@ -416,12 +420,12 @@ def main():
             f"Number of {plate_type}_plate",
             min_value=1,
             step=1,
-            value=1,
+            value=st.session_state[f"num_of_{plate_type}_plate"],
             key=f"num_of_{plate_type}_plate",
             disabled=True,
             help="This Method can only one reaction Plate",
         )
-        plates = st.tabs([f"{plate_type}_Plate_{i+1}" for i in range(number_of_plate)])
+        plates = st.tabs([f"{plate_type}_Plate_{i}" for i in range(number_of_plate)])
 
         for i in range(len(plates)):
             plate_initialization(i, plate_type=plate_type, table_type="empty")
@@ -474,10 +478,10 @@ def main():
             f"Number of {plate_type}_plate",
             min_value=1,
             step=1,
-            value=1,
+            value=st.session_state[f"num_of_{plate_type}_plate"],
             key=f"num_of_{plate_type}_plate",
         )
-        plates = st.tabs([f"{plate_type}_Plate_{i+1}" for i in range(number_of_plate)])
+        plates = st.tabs([f"{plate_type}_Plate_{i}" for i in range(number_of_plate)])
 
         for i in range(len(plates)):
             plate_initialization(i, plate_type=plate_type, table_type="empty")
@@ -540,6 +544,7 @@ def main():
         Assembly_volume = pd.DataFrame(
             columns=st.session_state["Assembly_plate_0_df"].columns
         ).drop(columns=["Name"])
+        
         Assembly_volume.loc[0, ["DNA1", "DNA2", "Enzyme1", "DW"]] = ["1.5", "1.5", "4", "8"]
 
         st.markdown("### PCR volume")
@@ -574,7 +579,7 @@ def main():
             "Deck": {},
             "Parameters": {},
         }
-        plate_types = ["DNA", "Reaction", "TF"]
+        plate_types = ["source", "Reaction", "TF"]
         for plate_type in plate_types:
             for num in range(st.session_state[f"num_of_{plate_type}_plate"]):
                 if st.session_state[f"{plate_type}_plate_{num}_toggle"]:
@@ -589,32 +594,31 @@ def main():
                         df=st.session_state[f"{plate_type}_plate_{num}_df"],
                         df_form="wide",
                     )
-                # Json append
-                # With Long form
-                export_JSON["Plates"][st.session_state[f"{plate_type}_plate_{num}_name"]] = {
+                # Json append With Long form
+                export_JSON["Plates"][f"{plate_type}_{str(num)}"] = {
+                    "name": st.session_state[f"{plate_type}_plate_{num}_name"],
+                    "type": plate_type,
+                    "labware": st.session_state[f"{plate_type}_plate_{num}_labware"],
                     "data": (
                         plate_transformation(
                             st.session_state[f"{plate_type}_plate_{num}_df"], "long"
-                        )
+                            )
                         .dropna()
                         .reset_index()
-                        .set_index("well")
-                    ).to_dict()["Value"],
-                    "labware": st.session_state[f"{plate_type}_plate_{num}_labware"],
-                    "type": plate_type,
+                        .set_index("well")).to_dict()["Value"],
                 }
 
         reaction_types = ["PCR", "Assembly"]
-        for reaction_type in reaction_types:
+        for n, reaction_type in enumerate(reaction_types):
             editor_update(
                 editor_key=f"{reaction_type}_plate_{0}_wide",
                 df=st.session_state[f"{reaction_type}_plate_{0}_df"],
                 df_form="wide",
             )
-
-            export_JSON["Reactions"][f"{reaction_type}_plate_{0}_name"] = {
-                "data": st.session_state[f"{reaction_type}_plate_{0}_df"].astype(str).to_dict(),
+            export_JSON["Reactions"][f"{reaction_type}_{n}"] = {
+                "name": f"{reaction_type}_{n}",
                 "type": reaction_type,
+                "data": st.session_state[f"{reaction_type}_plate_{0}_df"].astype(str).to_dict()
             }
 
             # Reaction Volume
@@ -630,8 +634,8 @@ def main():
         # Check overlap name in DNA and Reaction
         # DNA overlap from export_JSON["Plates"]
         DNA_names, Reaction_names, TF_names = [], [], []
-        for plate_name, plate_info in export_JSON["Plates"].items():
-            if plate_info["type"] == "DNA":
+        for plate_info in export_JSON["Plates"].values():
+            if plate_info["type"] == "source":
                 DNA_names += list(plate_info["data"].values())
             elif plate_info["type"] == "Reaction":
                 Reaction_names += list(plate_info["data"].values())
@@ -643,12 +647,24 @@ def main():
         Reaction_names = [i for i in Reaction_names if i != "nan"]
         TF_names = [i for i in TF_names if i != "nan"]
 
-        assert len(DNA_names) == len(set(DNA_names)), "DNA names are overlaped"
-        assert len(Reaction_names) == len(
-            set(Reaction_names)
-        ), "Reaction names are overlaped"
+        if len(DNA_names) + len(Reaction_names) != len(set(DNA_names + Reaction_names)):
+            if len(DNA_names) != len(set(DNA_names)):
+                for i in DNA_names:
+                    if DNA_names.count(i) > 1:
+                        st.error(f"Check DNA names: {i} is Overlaped")
+                        
+            elif len(Reaction_names) != len(set(Reaction_names)):
+                for i in Reaction_names:
+                    if Reaction_names.count(i) > 1:
+                        st.error(f"Check Reaction names: {i} is Overlaped")
+    
+            else:
+                for i in set(DNA_names) & set(Reaction_names):
+                    st.error(f"Check DNA and Reaction names: {i} is Overlaped")
+            st.stop()
+            
         for i in TF_names:
-            if pd.isna(i) or i == "None" or i == "":
+            if pd.isna(i) or i == "":
                 continue
             assert i in Reaction_names or i in DNA_names, f"Check TF names: {i} is not in Reaction Name"
         del TF_names, Reaction_names

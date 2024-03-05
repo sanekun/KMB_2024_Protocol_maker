@@ -48,8 +48,7 @@ def find_materials_well(material, type: ["DNA", "Enzyme"],
     # right_well means well of right side of plate (for abstraction)
 
     if type == "DNA":
-        for i in PARAMETERS["Plates"].keys():
-            plate = PARAMETERS["Plates"][i]
+        for plate in PARAMETERS["Plates"].values():
             if plate["type"] != "TF":
                 for well in plate["data"].keys():
                     if plate["data"][well] == material:
@@ -227,13 +226,13 @@ def run(protocol: protocol_api.ProtocolContext):
             block_max_volume=final_volume
         )
         profile = [
-            {"temperature": 94, "hold_time_seconds": 15},
-            {"temperature": 55, "hold_time_seconds": 10},
+            {"temperature": 94, "hold_time_seconds": 20},
+            {"temperature": 57, "hold_time_seconds": 15},
             {"temperature": 68, "hold_time_seconds": int(PARAMETERS["Parameters"]["PCR_extension_time"])},
         ]
         tc_mod.execute_profile(
             steps=profile,
-            repetitions=25,
+            repetitions=30,
             block_max_volume=final_volume
         )
         tc_mod.set_block_temperature(
