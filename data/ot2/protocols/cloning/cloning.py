@@ -249,8 +249,11 @@ def load_previous_protocol():
             tmp2.columns = tmp2.columns.map(str)
             st.session_state[f"{target_type}_plate_{n}_df"].update(tmp2)
     
-    # Reaction Table
-
+    # Reaction Table & Volumes
+    for reaction in params["Reactions"].values():
+        st.session_state[f"{reaction['type']}_plate_{0}_df"] = pd.DataFrame.from_dict(reaction['data'])
+        # st.session_state[f"{reaction['type']}_volume"] = pd.DataFrame.from_dict(params["Reaction_volume"][f"{reaction}"], orient='index').T
+        # Volume 입력 구조를 변경해야함.
 
 def main():
     plate_types = ["source", "Reaction", "TF"]
@@ -541,6 +544,7 @@ def main():
         Assembly_volume = pd.DataFrame(
             columns=st.session_state["Assembly_plate_0_df"].columns
         ).drop(columns=["Name"])
+        
         Assembly_volume.loc[0, ["DNA1", "DNA2", "Enzyme1", "DW"]] = ["1.5", "1.5", "4", "8"]
 
         st.markdown("### PCR volume")
@@ -643,12 +647,24 @@ def main():
         Reaction_names = [i for i in Reaction_names if i != "nan"]
         TF_names = [i for i in TF_names if i != "nan"]
 
-        assert len(DNA_names) == len(set(DNA_names)), "DNA names are overlaped"
-        assert len(Reaction_names) == len(
-            set(Reaction_names)
-        ), "Reaction names are overlaped"
+        if len(DNA_names) + len(Reaction_names) != len(set(DNA_names + Reaction_names)):
+            if len(DNA_names) != len(set(DNA_names)):
+                for i in DNA_names:
+                    if DNA_names.count(i) > 1:
+                        st.error(f"Check DNA names: {i} is Overlaped")
+                        
+            elif len(Reaction_names) != len(set(Reaction_names)):
+                for i in Reaction_names:
+                    if Reaction_names.count(i) > 1:
+                        st.error(f"Check Reaction names: {i} is Overlaped")
+    
+            else:
+                for i in set(DNA_names) & set(Reaction_names):
+                    st.error(f"Check DNA and Reaction names: {i} is Overlaped")
+            st.stop()
+            
         for i in TF_names:
-            if pd.isna(i) or i == "None" or i == "":
+            if pd.isna(i) or i == "":
                 continue
             assert i in Reaction_names or i in DNA_names, f"Check TF names: {i} is not in Reaction Name"
         del TF_names, Reaction_names
