@@ -143,7 +143,7 @@ def transfer_materials(key, p20, p300, mix_last=(0,0)):
 
         # Mix Product
         if sum(mix_last):
-            flow_rate(p20, aspirate=5, dispense=10, blow_out=10)
+            flow_rate(p20, aspirate=10, dispense=10, blow_out=10)
             p20.pick_up_tip()
             for _ in range(mix_last[0]):
                 p20.aspirate(mix_last[1], dest.bottom())
@@ -218,6 +218,7 @@ def run(protocol: protocol_api.ProtocolContext):
         discord_message(f"PCR Start")
         transfer_materials(key=reaction, p20=p20, p300=p300, mix_last=(2, 15))
         ## Thermocycler
+        discord_message(f"Thermocycler in PCR start RUN take off Enzyme")
         tc_mod.close_lid()
         tc_mod.set_lid_temperature(100)
         tc_mod.set_block_temperature(
@@ -227,7 +228,7 @@ def run(protocol: protocol_api.ProtocolContext):
         )
         profile = [
             {"temperature": 94, "hold_time_seconds": 20},
-            {"temperature": 57, "hold_time_seconds": 15},
+            {"temperature": 55, "hold_time_seconds": 20},
             {"temperature": 68, "hold_time_seconds": int(PARAMETERS["Parameters"]["PCR_extension_time"])},
         ]
         tc_mod.execute_profile(
@@ -262,10 +263,11 @@ def run(protocol: protocol_api.ProtocolContext):
         discord_message(f"Assembly Start")
 
         transfer_materials(list(PARAMETERS["Reactions"].keys())[1], p20=p20, p300=p300, mix_last=(2, 10))
+        discord_message(f"Thermocycler in Assembly start RUN remove Enzyme")
         ## Thermocycler
         tc_mod.close_lid()
         tc_mod.set_lid_temperature(100)
-        
+
         ### DpnI
         tc_mod.set_block_temperature(
             temperature=37,
@@ -374,7 +376,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
         # Add media for recovery
         #start_time = time.time()
-        p300.transfer(40, src, dest,
+        p300.transfer(60, src, dest,
                     new_tip="always", touch_tip=False, disposal_volume=5,
                     blow_out=False, trash=not debug)
         protocol.delay(seconds=30)
@@ -391,17 +393,17 @@ def run(protocol: protocol_api.ProtocolContext):
         # Recovery
         tc_mod.set_block_temperature(temperature=37,
                                      hold_time_minutes=int(int(PARAMETERS["Parameters"]["TF_recovery_time"])/2))
-        
+
         for dest_well in dest:
             p300.pick_up_tip()
             for _ in range(2):
                 p300.aspirate(40, dest_well)
                 p300.dispense(40, dest_well.bottom(z=5))
             p300.drop_tip()
-            
+
         tc_mod.set_block_temperature(temperature=37,
                                         hold_time_minutes=int(int(PARAMETERS["Parameters"]["TF_recovery_time"])/2))
-        
+
         #total_duration = int(PARAMETERS["Parameters"]["TF_recovery_time"]) * 60
         #start_time = time.time()
         #end_time = start_time + total_duration
@@ -423,7 +425,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
         # Spotting
         spotting_volume = 4
-        flow_rate(p20, aspirate=8, dispense=8, blow_out=8)
+        flow_rate(p20, aspirate=8, dispense=15, blow_out=15)
         for i in PARAMETERS["Plates"].keys():
             plate = PARAMETERS["Plates"][i]
             if plate["type"] != "TF":
@@ -437,7 +439,7 @@ def run(protocol: protocol_api.ProtocolContext):
                     dest = [plate['Deck'][well] for well, value in plate["data"].items() if value == sample]
                     p20.pick_up_tip()
                     # Mix Sample
-                    for _ in range(2):
+                    for _ in range(3):
                         p20.aspirate(20, src)
                         p20.dispense(20, src.bottom(z=4))
                     # Dispense Sample
