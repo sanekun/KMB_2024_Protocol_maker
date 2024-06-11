@@ -220,7 +220,7 @@ def run(protocol: protocol_api.ProtocolContext):
         ## Thermocycler
         discord_message(f"Thermocycler in PCR start RUN take off Enzyme")
         tc_mod.close_lid()
-        tc_mod.set_lid_temperature(100)
+        tc_mod.set_lid_temperature(95)
         tc_mod.set_block_temperature(
             temperature=94,
             hold_time_seconds=30,
@@ -266,7 +266,7 @@ def run(protocol: protocol_api.ProtocolContext):
         discord_message(f"Thermocycler in Assembly start RUN remove Enzyme")
         ## Thermocycler
         tc_mod.close_lid()
-        tc_mod.set_lid_temperature(100)
+        tc_mod.set_lid_temperature(95)
 
         ### DpnI
         tc_mod.set_block_temperature(
@@ -336,7 +336,7 @@ def run(protocol: protocol_api.ProtocolContext):
             for name in unique_sample
         ]
 
-        CP_cell_volume = 40
+        CP_cell_volume = 45
         ## Mix CP cell
         p300.pick_up_tip()
         for _ in range(2):
@@ -376,7 +376,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
         # Add media for recovery
         #start_time = time.time()
-        p300.transfer(60, src, dest,
+        p300.transfer(100, src, dest,
                     new_tip="always", touch_tip=False, disposal_volume=5,
                     blow_out=False, trash=not debug)
         protocol.delay(seconds=30)
