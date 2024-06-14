@@ -1,6 +1,6 @@
 import streamlit as st
 from multiapp import MultiApp
-from data.ot2.protocols.cloning import cloning
+from apps import cloning
 st.set_page_config(layout="wide")
 app = MultiApp()
 

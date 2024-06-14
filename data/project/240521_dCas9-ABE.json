@@ -1,0 +1,23 @@
+{
+    "Name": "240521_dCas9-ABE",
+    "Date": "24-05-21",
+    "Author": "Kun",
+    "Design": "pRSFduet1_dCas9-ABE.gb",
+    "Type": "Plasmid",
+    "Process": {
+        "Design": "Benchling",
+        "Oligo": "Macrogen",
+        "Cloning": "240527_OT-2",
+        "Sequencing": "240614_kun-Barcode49",
+        "Stock": "kun_stock2-I7:8"
+    },
+    "Build":{
+        "PCR": {
+            "duet_CDS_assemble": ["pRSFduet1", "CDS_assembly_BF", "CDS_assembly_BR"],
+            "duet-DmpR-1": ["DmpR", "Duet_DmpR_FWD", "Duet_DmpR_REV"]
+        },
+        "Gibson":{
+            "pRSFduet1_WT-DmpR": ["duet_CDS_assemble", "duet-DmpR-1"]
+        }
+    }
+}
