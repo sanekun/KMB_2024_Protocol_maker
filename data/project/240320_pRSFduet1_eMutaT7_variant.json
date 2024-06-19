@@ -2,25 +2,25 @@
     "Name": "240320_pRSFduet1_eMutaT7_variant",
     "Date": "24-03-20",
     "Author": "Kun",
-    "Design": "pRSFduet1_eMutaT7-UGI",
+    "Design": "pRSFduet1_eMutaT7-UGI.gb",
     "Type": "Library",
     "Process": {
         "Design": "Benchling",
         "Oligo": "Macrogen",
-        "Cloning": "240410_OT-2",
-        "Sequencing": "240514_kun-Barcode49",
+        "Build": "240410_OT-2",
+        "Sequencing": "240514_kun-Barcode43",
         "Stock": ""
     },
     "Build":{
         "PCR": {
-            "duet_eM_P226L": ["pRSFduet1_eMutaT7-UGI", "T7pol_P226L_FWD", "T7pol_P226L_REV"],
-            "duet_eM_Q568A": ["pRSFduet1_eMutaT7-UGI", "T7pol_Q568A_FWD", "T7pol_Q568A_REV"],
-            "duet_eM_Y639D": ["pRSFduet1_eMutaT7-UGI", "T7pol_Y639D_FWD", "T7pol_Y639D_REV"],
+            "duet_eM_P226L": ["pRSFduet1_eMutaT7-UGI", "T7pol_P226L_FWD", "T7pol_P226L_REV", "[E]KODone", "[E]DW"],
+            "duet_eM_Q568A": ["pRSFduet1_eMutaT7-UGI", "T7pol_Q568A_FWD", "T7pol_Q568A_REV", "[E]KODone", "[E]DW"],
+            "duet_eM_Y639D": ["pRSFduet1_eMutaT7-UGI", "T7pol_Y639D_FWD", "T7pol_Y639D_REV", "[E]KODone", "[E]DW"]
         },
         "Gibson":{
-            "pRSFduet1_eM_P226L": ["duet_eM_P226L"],
-            "pRSFduet1_eM_Q568A": ["duet_eM_Q568A"],
-            "pRSFduet1_eM_Y639D": ["duet_eM_Y639D"]
+            "pRSFduet1_eM_P226L": ["duet_eM_P226L", "[E]GibsonMix", "[E]DW"],
+            "pRSFduet1_eM_Q568A": ["duet_eM_Q568A", "[E]GibsonMix", "[E]DW"],
+            "pRSFduet1_eM_Y639D": ["duet_eM_Y639D", "[E]GibsonMix", "[E]DW"]
         }
     }
 }

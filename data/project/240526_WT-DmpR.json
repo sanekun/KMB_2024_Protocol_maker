@@ -1,0 +1,23 @@
+{
+    "Name": "240526_WT-DmpR",
+    "Date": "24-05-26",
+    "Author": "Kun",
+    "Design": "pRSFduet1_WT-DmpR.gb",
+    "Type": "Plasmid",
+    "Process": {
+        "Design": "Benchling",
+        "Oligo": "Macrogen",
+        "Build": "240527_OT-2",
+        "Sequencing": "240614_kun-Barcode48",
+        "Stock": "kun_stock2-I5:6"
+    },
+    "Build":{
+        "PCR": {
+            "duet_CDS_assemble": ["pRSFduet1", "CDS_assembly_BF", "CDS_assembly_BR", "[E]KODone", "[E]DW"],
+            "duet-DmpR-1": ["DmpR", "Duet_DmpR_FWD", "Duet_DmpR_REV", "[E]KODone", "[E]DW"]
+        },
+        "Gibson":{
+            "pRSFduet1_WT-DmpR": ["duet_CDS_assemble", "duet-DmpR-1", "[E]GibsonMix", "[E]DW"]
+        }
+    }
+}

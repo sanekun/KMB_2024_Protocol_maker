@@ -1,0 +1,157 @@
+{
+    "Meta": {
+      "Task": "OT-2 cloning",
+      "version": "2.1",
+      "workflow": [
+        "PCR_1",
+        "Gibson_2",
+        "Transformation_3"
+      ],
+      "Messenger": "kun"
+    },
+    "Plate": {
+      "Source_1": {
+        "name": "Source_plate_1_name",
+        "type": "Source",
+        "data": {
+          "A1": "pCC1BAC",
+          "B1": "pCC1_BsaI_F",
+          "C1": "pCC1_BsaI_R",
+          "D1": "pACBB_T7pad",
+          "E1": "T7pad_F",
+          "F1": "T7pad_R",
+          "G1": "pRSFduet1",
+          "H1": "CDS_assembly_BF",
+          "A2": "CDS_assembly_BR",
+          "B2": "DmpR",
+          "C2": "Duet_DmpR_FWD",
+          "D2": "Duet_DmpR_REV"
+        }
+      },
+      "Destination_1": {
+        "name": "Destination_1",
+        "type": "Destination",
+        "data": {
+          "A1": "pCC1BAC_BsaI_frag",
+          "B1": "T7pad",
+          "C1": "pCC1BAC_BsaI_T7pad",
+          "D1": "duet_CDS_assemble",
+          "E1": "duet-DmpR-1",
+          "F1": "pRSFduet1_WT-DmpR"
+        }
+      }
+    },
+    "Workflow": {
+      "PCR_1": {
+        "type": "PCR",
+        "data": {
+          "0": {
+            "0": "pCC1BAC",
+            "1": "pACBB_T7pad",
+            "2": "pRSFduet1",
+            "3": "DmpR"
+          },
+          "1": {
+            "0": "pCC1_BsaI_F",
+            "1": "T7pad_F",
+            "2": "CDS_assembly_BF",
+            "3": "Duet_DmpR_FWD"
+          },
+          "2": {
+            "0": "pCC1_BsaI_R",
+            "1": "T7pad_R",
+            "2": "CDS_assembly_BR",
+            "3": "Duet_DmpR_REV"
+          },
+          "3": {
+            "0": "[E]KODone",
+            "1": "[E]KODone",
+            "2": "[E]KODone",
+            "3": "[E]KODone"
+          },
+          "4": {
+            "0": "[E]DW",
+            "1": "[E]DW",
+            "2": "[E]DW",
+            "3": "[E]DW"
+          },
+          "Name": {
+            "0": "pCC1BAC_BsaI_frag",
+            "1": "T7pad",
+            "2": "duet_CDS_assemble",
+            "3": "duet-DmpR-1"
+          }
+        }
+      },
+      "Gibson_2": {
+        "type": "Gibson",
+        "data": {
+          "0": {
+            "0": "pCC1BAC_BsaI_frag",
+            "1": "duet_CDS_assemble"
+          },
+          "1": {
+            "0": "T7pad",
+            "1": "duet-DmpR-1"
+          },
+          "2": {
+            "0": "[E]HotPhusion",
+            "1": "[E]GibsonMix"
+          },
+          "3": {
+            "0": "[E]DW",
+            "1": "[E]DW"
+          },
+          "Name": {
+            "0": "pCC1BAC_BsaI_T7pad",
+            "1": "pRSFduet1_WT-DmpR"
+          }
+        }
+      },
+      "Transformation_3_1": {
+        "name": "Transformation_3_plate_1_name",
+        "type": "Transformation",
+        "data": {}
+      }
+    },
+    "Workflow_volume": {
+      "PCR_1": [
+        "1",
+        "0.5",
+        "0.5",
+        "12.5",
+        "10.5"
+      ],
+      "Gibson_2": [
+        "2",
+        "2",
+        "5",
+        "1"
+      ]
+    },
+    "Deck": {
+      "Enzyme_position": {
+        "[E]KODone": "A1",
+        "[E]DW": "A2",
+        "[E]HotPhusion": "A3",
+        "[E]GibsonMix": "A4",
+        "CPcell": "A5",
+        "SOC": "A6"
+      },
+      "Deck_position": {
+        "Enzyme_tube": 1,
+        "p20_tip": 2,
+        "p300_tip": 3,
+        "Source_1": 4,
+        "Destination_1": 7,
+        "Transformation_3_1": 5
+      }
+    },
+    "Parameter": {
+      "stop_reaction": true,
+      "annealing": 57,
+      "pcr_extension": 25,
+      "tf_recovery": 40,
+      "num_of_tips": "NULL"
+    }
+  }

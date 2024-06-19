@@ -6,6 +6,7 @@ import json
 from datetime import datetime
 from data.ot2.protocols.cloning.check_protocol import *
 
+# st.session_state.messenger = "kun"
 # Statics
 def empty_plate_df():
     # Empty 96-well plate DataFrame

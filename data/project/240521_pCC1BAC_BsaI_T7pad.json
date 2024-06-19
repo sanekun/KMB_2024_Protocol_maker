@@ -1,0 +1,23 @@
+{
+    "Name": "240521_pCC1BAC_BsaI_T7pad",
+    "Date": "24-05-21",
+    "Author": "Kun",
+    "Design": "pcc1bac_bsai_t7pad.gb",
+    "Type": "Plasmid",
+    "Process": {
+        "Design": "Benchling",
+        "Oligo": "Macrogen",
+        "Build": "240527_OT-2",
+        "Sequencing": "240614_kun-Barcode49",
+        "Stock": "kun_stock2-I7:8"
+    },
+    "Build":{
+        "PCR": {
+            "pCC1BAC_BsaI_frag": ["pCC1BAC", "pCC1_BsaI_F", "pCC1_BsaI_R", "[E]KODone", "[E]DW"],
+            "T7pad": ["pACBB_T7pad", "T7pad_F", "T7pad_R", "[E]KODone", "[E]DW"]
+        },
+        "Gibson":{
+            "pCC1BAC_BsaI_T7pad": ["pCC1BAC_BsaI_frag", "T7pad", "[E]HotPhusion", "[E]DW"]
+        }
+    }
+}

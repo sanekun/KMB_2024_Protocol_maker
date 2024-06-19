@@ -3,7 +3,10 @@ runOnSave = true
 headless = true
 # sslCertFile = "./.streamlit/server.crt"
 # sslKeyFile = "./.streamlit/server.key"
-port = 5003
+port = 5005
 
 [browser]
 gatherUsageStats = false
+
+[theme]
+base="light"
