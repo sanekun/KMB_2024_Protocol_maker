@@ -204,14 +204,29 @@ initial_tables = {
     "empty": empty_plate_df(),
     "PCR": pd.DataFrame({
                 "Name": [None],
+                "0": [None],
                 "1": [None],
                 "2": [None],
-                "3": [None],
-                "4": ["PCRmix"],
-                "5": ["DW"],
+                "3": ["[E]PCRmix"],
+                "4": ["[E]DW"],
             }),
-    "Gibson": pd.DataFrame({'Name': [None, None, '[E]Gibsonmix', '[E]DW']}).T,
-    "GGA": pd.DataFrame({'Name': [None, None, None, '[E]BsaI', '[E]T4_ligase', '[E]Buffer', '[E]DW']}).T
+    "Gibson": pd.DataFrame({
+                "Name": [None],
+                "0": [None],
+                "1": [None],
+                "2": ["[E]Gibsonmix"],
+                "3": ["[E]DW"],
+            }),
+    "GGA": pd.DataFrame({
+                "Name": [None],
+                "0": [None],
+                "1": [None],
+                "2": [None],
+                "3": ["[E]BsaI"],
+                "4": ["[E]T4_ligase"],
+                "5": ["[E]Buffer"],
+                "6": ["[E]DW"],
+            })
     }
 
 # Main
@@ -316,7 +331,7 @@ with mid_col[1]:
                 if workflow.split('_')[0] == 'Transformation':
                     plate_table(workflow, use_name=True)
                 else:
-                    workflow_table(workflow)
+                    workflow_table(workflow) # 여기서는 정상
         # Use loaded Project
         else:
             # 로드된 것 중 가장 긴 프로젝트 선택
@@ -358,10 +373,10 @@ with st.expander("Parameters", expanded=True):
             if workflow.startswith('Transformation'):
                 continue
             st.markdown(f'### {workflow} volume')
-            df = state[f"{workflow}_edit_table"]
-            df = df.dropna(axis=1, how='all')
-            df.drop(["Name"], axis=1, inplace=True)
-            df.reset_index(inplace=True, drop=True)
+            df = (state[f"{workflow}_edit_table"]
+                  .drop(["Name"], axis=1, inplace=False)
+                  .dropna(axis=1, how='all')
+                  .reset_index(drop=True, inplace=False))
             # remove all values in df
             df = df.iloc[[0], :]
             df.loc[:, :] = None
@@ -373,6 +388,7 @@ with st.expander("Parameters", expanded=True):
             elif workflow.startswith('GGA'):
                 df.loc[0, ['0', '1', '2', '3', '4', '5', '6']] = ['1', '1', '1', '1', '0.5', '2.5', '3']
 
+            df = df[sorted(df.columns)]
             state[f"{workflow}_edit_volume"] = st.data_editor(df, use_container_width=True, key=f"{workflow}_volume",
                                                               hide_index=True)
         
@@ -481,6 +497,7 @@ with end_col[0]:
         
         # Deck
         ## Materials
+        use_tf = False
         materials, enzymes, dnas, products = [], [], [], []
         for workflow in state.workflow:
             if workflow.startswith("Transformation"):

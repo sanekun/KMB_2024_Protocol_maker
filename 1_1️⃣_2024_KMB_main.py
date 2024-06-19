@@ -5,13 +5,8 @@ import streamlit as st
 import requests
 import json
 from streamlit import session_state as state
-import base64
+from streamlit_pdf_viewer import pdf_viewer
 
-def show_pdf(file_path):
-    with open(file_path, "rb") as f:
-        base64_pdf = base64.b64encode(f.read()).decode("utf-8")
-    pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="800" height="800" type="application/pdf"></iframe>'
-    return pdf_display
 
 def discord_message(message, user="kun"):
     if user == "None":
@@ -23,10 +18,6 @@ def discord_message(message, user="kun"):
     headers = {"Content-Type": "application/json"}
     data = {"content": message}
     response = requests.post(url, headers=headers, data=json.dumps(data), verify=False)
-
-@st.cache_data
-def get_pdf(path):
-    return show_pdf(path)
 
 if __name__ == '__main__':
     st.set_page_config("KMB_2024", layout="wide", initial_sidebar_state="expanded", page_icon="1️⃣")
@@ -73,8 +64,7 @@ st.page_link("https://sblab.or.kr/", label="KRIBB SBL", icon="🏠")
 
 # PDF 띄우기
 with st.expander("POSTER VIEWER", expanded=True):
-    pdf_display = get_pdf("data/2024_KMB_poster.pdf")
-    st.markdown(pdf_display, unsafe_allow_html=True)
+    pdf_viewer("data/2024_KMB_poster.pdf")
 
 with st.form("Send Message"):
     mail_title = st.text_input("Title", placeholder="Question from KMB")

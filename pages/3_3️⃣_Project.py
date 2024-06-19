@@ -75,17 +75,17 @@ df.columns = state.load_project['Process'].keys()
 st.dataframe(df, use_container_width=True, hide_index=True)
 
 st.markdown("## Design")
-with st.expander("## Vector Map", expanded=False):
+with st.container(border=True, height=550):
     reference = get_reference(f"data/reference/{state.load_project['Design']}")
     
-    if False:
+    if True:
         if reference:
-            result = streamlit_seqviz(name = reference['name'],
-                        seq = reference['seq'],
-                        annotations = reference['annotations'],
-                        style =  { "height": "100vh", "width": "100vw" },
-                        highlights=[{}],
-                        enzymes = ["BsaI"])
+            streamlit_seqviz(name = reference['name'],
+                             seq = reference['seq'],
+                             annotations = reference['annotations'],
+                             style =  { "height": "100vh", "width": "100vw" },
+                             highlights=[{}],
+                             enzymes = ["BsaI"])
 
 
 st.markdown("## Build")
