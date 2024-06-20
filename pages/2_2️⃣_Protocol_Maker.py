@@ -7,12 +7,16 @@ from pathlib import Path
 if __name__ == '__main__':
     st.set_page_config(page_title='Cloning', layout='wide')
 
-st.sidebar.title("Protocol Maker")
-st.sidebar.subheader("by Seong-Kun Bak *sanekun@kribb.re.kr*")
+st.sidebar.title("2024 KMB")
+st.sidebar.subheader("by Seong-Kun Bak *sanekun@kaist.ac.kr*")
 st.sidebar.markdown("---")
+st.sidebar.markdown("""
+                    The `Protocol Maker` can translate Research note like format (human) to machine-readable format.  
+                    It also can convert automated protocol (script) of each devices.  
+                    So that, `Protocol Maker` can connect human with machine easily.  
+                    And unifies input from of multiple devices into one.
+                    """)
 st.sidebar.selectbox("Messenger", ['Kun', ''], key='messenger', disabled=True, help="Send Messeage while Protocol is in Progress")
-st.sidebar.text("")
-st.sidebar.markdown("---")
 
 # def
 def check_project():

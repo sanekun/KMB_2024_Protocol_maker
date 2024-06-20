@@ -53,9 +53,14 @@ if 'project' not in state:
 if 'load_project' not in state:
     state.load_project = None
 
-st.sidebar.title("Protocol Maker")
-st.sidebar.subheader("by Seong-Kun Bak *sanekun@kribb.re.kr*")
+st.sidebar.title("2024 KMB")
+st.sidebar.subheader("by Seong-Kun Bak *sanekun@kaist.ac.kr*")
 st.sidebar.markdown("---")
+st.sidebar.markdown("## Author Comments")
+st.sidebar.markdown("""
+                    This page show how we integrate different type of data based-on sample.
+                    """)
+
 
 st.markdown("# Project")
 st.selectbox('Load Project', state.project, 

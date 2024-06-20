@@ -23,9 +23,20 @@ if __name__ == '__main__':
     st.set_page_config("KMB_2024", layout="wide", initial_sidebar_state="expanded", page_icon="1️⃣")
     # Menu Items
 
-st.sidebar.title("Protocol Maker")
-st.sidebar.subheader("by Seong-Kun Bak *sanekun@kribb.re.kr*")
+st.sidebar.title("2024 KMB")
+st.sidebar.subheader("by Seong-Kun Bak *sanekun@kaist.ac.kr*")
 st.sidebar.markdown("---")
+st.sidebar.markdown("## Author Comments")
+st.sidebar.markdown("""
+                    In this Web-App we introduce how we integrate softwares included biofoundry.  
+                    2️⃣_Protocol_Maker, 4️⃣_Sequencing are stand-alone softwares they collect whole data from their own devices such as automated protocol, Sequencing Result  
+                    
+                    Then, 3️⃣_Project connect all of data based-on sample.  
+                    It make it easier for us to watch the research situation.  
+                    And also the other progress or devices integrated in biofoundry can refer data(parameters) through collected DB.  
+                    
+                    With this Application, we introduce the importance of software and their connectivity in biofoundry.
+                    """)
 
 if "language" not in state:
     state["language"] = 0
@@ -39,7 +50,7 @@ if "english" not in state:
 # 페이지에 대한 설명 (영어, 한글)
 st.markdown("# Toward Automated workflows for synthetic biology")
 st.markdown("Author: Seong-Kun Bak <sanekun@kaist.ac.kr>")
-with st.expander("Description", expanded=True):
+with st.expander("Author Comments", expanded=True):
     cols = st.columns([1,1,1,1])
     if cols[0].button("한국어", use_container_width=True,
                       type='secondary' if state.language else 'primary'):
@@ -47,7 +58,6 @@ with st.expander("Description", expanded=True):
         st.rerun()
     if cols[1].button("English", use_container_width=True,
                       type='primary' if state.language else 'secondary',
-                      disabled=True,
                       help="Working"):
         state.language = 1
         st.rerun()
